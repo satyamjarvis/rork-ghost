@@ -188,8 +188,8 @@ export default function MultiplayerGameScreen() {
   const startFallingLettersAnimation = useCallback((isPlayer1Winner: boolean, letters: { letter: string; points: number }[]) => {
     console.log('[FALLING] startFallingLettersAnimation called', { isPlayer1Winner, letterCount: letters.length, wordBoardPosition });
     
-    if (!wordBoardPosition) {
-      console.log('[FALLING] No word board position, skipping falling animation');
+    if (!wordBoardPosition || letters.length === 0) {
+      console.log('[FALLING] No word board position or no letters, skipping animation');
       letters.forEach((letterData) => {
         if (isPlayer1Winner) {
           setPlayer1Points(prev => prev + letterData.points);
@@ -199,79 +199,72 @@ export default function MultiplayerGameScreen() {
       });
       
       setTimeout(() => {
-        Animated.sequence([
-          Animated.delay(1500),
-          Animated.timing(announcementOpacity, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
+        Animated.timing(announcementOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(() => {
           setRoundWinnerAnnouncement(null);
         });
-      }, 0);
+      }, 1500);
       return;
     }
 
+    // Step 1: Just animate the FIRST letter falling 200px down
+    const firstLetter = letters[0];
+    const fallAnim = new Animated.Value(0);
     const tileWidth = getLetterTileWidth();
     const totalWidth = letters.length * (tileWidth + 8);
     const startXBase = wordBoardPosition.x - totalWidth / 2;
+    const startX = startXBase + tileWidth / 2;
+    const startY = wordBoardPosition.y;
 
-    letters.forEach((letterData, index) => {
-      const delay = index * 150;
-      const fallAnim = new Animated.Value(0);
-      const startX = startXBase + index * (tileWidth + 8) + tileWidth / 2;
-      const startY = wordBoardPosition.y;
+    const fallingLetter: FallingLetter = {
+      id: `falling-${Date.now()}-0`,
+      letter: firstLetter.letter,
+      index: 0,
+      points: firstLetter.points,
+      fallAnim,
+      startX,
+      startY,
+      randomXOffset: 0,
+      randomRotation: 0,
+    };
 
-      const fallingLetter: FallingLetter = {
-        id: `falling-${Date.now()}-${index}`,
-        letter: letterData.letter,
-        index,
-        points: letterData.points,
-        fallAnim,
-        startX,
-        startY,
-        randomXOffset: (Math.random() - 0.5) * 60,
-        randomRotation: (Math.random() - 0.5) * 60,
-      };
+    // Wait 1 second after announcement, then animate
+    setTimeout(() => {
+      console.log('[FALLING] Starting first letter animation:', fallingLetter.letter);
+      setFallingLetters([fallingLetter]);
 
-      setTimeout(() => {
-        console.log('[FALLING] Adding falling letter:', { letter: letterData.letter, index, id: fallingLetter.id });
-        setFallingLetters(prev => {
-          console.log('[FALLING] Current fallingLetters count:', prev.length);
-          return [...prev, fallingLetter];
-        });
-
-        Animated.timing(fallAnim, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }).start(() => {
+      Animated.timing(fallAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        console.log('[FALLING] First letter animation complete');
+        // Add all points at once for now
+        letters.forEach((letterData) => {
           if (isPlayer1Winner) {
             setPlayer1Points(prev => prev + letterData.points);
           } else {
             setPlayer2Points(prev => prev + letterData.points);
           }
-          
-          if (Platform.OS !== 'web') {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }
-
-          setFallingLetters(prev => prev.filter(l => l.id !== fallingLetter.id));
         });
-      }, delay);
-    });
-
-    const totalAnimationTime = letters.length * 150 + 600 + 500;
-    setTimeout(() => {
-      Animated.timing(announcementOpacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start(() => {
-        setRoundWinnerAnnouncement(null);
+        
+        setFallingLetters([]);
+        
+        // Fade out announcement
+        setTimeout(() => {
+          Animated.timing(announcementOpacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }).start(() => {
+            setRoundWinnerAnnouncement(null);
+          });
+        }, 500);
       });
-    }, totalAnimationTime);
+    }, 1000);
   }, [wordBoardPosition, announcementOpacity]);
 
   useEffect(() => {
@@ -983,31 +976,16 @@ export default function MultiplayerGameScreen() {
 
       {fallingLetters.map((item) => {
         console.log('[FALLING] Rendering falling letter:', item.letter, item.id);
-        const targetY = 400;
         
+        // Step 1: Simple animation - move straight down 200px, then fade out
         const translateY = item.fallAnim.interpolate({
-          inputRange: [0, 0.3, 0.7, 1],
-          outputRange: [0, targetY * 0.2, targetY * 0.6, targetY],
-        });
-        
-        const translateX = item.fallAnim.interpolate({
           inputRange: [0, 1],
-          outputRange: [0, item.randomXOffset],
+          outputRange: [0, 200],
         });
         
         const opacity = item.fallAnim.interpolate({
-          inputRange: [0, 0.7, 1],
+          inputRange: [0, 0.8, 1],
           outputRange: [1, 1, 0],
-        });
-        
-        const scale = item.fallAnim.interpolate({
-          inputRange: [0, 0.5, 1],
-          outputRange: [1, 0.8, 0.5],
-        });
-        
-        const rotate = item.fallAnim.interpolate({
-          inputRange: [0, 1],
-          outputRange: ['0deg', `${item.randomRotation}deg`],
         });
 
         return (
@@ -1019,10 +997,7 @@ export default function MultiplayerGameScreen() {
                 left: item.startX - 25,
                 top: item.startY - 30,
                 transform: [
-                  { translateX },
                   { translateY },
-                  { scale },
-                  { rotate },
                 ],
                 opacity,
               },
