@@ -1151,29 +1151,7 @@ export default function GameScreen() {
                       </>
                     ) : null}
                   </View>
-                  {gameState.phase === 'challenge' && gameState.currentPlayer === 'player1' && (
-                    <View style={styles.challengeInstructions}>
-                      <AlertCircle color={COLORS.gold} size={24} />
-                      <Text style={styles.challengeInstructionsText}>
-                        Add letters to complete the word on the board
-                      </Text>
-                    </View>
-                  )}
-                  {gameState.phase === 'challenge' && (() => {
-                    const isPlayer1 = gameState.currentPlayer === 'player1';
-                    const isChallengedPlayer = isPlayer1;
-                    
-                    return isChallengedPlayer ? (
-                      <View style={styles.challengeNotification}>
-                        <View style={styles.challengeNotificationContent}>
-                          <AlertCircle color="#FF6B6B" size={18} />
-                          <Text style={styles.challengeNotificationText}>
-                            You&apos;ve been challenged! Prove &quot;{gameState.originalWordBeforeChallenge || currentRound.currentWord}&quot; is valid
-                          </Text>
-                        </View>
-                      </View>
-                    ) : null;
-                  })()}
+
                 </View>
 
                 <View style={styles.bottomBar}>
@@ -1250,6 +1228,13 @@ export default function GameScreen() {
             </>
           </Animated.View>
         </SafeAreaView>
+
+        {gameState.phase === 'challenge' && gameState.currentPlayer === 'player1' && (
+          <View style={styles.challengeIndicator}>
+            <Text style={styles.challengeIndicatorTitle}>⚠️ CHALLENGED</Text>
+            <Text style={styles.challengeIndicatorSubtitle}>Spell a valid word</Text>
+          </View>
+        )}
 
         {showRoundWinner && (
           <Animated.View 
@@ -1981,48 +1966,27 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: COLORS.gold,
   },
-  challengeInstructions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  challengeInstructionsText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: COLORS.gold,
-    flex: 1,
-  },
-  challengeNotification: {
-    backgroundColor: 'rgba(255, 107, 107, 0.9)',
+  challengeIndicator: {
+    position: 'absolute' as const,
+    top: 180,
+    left: 20,
+    zIndex: 9999,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#FF6B6B',
-    shadowColor: '#FF0000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    maxWidth: 160,
   },
-  challengeNotificationContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  challengeIndicatorTitle: {
+    fontSize: 13,
+    fontWeight: '700' as const,
+    color: '#FFD700',
+    marginBottom: 2,
   },
-  challengeNotificationText: {
-    flex: 1,
-    fontSize: 12,
-    fontWeight: '600' as const,
-    color: COLORS.white,
-    lineHeight: 16,
+  challengeIndicatorSubtitle: {
+    fontSize: 11,
+    fontWeight: '500' as const,
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   bombedBanner: {
     backgroundColor: 'rgba(255, 68, 68, 0.95)',
