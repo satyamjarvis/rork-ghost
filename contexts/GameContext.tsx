@@ -17,6 +17,7 @@ export const [GameContext, useGame] = createContextHook(() => {
   const [lastLetterBombUsedBy, setLastLetterBombUsedBy] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState<boolean>(false);
   const validationInProgress = useRef<boolean>(false);
+  const [isProcessingMove, setIsProcessingMove] = useState<boolean>(false);
 
   const startGame = useCallback((mode: GameMode = 'ai') => {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -60,6 +61,13 @@ export const [GameContext, useGame] = createContextHook(() => {
   }, []);
 
   const playLetter = useCallback((letter: string) => {
+    if (isProcessingMove) {
+      console.log('[playLetter] Move already being processed, ignoring tap');
+      return;
+    }
+    
+    setIsProcessingMove(true);
+    
     setGameState(prevState => {
       if (!prevState) return null;
 
@@ -103,7 +111,7 @@ export const [GameContext, useGame] = createContextHook(() => {
     });
 
     setTimeLeft(GAME_CONFIG.TIME_PER_TURN);
-  }, []);
+  }, [isProcessingMove]);
 
   const nextRound = useCallback(() => {
     if (!gameState) return;
@@ -630,6 +638,12 @@ export const [GameContext, useGame] = createContextHook(() => {
   }, []);
 
   useEffect(() => {
+    if (gameState && gameState.currentPlayer === 'player1' && !isAIThinking) {
+      setIsProcessingMove(false);
+    }
+  }, [gameState?.currentPlayer, isAIThinking]);
+
+  useEffect(() => {
     if (!gameState || isAIThinking) return;
 
     if (gameState.mode === 'ai' && gameState.currentPlayer === 'player2') {
@@ -717,6 +731,7 @@ export const [GameContext, useGame] = createContextHook(() => {
     aiDifficulty,
     lastLetterBombUsedBy,
     isValidating,
+    isProcessingMove,
     startGame,
     playLetter,
     nextRound,

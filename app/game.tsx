@@ -14,7 +14,7 @@ import DanglingG from '@/components/DanglingG';
 
 export default function GameScreen() {
   const router = useRouter();
-  const { gameState, playLetter, isAIThinking, callWord, initiateChallenge, submitChallengeWord, letterBombActive, activateLetterBomb, useLetterBomb, lastLetterBombUsedBy, isValidating, nextRound } = useGame();
+  const { gameState, playLetter, isAIThinking, callWord, initiateChallenge, submitChallengeWord, letterBombActive, activateLetterBomb, useLetterBomb, lastLetterBombUsedBy, isValidating, isProcessingMove, nextRound } = useGame();
   const { inventory, usePowerUp } = usePlayer();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -1099,7 +1099,8 @@ export default function GameScreen() {
                           const isBombedLetter = isBomberSelectingReplacement && 
                             letter === gameState?.letterBombedLetter;
                           
-                          const isLetterBlocked = isBombedLetter;
+                          const isKeyboardDisabled = !isPlayer1Turn || isAIThinking || isProcessingMove || isValidating;
+                          const isLetterBlocked = isBombedLetter || (isKeyboardDisabled && !isBomberSelectingReplacement);
                           
                           return (
                             <Animated.View
