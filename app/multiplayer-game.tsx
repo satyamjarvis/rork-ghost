@@ -752,18 +752,7 @@ export default function MultiplayerGameScreen() {
               </View>
             </View>
 
-            {letterBombState.awaitingReplacement ? (
-              <View style={styles.bombBanner}>
-                <Bomb color={COLORS.white} size={18} />
-                <Text style={styles.bombBannerText}>
-                  Select a replacement letter (not {letterBombState.bombedLetter})
-                </Text>
-              </View>
-            ) : !isMyTurn ? (
-              <View style={styles.waitingBanner}>
-                <Text style={styles.waitingText}>Waiting for opponent...</Text>
-              </View>
-            ) : null}
+
 
             <View style={styles.wordDisplayContainer}>
               <View 
@@ -977,6 +966,25 @@ export default function MultiplayerGameScreen() {
         </Animated.View>
       )}
       
+      {letterBombState.awaitingReplacement && (
+        <View style={styles.challengeOverlay} pointerEvents="none">
+          <View style={styles.challengeBanner}>
+            <Bomb color={COLORS.white} size={18} />
+            <Text style={styles.challengeBannerText}>
+              Select a replacement letter (not {letterBombState.bombedLetter})
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {!isMyTurn && !letterBombState.awaitingReplacement && (
+        <View style={styles.waitingOverlay} pointerEvents="none">
+          <View style={styles.waitingBannerFixed}>
+            <Text style={styles.waitingTextFixed}>Waiting for opponent...</Text>
+          </View>
+        </View>
+      )}
+
       {fallingLetters.map((item) => {
         console.log('[FALLING] Rendering falling letter:', item.letter, item.id);
         const targetY = 400;
@@ -1127,36 +1135,60 @@ const styles = StyleSheet.create({
   headerRight: {
     width: 40,
   },
-  waitingBanner: {
-    backgroundColor: COLORS.whiteGlass,
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginBottom: 16,
+  challengeOverlay: {
+    position: 'absolute' as const,
+    top: 100,
+    left: 0,
+    right: 0,
     alignItems: 'center',
+    zIndex: 8000,
   },
-  waitingText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: COLORS.whiteTransparent,
-  },
-  bombBanner: {
-    backgroundColor: 'rgba(255, 100, 100, 0.3)',
+  challengeBanner: {
+    backgroundColor: 'rgba(255, 100, 100, 0.9)',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 20,
-    marginBottom: 16,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255, 100, 100, 0.5)',
+    borderColor: 'rgba(255, 100, 100, 0.8)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  bombBannerText: {
+  challengeBannerText: {
     fontSize: 14,
     fontWeight: '600' as const,
     color: COLORS.white,
+  },
+  waitingOverlay: {
+    position: 'absolute' as const,
+    top: 100,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 8000,
+  },
+  waitingBannerFixed: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  waitingTextFixed: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: COLORS.whiteTransparent,
   },
   wordDisplayContainer: {
     alignItems: 'center',
