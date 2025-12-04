@@ -186,8 +186,10 @@ export default function MultiplayerGameScreen() {
   }, []);
 
   const startFallingLettersAnimation = useCallback((isPlayer1Winner: boolean, letters: { letter: string; points: number }[]) => {
+    console.log('[FALLING] startFallingLettersAnimation called', { isPlayer1Winner, letterCount: letters.length, wordBoardPosition });
+    
     if (!wordBoardPosition) {
-      console.log('[GAME] No word board position, skipping falling animation');
+      console.log('[FALLING] No word board position, skipping falling animation');
       letters.forEach((letterData) => {
         if (isPlayer1Winner) {
           setPlayer1Points(prev => prev + letterData.points);
@@ -234,7 +236,11 @@ export default function MultiplayerGameScreen() {
       };
 
       setTimeout(() => {
-        setFallingLetters(prev => [...prev, fallingLetter]);
+        console.log('[FALLING] Adding falling letter:', { letter: letterData.letter, index, id: fallingLetter.id });
+        setFallingLetters(prev => {
+          console.log('[FALLING] Current fallingLetters count:', prev.length);
+          return [...prev, fallingLetter];
+        });
 
         Animated.timing(fallAnim, {
           toValue: 1,
@@ -281,6 +287,7 @@ export default function MultiplayerGameScreen() {
     if (player1WonRound || player2WonRound) {
       const wordPoints = calculateWordPoints(previousWordRef.current);
       console.log(`[GAME] Round ended! Word "${previousWordRef.current}" worth ${wordPoints} points`);
+      console.log('[GAME] Round winner detection:', { player1WonRound, player2WonRound, previousWord: previousWordRef.current });
       
       let winnerName = '';
       const isPlayer1Winner = player1WonRound;
@@ -306,13 +313,14 @@ export default function MultiplayerGameScreen() {
         }),
         Animated.delay(500),
       ]).start(() => {
+        console.log('[GAME] Announcement animation complete, starting falling letters');
         startFallingLettersAnimation(isPlayer1Winner, letters);
       });
     }
     
     previousRoundsWonRef.current = { player1: player1RoundsWon, player2: player2RoundsWon };
     previousRoundRef.current = currentGame.current_round;
-  }, [currentGame?.player1_rounds_won, currentGame?.player2_rounds_won, currentGame?.current_round, user?.id, opponentProfile, calculateWordPoints, currentGame?.player1_id]);
+  }, [currentGame?.player1_rounds_won, currentGame?.player2_rounds_won, currentGame?.current_round, user?.id, opponentProfile, calculateWordPoints, currentGame?.player1_id, announcementOpacity, startFallingLettersAnimation]);
 
   useEffect(() => {
     if (currentGame?.status === 'completed') {
@@ -970,6 +978,7 @@ export default function MultiplayerGameScreen() {
       )}
       
       {fallingLetters.map((item) => {
+        console.log('[FALLING] Rendering falling letter:', item.letter, item.id);
         const targetY = 400;
         
         const translateY = item.fallAnim.interpolate({
