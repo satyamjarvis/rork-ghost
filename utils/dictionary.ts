@@ -1,0 +1,149 @@
+// Common words list for AI word generation and offline fallback
+export const WORD_LIST = [
+  'ABLE', 'ABOUT', 'ABOVE', 'ACE', 'ACID', 'ACRE', 'ACT', 'ADD', 'AGE', 'AGO', 'AID', 'AIM', 'AIR', 'ALL', 'AND', 'ANT', 'ANY', 'APE', 'ARC', 'ARE', 'ARK', 'ARM', 'ART', 'ASH', 'ATE', 'BAD', 'BAG', 'BAN', 'BAR', 'BAT', 'BAY', 'BED', 'BEE', 'BET', 'BIG', 'BIN', 'BIT', 'BOW', 'BOX', 'BOY', 'BUD', 'BUG', 'BUS', 'BUT', 'BUY', 'CAB', 'CAN', 'CAP', 'CAR', 'CAT', 'COB', 'COD', 'COG', 'COT', 'COW', 'CRY', 'CUB', 'CUP', 'CUT', 'DAD', 'DAM', 'DAY', 'DEN', 'DEW', 'DID', 'DIE', 'DIG', 'DIM', 'DOC', 'DOE', 'DOG', 'DOT', 'DRY', 'DUB', 'DUE', 'DUG', 'EAR', 'EAT', 'EEL', 'EGG', 'ELF', 'ELK', 'ELM', 'EMU', 'END', 'ERA', 'EVE', 'EWE', 'EYE', 'FAN', 'FAR', 'FAT', 'FAX', 'FED', 'FEE', 'FEW', 'FIG', 'FIN', 'FIR', 'FIT', 'FLY', 'FOE', 'FOG', 'FOR', 'FOX', 'FRY', 'FUN', 'FUR', 'GAB', 'GAG', 'GAP', 'GAS', 'GAY', 'GEL', 'GEM', 'GET', 'GIG', 'GIN', 'GNU', 'GOB', 'GOD', 'GOT', 'GUM', 'GUN', 'GUT', 'GUY', 'GYM', 'HAD', 'HAM', 'HAS', 'HAT', 'HAY', 'HEM', 'HEN', 'HER', 'HEW', 'HEX', 'HID', 'HIM', 'HIP', 'HIS', 'HIT', 'HOB', 'HOD', 'HOE', 'HOG', 'HOP', 'HOT', 'HOW', 'HUB', 'HUE', 'HUG', 'HUM', 'HUT', 'ICE', 'ICY', 'ILL', 'IMP', 'INK', 'INN', 'ION', 'IRE', 'IRK', 'ITS', 'IVY', 'JAB', 'JAG', 'JAM', 'JAR', 'JAW', 'JAY', 'JET', 'JIG', 'JOB', 'JOG', 'JOT', 'JOY', 'JUG', 'KEG', 'KEN', 'KEY', 'KID', 'KIN', 'KIT', 'LAB', 'LAC', 'LAD', 'LAG', 'LAM', 'LAP', 'LAW', 'LAX', 'LAY', 'LEA', 'LED', 'LEG', 'LET', 'LID', 'LIE', 'LIP', 'LIT', 'LOG', 'LOT', 'LOW', 'LUG', 'MAD', 'MAN', 'MAP', 'MAR', 'MAT', 'MAW', 'MAX', 'MAY', 'MEN', 'MET', 'MID', 'MIX', 'MOB', 'MOD', 'MOM', 'MOP', 'MOW', 'MUD', 'MUG', 'NAB', 'NAG', 'NAP', 'NAY', 'NET', 'NEW', 'NIB', 'NIT', 'NOB', 'NOD', 'NOR', 'NOT', 'NOW', 'NUB', 'NUN', 'NUT', 'OAK', 'OAR', 'OAT', 'ODD', 'ODE', 'OFF', 'OFT', 'OIL', 'OLD', 'ONE', 'OPT', 'ORB', 'ORE', 'OUR', 'OUT', 'OWE', 'OWL', 'OWN', 'PAD', 'PAL', 'PAN', 'PAP', 'PAR', 'PAT', 'PAW', 'PAY', 'PEA', 'PEG', 'PEN', 'PEP', 'PER', 'PET', 'PEW', 'PIE', 'PIG', 'PIN', 'PIT', 'PLY', 'POD', 'POP', 'POT', 'POW', 'PRY', 'PUB', 'PUG', 'PUN', 'PUP', 'PUT', 'RAG', 'RAM', 'RAN', 'RAP', 'RAT', 'RAW', 'RAY', 'RED', 'REF', 'RIB', 'RID', 'RIG', 'RIM', 'RIP', 'ROB', 'ROD', 'ROE', 'ROT', 'ROW', 'RUB', 'RUG', 'RUN', 'RUT', 'RYE', 'SAC', 'SAD', 'SAG', 'SAP', 'SAT', 'SAW', 'SAY', 'SEA', 'SET', 'SEW', 'SHE', 'SHY', 'SIN', 'SIP', 'SIS', 'SIT', 'SIX', 'SKI', 'SKY', 'SLY', 'SOB', 'SOD', 'SON', 'SOP', 'SOT', 'SOW', 'SOY', 'SPA', 'SPY', 'STY', 'SUB', 'SUM', 'SUN', 'SUP', 'TAB', 'TAD', 'TAG', 'TAN', 'TAP', 'TAR', 'TAT', 'TAX', 'TEA', 'TEN', 'THE', 'THY', 'TIC', 'TIE', 'TIN', 'TIP', 'TOE', 'TON', 'TOO', 'TOP', 'TOT', 'TOW', 'TOY', 'TRY', 'TUB', 'TUG', 'TWO', 'URN', 'USE', 'VAN', 'VAT', 'VET', 'VIA', 'VIE', 'VOW', 'WAD', 'WAG', 'WAR', 'WAS', 'WAX', 'WAY', 'WEB', 'WED', 'WET', 'WHO', 'WHY', 'WIG', 'WIN', 'WIT', 'WOE', 'WOK', 'WON', 'WOO', 'WOW', 'YAK', 'YAM', 'YAP', 'YAW', 'YEA', 'YES', 'YET', 'YEW', 'YIN', 'YOU', 'ZAP', 'ZED', 'ZEN', 'ZIP', 'ZIT', 'ZOO',
+  'BACK', 'BAKE', 'BALL', 'BAND', 'BANK', 'BARE', 'BARK', 'BARN', 'BASE', 'BATH', 'BEAM', 'BEAN', 'BEAR', 'BEAT', 'BEEN', 'BEER', 'BELL', 'BELT', 'BEND', 'BEST', 'BILL', 'BIND', 'BIRD', 'BITE', 'BLOW', 'BLUE', 'BOAT', 'BODY', 'BOIL', 'BOLD', 'BOLT', 'BOMB', 'BOND', 'BONE', 'BOOK', 'BOOM', 'BOOT', 'BORE', 'BORN', 'BOSS', 'BOTH', 'BOWL', 'BURN', 'BUSY', 'CALL', 'CALM', 'CAME', 'CAMP', 'CARD', 'CARE', 'CART', 'CASE', 'CASH', 'CAST', 'CAVE', 'CELL', 'CENT', 'CHAT', 'CHIP', 'CITY', 'CLAP', 'CLAY', 'CLIP', 'CLUB', 'COAL', 'COAT', 'CODE', 'COIL', 'COIN', 'COLD', 'COME', 'COOK', 'COOL', 'COPE', 'COPY', 'CORD', 'CORE', 'CORK', 'CORN', 'COST', 'CRAB', 'CREW', 'CROP', 'CUBE', 'CURE', 'CURL', 'DARK', 'DATA', 'DATE', 'DAWN', 'DAYS', 'DEAD', 'DEAL', 'DEAN', 'DEAR', 'DEBT', 'DECK', 'DEEP', 'DEER', 'DESK', 'DIAL', 'DICE', 'DIET', 'DIME', 'DIRT', 'DISH', 'DISK', 'DIVE', 'DOCK', 'DOES', 'DOLL', 'DONE', 'DOOR', 'DOSE', 'DOWN', 'DRAG', 'DRAW', 'DREW', 'DRIP', 'DROP', 'DRUG', 'DRUM', 'DUCK', 'DULL', 'DUMP', 'DUNE', 'DUNK', 'DUSK', 'DUST', 'DUTY', 'EACH', 'EARL', 'EARN', 'EASE', 'EAST', 'EASY', 'ECHO', 'EDGE', 'EDIT', 'ELSE', 'EMIT', 'EPIC', 'EVEN', 'EVER', 'EVIL', 'EXIT', 'FACE', 'FACT', 'FADE', 'FAIL', 'FAIR', 'FALL', 'FAME', 'FARE', 'FARM', 'FAST', 'FATE', 'FEAR', 'FEED', 'FEEL', 'FEET', 'FELL', 'FELT', 'FILE', 'FILL', 'FILM', 'FIND', 'FINE', 'FIRE', 'FIRM', 'FISH', 'FIST', 'FIVE', 'FLAG', 'FLAT', 'FLEE', 'FLEW', 'FLIP', 'FLOW', 'FOLK', 'FOND', 'FOOD', 'FOOL', 'FOOT', 'FORD', 'FORK', 'FORM', 'FORT', 'FOUL', 'FOUR', 'FREE', 'FROM', 'FUEL', 'FULL', 'FUND', 'GAIN', 'GAME', 'GATE', 'GAVE', 'GEAR', 'GIFT', 'GIRL', 'GIVE', 'GLAD', 'GLEN', 'GLOW', 'GLUE', 'GOAL', 'GOAT', 'GOES', 'GOLD', 'GOLF', 'GONE', 'GOOD', 'GRAB', 'GRAD', 'GRAY', 'GREW', 'GREY', 'GRID', 'GRIM', 'GRIN', 'GRIP', 'GROW', 'GULF', 'HAIR', 'HALF', 'HALL', 'HALT', 'HAND', 'HANG', 'HARD', 'HARE', 'HARM', 'HATE', 'HAVE', 'HAWK', 'HEAD', 'HEAL', 'HEAP', 'HEAR', 'HEAT', 'HEEL', 'HELD', 'HELL', 'HELP', 'HERE', 'HERO', 'HIGH', 'HIKE', 'HILL', 'HINT', 'HIRE', 'HOLD', 'HOLE', 'HOME', 'HOOK', 'HOPE', 'HORN', 'HOST', 'HOUR', 'HUGE', 'HULL', 'HUNT', 'HURT', 'ICON', 'IDEA', 'INCH', 'INTO', 'IRON', 'ITEM', 'JACK', 'JAIL', 'JAZZ', 'JEAN', 'JOIN', 'JOKE', 'JUMP', 'JUNE', 'JURY', 'JUST', 'KEEN', 'KEEP', 'KEPT', 'KICK', 'KILL', 'KIND', 'KING', 'KISS', 'KNEE', 'KNEW', 'KNIT', 'KNOB', 'KNOW', 'LACK', 'LADY', 'LAID', 'LAKE', 'LAMB', 'LAMP', 'LAND', 'LANE', 'LAST', 'LATE', 'LAWN', 'LEAD', 'LEAF', 'LEAN', 'LEAP', 'LEFT', 'LEND', 'LENS', 'LESS', 'LIAR', 'LIFE', 'LIFT', 'LIKE', 'LIMB', 'LIME', 'LINE', 'LINK', 'LION', 'LIST', 'LIVE', 'LOAD', 'LOAN', 'LOCK', 'LOGO', 'LONG', 'LOOK', 'LORD', 'LOSE', 'LOSS', 'LOST', 'LOTS', 'LOUD', 'LOVE', 'LUCK', 'LUNG', 'MADE', 'MAIL', 'MAIN', 'MAKE', 'MALE', 'MALL', 'MANY', 'MARK', 'MASK', 'MASS', 'MATE', 'MATH', 'MEAL', 'MEAN', 'MEAT', 'MEET', 'MEMO', 'MENU', 'MERE', 'MESH', 'MESS', 'MILD', 'MILE', 'MILK', 'MILL', 'MIND', 'MINE', 'MINT', 'MISS', 'MODE', 'MOON', 'MORE', 'MOST', 'MOVE', 'MUCH', 'MUST', 'MYTH', 'NAIL', 'NAME', 'NAVY', 'NEAR', 'NEAT', 'NECK', 'NEED', 'NEST', 'NEWS', 'NEXT', 'NICE', 'NINE', 'NODE', 'NONE', 'NOON', 'NORM', 'NOSE', 'NOTE', 'NOUN',
+  'ABORT', 'ABOUT', 'ABOVE', 'ABUSE', 'ACTOR', 'ACUTE', 'ADMIT', 'ADOPT', 'ADULT', 'AFTER', 'AGAIN', 'AGENT', 'AGREE', 'AHEAD', 'ALARM', 'ALBUM', 'ALERT', 'ALIGN', 'ALIKE', 'ALIVE', 'ALLOW', 'ALONE', 'ALONG', 'ALTER', 'AMBER', 'AMEND', 'AMONG', 'ANGEL', 'ANGER', 'ANGLE', 'ANGRY', 'APART', 'APPLE', 'APPLY', 'ARENA', 'ARGUE', 'ARISE', 'ARMOR', 'ARRAY', 'ARROW', 'ASIDE', 'ASSET', 'AUDIO', 'AUDIT', 'AVOID', 'AWARD', 'AWARE', 'BADLY', 'BAKER', 'BASES', 'BASIC', 'BASIN', 'BASIS', 'BATCH', 'BEACH', 'BEAST', 'BEGAN', 'BEGIN', 'BEGUN', 'BEING', 'BELOW', 'BENCH', 'BILLY', 'BIRTH', 'BLACK', 'BLADE', 'BLAME', 'BLANK', 'BLAST', 'BLEED', 'BLEND', 'BLESS', 'BLIND', 'BLOCK', 'BLOOD', 'BLOOM', 'BLOWN', 'BOARD', 'BOOST', 'BOOTH', 'BOUND', 'BRAIN', 'BRAND', 'BRAVE', 'BREAD', 'BREAK', 'BREED', 'BRICK', 'BRIDE', 'BRIEF', 'BRING', 'BROAD', 'BROKE', 'BROWN', 'BRUSH', 'BUDDY', 'BUILD', 'BUILT', 'BUNCH', 'BURST', 'BUYER', 'CABIN', 'CABLE', 'CARRY', 'CATCH', 'CAUSE', 'CHAIN', 'CHAIR', 'CHAOS', 'CHARM', 'CHART', 'CHASE', 'CHEAP', 'CHECK', 'CHEEK', 'CHESS', 'CHEST', 'CHIEF', 'CHILD', 'CHINA', 'CHOSE', 'CHUNK', 'CLAIM', 'CLASS', 'CLEAN', 'CLEAR', 'CLERK', 'CLICK', 'CLIFF', 'CLIMB', 'CLOCK', 'CLONE', 'CLOSE', 'CLOTH', 'CLOUD', 'COACH', 'COAST', 'COUCH', 'COULD', 'COUNT', 'COURT', 'COVER', 'CRACK', 'CRAFT', 'CRASH', 'CRAZY', 'CREAM', 'CREEP', 'CRIME', 'CRISP', 'CROSS', 'CROWD', 'CROWN', 'CRUDE', 'CRUSH', 'CURVE', 'CYCLE', 'DAILY', 'DAIRY', 'DAISY', 'DANCE', 'DATED', 'DEALT', 'DEATH', 'DEBUT', 'DELAY', 'DELTA', 'DENSE', 'DEPOT', 'DEPTH', 'DERBY', 'DEVIL', 'DIARY', 'DIRTY', 'DOUBT', 'DOZEN', 'DRAFT', 'DRAMA', 'DRANK', 'DRAWN', 'DREAM', 'DRESS', 'DRIED', 'DRILL', 'DRINK', 'DRIVE', 'DROVE', 'DROWN', 'DUMMY', 'DUTCH', 'DYING', 'EAGER', 'EAGLE', 'EARLY', 'EARTH', 'EIGHT', 'ELDER', 'ELECT', 'ELITE', 'EMPTY', 'ENEMY', 'ENJOY', 'ENTER', 'ENTRY', 'EQUAL', 'ERROR', 'ESSAY', 'ETHIC', 'EVENT', 'EVERY', 'EXACT', 'EXIST', 'EXTRA', 'FAITH', 'FALSE', 'FANCY', 'FATAL', 'FAULT', 'FAVOR', 'FENCE', 'FEWER', 'FIBER', 'FIELD', 'FIFTY', 'FIGHT', 'FINAL', 'FIRST', 'FIXED', 'FLAME', 'FLASH', 'FLEET', 'FLESH', 'FLOAT', 'FLOOD', 'FLOOR', 'FLOUR', 'FLUID', 'FOCUS', 'FORCE', 'FORGE', 'FORTH', 'FORTY', 'FORUM', 'FOUND', 'FRAME', 'FRANK', 'FRAUD', 'FRESH', 'FRONT', 'FRUIT', 'FULLY', 'FUNDS', 'FUNNY', 'GIANT', 'GIVEN', 'GLASS', 'GLOBE', 'GLORY', 'GOING', 'GONNA', 'GRACE', 'GRADE', 'GRAIN', 'GRAND', 'GRANT', 'GRAPH', 'GRASP', 'GRASS', 'GRAVE', 'GREAT', 'GREEN', 'GREET', 'GRIEF', 'GROSS', 'GROUP', 'GROWN', 'GUARD', 'GUESS', 'GUEST', 'GUIDE', 'GUILT', 'HAPPY', 'HARSH', 'HASN', 'HAVEN', 'HEART', 'HEAVY', 'HENCE', 'HENRY', 'HOBBY', 'HONEY', 'HONOR', 'HORSE', 'HOTEL', 'HOUSE', 'HUMAN', 'HUMOR', 'HURRY', 'IDEAL', 'IMAGE', 'IMPLY', 'INDEX', 'INNER', 'INPUT', 'IRONY', 'ISSUE', 'JAPAN', 'JENNY', 'JESUS', 'JIMMY', 'JOINT', 'JONES', 'JUDGE', 'JUICE', 'KNIFE', 'KNOCK', 'KNOWN', 'LABEL', 'LABOR', 'LARGE', 'LASER', 'LATER', 'LATIN', 'LAUGH', 'LAYER', 'LEARN', 'LEASE', 'LEAST', 'LEAVE', 'LEGAL', 'LEVEL', 'LEWIS', 'LIGHT', 'LIMIT', 'LINKS', 'LIONS', 'LIVER', 'LIVING', 'LOCAL', 'LODGE', 'LOGIC', 'LOOSE', 'LOTUS', 'LOVER', 'LOWER', 'LOYAL', 'LUCKY', 'LUNCH', 'LYING', 'MAGIC', 'MAGNA', 'MAJOR', 'MAKER', 'MANOR', 'MAPLE', 'MARCH', 'MARIA', 'MARRY', 'MARSH', 'MATCH', 'MAYBE', 'MAYOR', 'MEANS', 'MEANT', 'MEDAL', 'MEDIA', 'MERCY', 'MERGE', 'MERIT', 'MERRY', 'METAL', 'METER', 'MIGHT', 'MILAN', 'MINOR', 'MINUS', 'MIXED', 'MODEL', 'MODEM', 'MONEY', 'MONTH', 'MORAL', 'MOTOR', 'MOUNT', 'MOUSE', 'MOUTH', 'MOVIE', 'MUSIC', 'NAIVE', 'NAKED', 'NANCY', 'NASTY', 'NAVAL', 'NERVE', 'NEVER', 'NEWLY', 'NIGHT', 'NINTH', 'NOBLE', 'NOISE', 'NORTH', 'NOTCH', 'NOTED', 'NOVEL', 'NURSE', 'OCCUR', 'OCEAN', 'OFFER', 'OFTEN', 'OLIVE', 'OMEGA', 'ONSET', 'OPERA', 'ORBIT', 'ORDER', 'ORGAN', 'OTHER', 'OUGHT', 'OUNCE', 'OUTER', 'OWNED', 'OWNER', 'OXIDE', 'OZONE', 'PAINT', 'PANEL', 'PANIC', 'PAPER', 'PARTY', 'PASTA', 'PATCH', 'PAUSE', 'PEACE', 'PEARL', 'PENNY', 'PETER', 'PHASE', 'PHONE', 'PHOTO', 'PIANO', 'PIECE', 'PILOT', 'PINCH', 'PITCH', 'PIXEL', 'PLACE', 'PLAIN', 'PLANE', 'PLANT', 'PLATE', 'PLAZA', 'PLEAD', 'PLEAS', 'POINT', 'POLAR', 'POSED', 'POUND', 'POWER', 'PRESS', 'PRICE', 'PRIDE', 'PRIME', 'PRINT', 'PRIOR', 'PRIZE', 'PROBE', 'PROOF', 'PROSE', 'PROUD', 'PROVE', 'PROXY', 'PSALM', 'PULSE', 'PUNCH', 'PUPIL', 'QUEEN', 'QUERY', 'QUEST', 'QUICK', 'QUIET', 'QUITE', 'QUOTA', 'QUOTE', 'RADAR', 'RADIO', 'RAISE', 'RALLY', 'RANCH', 'RANGE', 'RAPID', 'RATIO', 'REACH', 'REACT', 'READY', 'REALM', 'REBEL', 'REFER', 'REIGN', 'RELAX', 'RENEW', 'REPLY', 'RHYME', 'RIGHT', 'RIGID', 'RISKY', 'RIVAL', 'RIVER', 'ROBOT', 'ROCKY', 'ROMAN', 'ROUGH', 'ROUND', 'ROUTE', 'ROYAL', 'RUGBY', 'RURAL', 'SADLY', 'SAINT', 'SALAD', 'SALES', 'SALON', 'SANDY', 'SANTA', 'SATAN', 'SAUCE', 'Saudi', 'SAVED', 'SCALE', 'SCARE', 'SCENE', 'SCOPE', 'SCORE', 'SCOUT', 'SCREW', 'SEAL', 'SEIZE', 'SENSE', 'SERVE', 'SETUP', 'SEVEN', 'SHADE', 'SHAKE', 'SHALL', 'SHAME', 'SHAPE', 'SHARE', 'SHARP', 'SHEEP', 'SHEER', 'SHEET', 'SHELF', 'SHELL', 'SHIFT', 'SHINE', 'SHIRT', 'SHOCK', 'SHOOT', 'SHORE', 'SHORT', 'SHOUT', 'SHOWN', 'SIGHT', 'SIGMA', 'SILLY', 'SIMON', 'SINCE', 'SIXTH', 'SIXTY', 'SIZED', 'SKILL', 'SLAVE', 'SLEEP', 'SLICE', 'SLIDE', 'SLOPE', 'SMALL', 'SMART', 'SMELL', 'SMILE', 'SMITH', 'SMOKE', 'SNAKE', 'SNOW', 'SOLAR', 'SOLID', 'SOLVE', 'SORRY', 'SOUND', 'SOUTH', 'SPACE', 'SPARE', 'SPARK', 'SPEAK', 'SPEED', 'SPELL', 'SPEND', 'SPENT', 'SPICE', 'SPINE', 'SPITE', 'SPLIT', 'SPOKE', 'SPORT', 'SPRAY', 'SQUAD', 'STACK', 'STAFF', 'STAGE', 'STAKE', 'STAMP', 'STAND', 'STARK', 'START', 'STATE', 'STEAM', 'STEEL', 'STEEP', 'STEER', 'STICK', 'STILL', 'STOCK', 'STONE', 'STOOD', 'STORE', 'STORM', 'STORY', 'STRAP', 'STRAW', 'STRIP', 'STUCK', 'STUDY', 'STUFF', 'STYLE', 'SUGAR', 'SUITE', 'SUNNY', 'SUPER', 'SURGE', 'SWEAR', 'SWEAT', 'SWEEP', 'SWEET', 'SWIFT', 'SWING', 'SWISS', 'SWORD', 'TABLE', 'TAKEN', 'TASTE', 'TAXES', 'TEACH', 'TEETH', 'TEMPO', 'TENSE', 'TENTH', 'TERMS', 'TERRY', 'TEXAS', 'THANK', 'THEFT', 'THEME', 'THERE', 'THESE', 'THICK', 'THIEF', 'THING', 'THINK', 'THIRD', 'THOSE', 'THREE', 'THREW', 'THROW', 'THUMB', 'TIGHT', 'TIMER', 'TIRED', 'TITLE', 'TODAY', 'TOKEN', 'TOMMY', 'TOPIC', 'TOTAL', 'TOUCH', 'TOUGH', 'TOWER', 'TRACE', 'TRACK', 'TRADE', 'TRAIL', 'TRAIN', 'TRAIT', 'TRASH', 'TREAT', 'TREND', 'TRIAL', 'TRIBE', 'TRICK', 'TRIED', 'TRIES', 'TROOP', 'TRUCK', 'TRULY', 'TRUNK', 'TRUST', 'TRUTH', 'TWICE', 'TWIST', 'TYLER', 'ULTRA', 'UNCLE', 'UNDER', 'UNDUE', 'UNION', 'UNITY', 'UNTIL', 'UPPER', 'UPSET', 'URBAN', 'USAGE', 'USUAL', 'VALID', 'VALUE', 'VAULT', 'VEGAS', 'VENUE', 'VERSE', 'VIDEO', 'VIEWS', 'VIGOR', 'VILLA', 'VINYL', 'VIOLA', 'VIRUS', 'VISIT', 'VISTA', 'VITAL', 'VIVID', 'VOCAL', 'VODKA', 'VOGUE', 'VOICE', 'VOTER', 'WAGON', 'WAIST', 'WASTE', 'WATCH', 'WATER', 'WAVE', 'WEIGH', 'WEIRD', 'WHEAT', 'WHEEL', 'WHERE', 'WHICH', 'WHILE', 'WHITE', 'WHOLE', 'WHOSE', 'WIDTH', 'WITCH', 'WOMAN', 'WOMEN', 'WOODS', 'WORLD', 'WORRY', 'WORSE', 'WORST', 'WORTH', 'WOULD', 'WOUND', 'WRIST', 'WRITE', 'WRONG', 'WROTE', 'YACHT', 'YIELD', 'YOUNG', 'YOURS', 'YOUTH', 'ZEBRA', 'ZESTY',
+  'ABANDON', 'ABILITY', 'ABSENCE', 'ABSOLUTE', 'ABSTRACT', 'ACADEMY', 'ACCOUNT', 'ACHIEVE', 'ACQUIRE', 'ADDRESS', 'ADVANCE', 'ADVENTURE', 'AGAINST', 'ALREADY', 'ALTHOUGH', 'ANCIENT', 'ANOTHER', 'ANXIETY', 'ANYTHING', 'ANYWHERE', 'APPARENT', 'APPROACH', 'APPROVE', 'ARRANGE', 'ARTICLE', 'ATTEMPT', 'ATTRACT', 'AVERAGE', 'BALANCE', 'BATTERY', 'BECAUSE', 'BECOME', 'BEDROOM', 'BELIEVE', 'BENEFIT', 'BETWEEN', 'BILLION', 'BROTHER', 'BUILDING', 'BUSINESS', 'CABINET', 'CAMPAIGN', 'CAPABLE', 'CAPITAL', 'CAPTAIN', 'CAPTURE', 'CAREFUL', 'CENTURY', 'CERTAIN', 'CHAIRMAN', 'CHAMBER', 'CHAMPION', 'CHANNEL', 'CHAPTER', 'CHARACTER', 'CHARGE', 'CHEMICAL', 'CHICKEN', 'CHILDREN', 'CITIZEN', 'CLASSIC', 'CLIMATE', 'CLOTHES', 'COLLECT', 'COLLEGE', 'COMBINE', 'COMFORT', 'COMMAND', 'COMMENT', 'COMMERCE', 'COMMITTEE', 'COMMON', 'COMPANY', 'COMPARE', 'COMPETE', 'COMPLETE', 'COMPLEX', 'COMPUTER', 'CONCEPT', 'CONCERN', 'CONCERT', 'CONDUCT', 'CONFIRM', 'CONFLICT', 'CONGRESS', 'CONNECT', 'CONSIDER', 'CONSIST', 'CONSTANT', 'CONSUMER', 'CONTACT', 'CONTAIN', 'CONTENT', 'CONTEST', 'CONTEXT', 'CONTINUE', 'CONTRACT', 'CONTRAST', 'CONTROL', 'CONVERT', 'CORRECT', 'COUNCIL', 'COUNTER', 'COUNTRY', 'COURAGE', 'CREATE', 'CREATURE', 'CRICKET', 'CRIMINAL', 'CRITICAL', 'CULTURE', 'CURRENT', 'CUSTOMER', 'DAMAGE', 'DANGER', 'DAUGHTER', 'DEALING', 'DEBATE', 'DECIDE', 'DECISION', 'DECLARE', 'DECLINE', 'DEFENSE', 'DEFINE', 'DELIVER', 'DEMAND', 'DESCRIBE', 'DESIGN', 'DESIRE', 'DESTROY', 'DETAIL', 'DETECT', 'DETERMINE', 'DEVELOP', 'DEVICE', 'DIAMOND', 'DIFFER', 'DIFFICULT', 'DIGITAL', 'DINNER', 'DIRECT', 'DISCOVER', 'DISCUSS', 'DISEASE', 'DISPLAY', 'DISTANCE', 'DISTRICT', 'DIVIDE', 'DOCUMENT', 'DOMESTIC', 'DOMINATE', 'DRAWING', 'DRIVING', 'DYNAMIC', 'EASTERN', 'ECONOMY', 'EDUCATE', 'EFFECT', 'EFFORT', 'ELDERLY', 'ELEMENT', 'EMBRACE', 'EMERGE', 'EMOTION', 'EMPEROR', 'EMPIRE', 'EMPLOY', 'ENABLE', 'ENCOURAGE', 'ENERGY', 'ENFORCE', 'ENGAGE', 'ENGINE', 'ENHANCE', 'ENORMOUS', 'ENOUGH', 'ENSURE', 'ENTIRE', 'ENTRANCE', 'EPISODE', 'EQUALLY', 'ESCAPE', 'ESSENCE', 'ESTABLISH', 'ESTIMATE', 'EVALUATE', 'EVENING', 'EVIDENT', 'EXACTLY', 'EXAMINE', 'EXAMPLE', 'EXCELLENT', 'EXCHANGE', 'EXCITED', 'EXECUTE', 'EXERCISE', 'EXHIBIT', 'EXPAND', 'EXPECT', 'EXPENSE', 'EXPERT', 'EXPLAIN', 'EXPLORE', 'EXPRESS', 'EXTEND', 'EXTREME', 'FACTORY', 'FACULTY', 'FAILURE', 'FAMILIAR', 'FANTASY', 'FASHION', 'FEATURE', 'FEDERAL', 'FEELING', 'FICTION', 'FIFTEEN', 'FIGHTER', 'FINALLY', 'FINANCE', 'FINDING', 'FISHING', 'FITNESS', 'FLORIDA', 'FOREIGN', 'FOREVER', 'FORMULA', 'FORTUNE', 'FORWARD', 'FOUNDER', 'FREEDOM', 'FREQUENT', 'FRIENDLY', 'FURTHER', 'GALLERY', 'GATEWAY', 'GENERAL', 'GENERATE', 'GENUINE', 'GESTURE', 'GLASSES', 'GLIMPSE', 'GLOBALLY', 'GLORIOUS', 'GOODBYE', 'GOVERN', 'GRADUATE', 'GRANDMA', 'GRANDPA', 'GRANTED', 'GRAPHIC', 'GRAVITY', 'GREATER', 'GREATLY', 'GROCERY', 'GROWING', 'HABITAT', 'HALFWAY', 'HANDFUL', 'HANDSOME', 'HANGING', 'HAPPENING', 'HAPPILY', 'HARBOUR', 'HARMONY', 'HARVEST', 'HEADING', 'HEALTHY', 'HEARING', 'HEAVILY', 'HELPFUL', 'HERITAGE', 'HERSELF', 'HIGHWAY', 'HIMSELF', 'HISTORIC', 'HISTORY', 'HOLDING', 'HOLIDAY', 'HOMELESS', 'HOMEWORK', 'HONEST', 'HOWEVER', 'HUMANITY', 'HUNDRED', 'HUNTING', 'HUSBAND', 'ILLEGAL', 'ILLNESS', 'IMAGINE', 'IMPRESS', 'IMPROVE', 'INCLUDE', 'INCOME', 'INCREASE', 'INDEED', 'INDICATE', 'INDIRECT', 'INDUSTRY', 'INFINITE', 'INFORM', 'INITIAL', 'INQUIRY', 'INSIGHT', 'INSTALL', 'INSTANCE', 'INSTANT', 'INSTEAD', 'INTENSE', 'INTEREST', 'INTERNAL', 'INTERNET', 'INTERVAL', 'INTIMATE', 'INVALID', 'INVOLVE', 'ISLAMIC', 'ISOLATE', 'ITALIAN', 'JANUARY', 'JEALOUS', 'JOHNSON', 'JOURNAL', 'JOURNEY', 'JUSTICE', 'JUSTIFY', 'KEEPING', 'KEYWORD', 'KINGDOM', 'KITCHEN', 'KNOWING', 'LANDING', 'LARGELY', 'LASTING', 'LATERAL', 'LAUGHER', 'LAUGHTER', 'LAUNDRY', 'LAWSUIT', 'LEADING', 'LEARNED', 'LEATHER', 'LEAVING', 'LECTURE', 'LEGALLY', 'LEISURE', 'LENDING', 'LEONARD', 'LIBRARY', 'LICENSE', 'LIGHTLY', 'LIKEWISE', 'LIMITED', 'LINCOLN', 'LINKING', 'LISTING', 'LITERAL', 'LITERARY', 'LOCATED', 'LOCATION', 'LOGICAL', 'LONGING', 'LOOKING', 'LOTTERY', 'LOYALTY', 'MACHINE', 'MADISON', 'MAGICAL', 'MAGNETIC', 'MAINTAIN', 'MAJORITY', 'MANAGED', 'MANAGER', 'MANDATE', 'MANKIND', 'MANSION', 'MASSIVE', 'MASTERY', 'MATCHING', 'MATERIAL', 'MAXIMIZE', 'MEANING', 'MEASURE', 'MEDICAL', 'MEETING', 'MELTING', 'MEMBERS', 'MEMORIAL', 'MENTION', 'MERCURY', 'MESSAGE', 'MEXICAN', 'MIDWEST', 'MIGRATE', 'MILITARY', 'MILLION', 'MINERAL', 'MINIMUM', 'MINISTER', 'MINORITY', 'MIRACLE', 'MISSING', 'MISSION', 'MISTAKE', 'MIXTURE', 'MODERATE', 'MODIFIED', 'MONITOR', 'MONSTER', 'MONTHLY', 'MORNING', 'MORTGAGE', 'MULTIPLE', 'MUNDANE', 'MUSICAL', 'MYSTERY', 'MYTHICAL', 'NATIONAL', 'NATURAL', 'NEAREST', 'NEGATIVE', 'NEIGHBOR', 'NEITHER', 'NERVOUS', 'NETWORK', 'NEUTRAL', 'NOMINAL', 'NORMALLY', 'NOTABLE', 'NOTHING', 'NOWHERE', 'NUCLEAR', 'NURSING', 'OBESITY', 'OBLIGATE', 'OBVIOUS', 'OCCASION', 'OCCUPIED', 'OCCURRED', 'OFFERING', 'OFFICER', 'OFFLINE', 'ONGOING', 'OPENING', 'OPERATE', 'OPINION', 'OPPONENT', 'OPPOSITE', 'OPTIMAL', 'OPTIMISM', 'OPTIONAL', 'ORDERED', 'ORDINARY', 'ORGANIC', 'ORGANIZE', 'ORIENTAL', 'ORIGINAL', 'OUTDOOR', 'OUTLINE', 'OUTLOOK', 'OUTSIDE', 'OVERALL', 'OVERCOME', 'OVERHEAD', 'OVERLOOK', 'OVERSEAS', 'OVERVIEW', 'PACKAGE', 'PAINFUL', 'PAINTER', 'PAINTING', 'PARALLEL', 'PARKING', 'PARTIAL', 'PARTNER', 'PASSAGE', 'PASSING', 'PASSION', 'PASSIVE', 'PATIENT', 'PATTERN', 'PAYMENT', 'PEACEFUL', 'PENALTY', 'PENDING', 'PENSION', 'PERCENT', 'PERFECT', 'PERFORM', 'PERHAPS', 'PERMANENT', 'PERSIST', 'PERSONA', 'PETITION', 'PHOENIX', 'PHYSICAL', 'PICKING', 'PICTURE', 'PIONEER', 'PIPELINE', 'PLACING', 'PLAINLY', 'PLANNED', 'PLANNING', 'PLASTIC', 'PLATFORM', 'PLEASANT', 'PLEASED', 'PLEASURE', 'PLENTIFUL', 'POINTED', 'POLITIC', 'POPULAR', 'PORTION', 'PORTRAIT', 'POSITION', 'POSITIVE', 'POSSIBLE', 'POSTING', 'POTENT', 'POVERTY', 'POWERFUL', 'PRACTICE', 'PRAIRIE', 'PRECISE', 'PREDICT', 'PREMIER', 'PREMISE', 'PREMIUM', 'PREPARE', 'PRESENCE', 'PRESENT', 'PRESERVE', 'PRESSURE', 'PREVENT', 'PREVIEW', 'PRIMARY', 'PRIMATE', 'PRINCE', 'PRINCESS', 'PRINCIPAL', 'PRINTING', 'PRIVACY', 'PRIVATE', 'PROBABLE', 'PROBLEM', 'PROCEED', 'PROCESS', 'PRODUCE', 'PRODUCT', 'PROFILE', 'PROGRAM', 'PROGRESS', 'PROJECT', 'PROMISE', 'PROMOTE', 'PROMPTLY', 'PROPERLY', 'PROPERTY', 'PROPHET', 'PROPOSAL', 'PROPOSE', 'PROSPECT', 'PROTECT', 'PROTEIN', 'PROTEST', 'PROTOCOL', 'PROUDLY', 'PROVIDE', 'PROVINCE', 'PROVOKE', 'PUBLISH', 'PULLING', 'PUNISH', 'PURCHASE', 'PURPOSE', 'PUSHING', 'PUTTING', 'QUALIFY', 'QUALITY', 'QUANTUM', 'QUARTER', 'QUIETLY', 'RADICAL', 'RAILWAY', 'RAINBOW', 'RAISING', 'RANGING', 'RANKING', 'RAPIDLY', 'REACHING', 'READING', 'READILY', 'REALITY', 'REALIZE', 'RECEIPT', 'RECEIVE', 'RECOVER', 'RECRUIT', 'RECYCLE', 'REDUCED', 'REFLECT', 'REFORM', 'REFUGEE', 'REFUND', 'REGIONAL', 'REGISTER', 'REGULAR', 'REGULATE', 'REINFORCE', 'RELATED', 'RELATION', 'RELATIVE', 'RELAXED', 'RELEASE', 'RELEVANT', 'RELIABLE', 'RELIEVE', 'RELIGION', 'RELOCATE', 'RELUCTANT', 'REMAINS', 'REMARK', 'REMEMBER', 'REMIND', 'REMOVAL', 'REMOVED', 'RENEWED', 'REPLACE', 'REPLICA', 'REPLIED', 'REPORTER', 'REPUBLIC', 'REQUEST', 'REQUIRE', 'RESCUE', 'RESEARCH', 'RESERVED', 'RESIDENT', 'RESOLVE', 'RESOURCE', 'RESPECT', 'RESPOND', 'RESPONSE', 'RESTORE', 'RESTRICT', 'RESULT', 'RETIRED', 'RETRIEVE', 'RETURNS', 'REUNION', 'REVENUE', 'REVERSE', 'REVISED', 'REVIVAL', 'REVOLVE', 'REWARDING', 'RHYTHMIC', 'RICHARD', 'RIDICULE', 'RIGOROUS', 'ROMANCE', 'ROMANTIC', 'ROUGHLY', 'ROUTINE', 'RUNNING', 'RUSHING', 'RUSSIAN', 'SACRIFICE', 'SADNESS', 'SAILING', 'SATISFY', 'SAVINGS', 'SCALING', 'SCANDAL', 'SCATTER', 'SCENARIO', 'SCHEDULE', 'SCHOLAR', 'SCIENCE', 'SCRATCH', 'SCREENED', 'SEATING', 'SECONDARY', 'SECTION', 'SECULAR', 'SECURED', 'SEGMENT', 'SENATOR', 'SENDING', 'SENIORS', 'SENSIBLE', 'SENTENCE', 'SEPARATE', 'SEQUENCE', 'SERIOUS', 'SESSION', 'SETTING', 'SETTLED', 'SEVENTH', 'SEVERAL', 'SHARING', 'SHELTER', 'SHERIFF', 'SHIFTING', 'SHINING', 'SHIPPED', 'SHIPPING', 'SHOCKED', 'SHOOTER', 'SHOPPING', 'SHORTAGE', 'SHORTLY', 'SHOWING', 'SIBLING', 'SICKNESS', 'SIDEBAR', 'SIMILAR', 'SINCERE', 'SITTING', 'SIXTEEN', 'SKILLED', 'SLAVERY', 'SLEEPING', 'SLIDING', 'SLIGHTLY', 'SMALLER', 'SMOKING', 'SMOOTHLY', 'SNAPSHOT', 'SNOWFALL', 'SOCIALLY', 'SOCIETY', 'SOFTWARE', 'SOLDIER', 'SOMEHOW', 'SOMEONE', 'SOMETIME', 'SOMEWHAT', 'SOUTHERN', 'SPANISH', 'SPATIAL', 'SPEAKER', 'SPEAKING', 'SPECIAL', 'SPECIFIC', 'SPECTRUM', 'SPELLING', 'SPENDING', 'SPINNING', 'SPIRITUAL', 'SPLENDID', 'SPORTING', 'SPOTLIGHT', 'SQUADRON', 'STAFFING', 'STAINING', 'STAIRWAY', 'STANDARD', 'STANDING', 'STARTING', 'STATEMENT', 'STATION', 'STAYING', 'STEADILY', 'STEALING', 'STERLING', 'STIMULUS', 'STOPPING', 'STORAGE', 'STRAIGHT', 'STRAND', 'STRANGER', 'STRATEGIC', 'STRATEGY', 'STRENGTH', 'STRIKING', 'STRONGLY', 'STRUGGLE', 'STUBBORN', 'STUNNING', 'STUPIDITY', 'STYLISH', 'SUBJECT', 'SUBLIME', 'SUBMIT', 'SUBURBAN', 'SUCCEED', 'SUCCESS', 'SUDDENLY', 'SUFFERED', 'SUFFICE', 'SUGGEST', 'SUITABLE', 'SULLIVAN', 'SUMMARIZE', 'SUMMARY', 'SUPERIOR', 'SUPPLIED', 'SUPPLIER', 'SUPPORT', 'SUPPOSED', 'SUPPRESS', 'SUPREME', 'SURFACE', 'SURGEON', 'SURGERY', 'SURPLUS', 'SURPRISE', 'SURROUND', 'SURVIVAL', 'SURVIVE', 'SUSPECT', 'SUSPEND', 'SUSTAIN', 'SWEEPING', 'SWIMMING', 'SYMBOLIC', 'SYMPATHY', 'SYNDROME', 'TACTICAL', 'TAILORED', 'TALENTED', 'TALKING', 'TANGIBLE', 'TARGETED', 'TAXPAYER', 'TEACHING', 'TEAMMATE', 'TEARING', 'TECHNICAL', 'TEENAGER', 'TEMPLATE', 'TENDENCY', 'TERMINAL', 'TERRIFIC', 'TERRIBLE', 'TERRITORY', 'TEXTBOOK', 'THANKFUL', 'THEOLOGY', 'THERAPY', 'THEREBY', 'THINKING', 'THIRTEEN', 'THOROUGH', 'THOUSAND', 'THREATEN', 'THRILLER', 'THROWING', 'THURSDAY', 'TIMELINE', 'TOGETHER', 'TOMORROW', 'TONIGHT', 'TOOLBAR', 'TOTALLY', 'TOUCHING', 'TOURING', 'TOURIST', 'TOURNAMENT', 'TOWNSHIP', 'TRACKING', 'TRADING', 'TRADITION', 'TRAFFIC', 'TRAGEDY', 'TRAILER', 'TRAINING', 'TRANQUIL', 'TRANSFER', 'TRANSFORM', 'TRANSIT', 'TRANSMIT', 'TRANSPORT', 'TRAVELER', 'TREASURE', 'TREASURY', 'TREATING', 'TREATMENT', 'TREMENDOUS', 'TRIANGLE', 'TRIBUNAL', 'TRIBUTE', 'TRILLION', 'TROPICAL', 'TROUBLE', 'TRUSTED', 'TUESDAY', 'TURNING', 'TUTORIAL', 'TWILIGHT', 'TYPICAL', 'UKRAINE', 'ULTIMATE', 'UMBRELLA', 'UNABLE', 'UNCERTAIN', 'UNCOMMON', 'UNDERGO', 'UNDERSTAND', 'UNDERTAKE', 'UNFAIR', 'UNIFORM', 'UNIQUE', 'UNIVERSAL', 'UNIVERSE', 'UNKNOWN', 'UNLIKELY', 'UNLIMITED', 'UNPLEASANT', 'UNSTABLE', 'UPCOMING', 'UPGRADE', 'UPSTAIRS', 'UPSTREAM', 'USUALLY', 'UTILITY', 'VACATION', 'VALUABLE', 'VARIABLE', 'VARIANCE', 'VARIETY', 'VARIOUS', 'VEHICLE', 'VELOCITY', 'VENTURE', 'VERDICT', 'VERSION', 'VERTICAL', 'VETERAN', 'VIBRANT', 'VICTORY', 'VIEWING', 'VILLAGE', 'VINTAGE', 'VIOLENCE', 'VIRTUAL', 'VISIBLE', 'VISITOR', 'VITAMIN', 'VOLCANIC', 'VOLTAGE', 'VOLUNTEER', 'WAITING', 'WALKING', 'WANTING', 'WARNING', 'WARRANTY', 'WATCHING', 'WATERSHED', 'WEAKNESS', 'WEALTHY', 'WEAPONS', 'WEARING', 'WEATHER', 'WEBSITE', 'WEDDING', 'WEEKDAY', 'WEEKEND', 'WEIGHTED', 'WELCOME', 'WELFARE', 'WESTERN', 'WHATEVER', 'WHENEVER', 'WHEREVER', 'WHISPER', 'WILDFIRE', 'WILDLIFE', 'WILLIAMS', 'WINDFALL', 'WINNING', 'WIRELESS', 'WITHDRAW', 'WITHIN', 'WITHOUT', 'WITNESS', 'WONDERFUL', 'WONDERED', 'WOODLAND', 'WORKERS', 'WORKING', 'WORKSHOP', 'WORSHIP', 'WORTHWHILE', 'WOULDN', 'WOUNDING', 'WRAPPED', 'WRAPPER', 'WRESTLER', 'WRITING', 'WRITTEN', 'WRONGFUL', 'YEARBOOK', 'YIELDING', 'YOUNGEST', 'YOURSELF', 'YOUTHFUL', 'BYZANTINE', 'ZEPPELIN',
+];
+
+const WORD_SET = new Set(WORD_LIST);
+
+// Cache for API validated words to avoid redundant calls
+const apiValidatedCache = new Map<string, boolean>();
+
+// Free Dictionary API endpoint
+const FREE_DICTIONARY_API = 'https://api.dictionaryapi.dev/api/v2/entries/en';
+
+/**
+ * Validates a word using the Free Dictionary API
+ * Returns true if the word exists, false otherwise
+ */
+async function validateWithFreeDictionary(word: string): Promise<boolean> {
+  const lowerWord = word.toLowerCase();
+  
+  // Check cache first
+  if (apiValidatedCache.has(lowerWord)) {
+    console.log(`[Dictionary] Cache hit for "${word}": ${apiValidatedCache.get(lowerWord)}`);
+    return apiValidatedCache.get(lowerWord)!;
+  }
+  
+  try {
+    console.log(`[Dictionary] Validating "${word}" with Free Dictionary API...`);
+    const response = await fetch(`${FREE_DICTIONARY_API}/${encodeURIComponent(lowerWord)}`);
+    
+    // API returns 200 for valid words, 404 for invalid
+    const isValid = response.ok;
+    
+    // Cache the result
+    apiValidatedCache.set(lowerWord, isValid);
+    
+    console.log(`[Dictionary] API result for "${word}": ${isValid ? 'VALID' : 'INVALID'}`);
+    return isValid;
+  } catch (error) {
+    console.error(`[Dictionary] API error for "${word}":`, error);
+    // On network error, fall back to local word list
+    const localResult = WORD_SET.has(word.toUpperCase());
+    console.log(`[Dictionary] Falling back to local list for "${word}": ${localResult}`);
+    return localResult;
+  }
+}
+
+/**
+ * Main word validation function
+ * Uses Free Dictionary API for comprehensive validation
+ * Falls back to local list on network errors
+ */
+export async function isValidWordAsync(word: string): Promise<boolean> {
+  if (!word || word.length < 2) {
+    return false;
+  }
+  
+  // First check local list for instant validation of common words
+  if (WORD_SET.has(word.toUpperCase())) {
+    console.log(`[Dictionary] "${word}" found in local word list`);
+    return true;
+  }
+  
+  // If not in local list, validate with API
+  return validateWithFreeDictionary(word);
+}
+
+/**
+ * Synchronous word validation (local list only)
+ * Use this for non-critical checks or when async is not possible
+ */
+export function isValidWord(word: string): boolean {
+  return WORD_SET.has(word.toUpperCase());
+}
+
+/**
+ * Get word definition from Free Dictionary API
+ */
+export async function getWordDefinition(word: string): Promise<string | null> {
+  try {
+    const response = await fetch(`${FREE_DICTIONARY_API}/${encodeURIComponent(word.toLowerCase())}`);
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const data = await response.json();
+    
+    // Extract first definition
+    if (data && data[0]?.meanings?.[0]?.definitions?.[0]?.definition) {
+      return data[0].meanings[0].definitions[0].definition;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error(`[Dictionary] Error getting definition for "${word}":`, error);
+    return null;
+  }
+}
+
+export function getAllValidWords(letters: string[]): string[] {
+  const letterCount: Record<string, number> = {};
+  letters.forEach(letter => {
+    letterCount[letter] = (letterCount[letter] || 0) + 1;
+  });
+
+  const validWords: string[] = [];
+  
+  for (const word of WORD_LIST) {
+    const wordLetterCount: Record<string, number> = {};
+    let canForm = true;
+    
+    for (const letter of word) {
+      wordLetterCount[letter] = (wordLetterCount[letter] || 0) + 1;
+      if (!letterCount[letter] || wordLetterCount[letter] > letterCount[letter]) {
+        canForm = false;
+        break;
+      }
+    }
+    
+    if (canForm) {
+      validWords.push(word);
+    }
+  }
+  
+  return validWords;
+}
+
+export function getAllWordsStartingWith(prefix: string): string[] {
+  const upperPrefix = prefix.toUpperCase();
+  const result: string[] = [];
+  
+  for (const word of WORD_LIST) {
+    if (word.startsWith(upperPrefix)) {
+      result.push(word);
+    }
+  }
+  
+  return result;
+}
+
+// Clear the API cache (useful for testing)
+export function clearValidationCache(): void {
+  apiValidatedCache.clear();
+  console.log('[Dictionary] Validation cache cleared');
+}
