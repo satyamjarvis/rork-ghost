@@ -944,11 +944,10 @@ export default function GameScreen() {
                       });
                     }}
                   >
-                    {displayedWord.split('').map((letter, index) => {
-                      const isAnimating = index === animatingIndex;
+                    {currentRound.currentWord.split('').map((letter, index) => {
+                      const isAnimating = index === animatingIndex && displayedWord.length === currentRound.currentWord.length;
                       const isExploding = index === hiddenLetterIndex;
-                      const actualWordLength = currentRound.currentWord.length;
-                      const letterCount = Math.max(displayedWord.length, actualWordLength);
+                      const letterCount = currentRound.currentWord.length;
                       const containerWidth = SCREEN_WIDTH * 0.95 - 40;
                       const scaleFactor = Math.min(1, 70 / (containerWidth / letterCount));
                       
