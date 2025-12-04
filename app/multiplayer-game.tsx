@@ -39,6 +39,18 @@ interface FloatingLetterData {
   targetIndex: number;
 }
 
+interface FallingLetter {
+  id: string;
+  letter: string;
+  index: number;
+  points: number;
+  fallAnim: Animated.Value;
+  startX: number;
+  startY: number;
+  randomXOffset: number;
+  randomRotation: number;
+}
+
 export default function MultiplayerGameScreen() {
   const router = useRouter();
   const { id: gameId } = useLocalSearchParams<{ id: string }>();
@@ -80,6 +92,10 @@ export default function MultiplayerGameScreen() {
   
   const [roundWinnerAnnouncement, setRoundWinnerAnnouncement] = useState<{ winner: string; points: number } | null>(null);
   const announcementOpacity = useRef(new Animated.Value(0)).current;
+  
+  const [fallingLetters, setFallingLetters] = useState<FallingLetter[]>([]);
+  const player1ScoreRef = useRef<View | null>(null);
+  const player2ScoreRef = useRef<View | null>(null);
   
   const previousRoundRef = useRef<number>(1);
   const previousRoundsWonRef = useRef<{ player1: number; player2: number }>({ player1: 0, player2: 0 });
@@ -169,6 +185,89 @@ export default function MultiplayerGameScreen() {
     }, 0);
   }, []);
 
+  const startFallingLettersAnimation = useCallback((isPlayer1Winner: boolean, letters: { letter: string; points: number }[]) => {
+    if (!wordBoardPosition) {
+      console.log('[GAME] No word board position, skipping falling animation');
+      letters.forEach((letterData) => {
+        if (isPlayer1Winner) {
+          setPlayer1Points(prev => prev + letterData.points);
+        } else {
+          setPlayer2Points(prev => prev + letterData.points);
+        }
+      });
+      
+      setTimeout(() => {
+        Animated.sequence([
+          Animated.delay(1500),
+          Animated.timing(announcementOpacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setRoundWinnerAnnouncement(null);
+        });
+      }, 0);
+      return;
+    }
+
+    const tileWidth = getLetterTileWidth();
+    const totalWidth = letters.length * (tileWidth + 8);
+    const startXBase = wordBoardPosition.x - totalWidth / 2;
+
+    letters.forEach((letterData, index) => {
+      const delay = index * 150;
+      const fallAnim = new Animated.Value(0);
+      const startX = startXBase + index * (tileWidth + 8) + tileWidth / 2;
+      const startY = wordBoardPosition.y;
+
+      const fallingLetter: FallingLetter = {
+        id: `falling-${Date.now()}-${index}`,
+        letter: letterData.letter,
+        index,
+        points: letterData.points,
+        fallAnim,
+        startX,
+        startY,
+        randomXOffset: (Math.random() - 0.5) * 60,
+        randomRotation: (Math.random() - 0.5) * 60,
+      };
+
+      setTimeout(() => {
+        setFallingLetters(prev => [...prev, fallingLetter]);
+
+        Animated.timing(fallAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }).start(() => {
+          if (isPlayer1Winner) {
+            setPlayer1Points(prev => prev + letterData.points);
+          } else {
+            setPlayer2Points(prev => prev + letterData.points);
+          }
+          
+          if (Platform.OS !== 'web') {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }
+
+          setFallingLetters(prev => prev.filter(l => l.id !== fallingLetter.id));
+        });
+      }, delay);
+    });
+
+    const totalAnimationTime = letters.length * 150 + 600 + 500;
+    setTimeout(() => {
+      Animated.timing(announcementOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => {
+        setRoundWinnerAnnouncement(null);
+      });
+    }, totalAnimationTime);
+  }, [wordBoardPosition, announcementOpacity]);
+
   useEffect(() => {
     if (!currentGame) return;
     
@@ -184,13 +283,18 @@ export default function MultiplayerGameScreen() {
       console.log(`[GAME] Round ended! Word "${previousWordRef.current}" worth ${wordPoints} points`);
       
       let winnerName = '';
+      const isPlayer1Winner = player1WonRound;
+      
       if (player1WonRound) {
-        setPlayer1Points(prev => prev + wordPoints);
         winnerName = isPlayer1 ? 'You' : (opponentProfile?.username || 'Opponent');
       } else if (player2WonRound) {
-        setPlayer2Points(prev => prev + wordPoints);
         winnerName = !isPlayer1 ? 'You' : (opponentProfile?.username || 'Opponent');
       }
+      
+      const letters = previousWordRef.current.split('').map(letter => ({
+        letter,
+        points: POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER] || 0,
+      }));
       
       setRoundWinnerAnnouncement({ winner: winnerName, points: wordPoints });
       announcementOpacity.setValue(0);
@@ -200,14 +304,9 @@ export default function MultiplayerGameScreen() {
           duration: 300,
           useNativeDriver: true,
         }),
-        Animated.delay(2500),
-        Animated.timing(announcementOpacity, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
+        Animated.delay(500),
       ]).start(() => {
-        setRoundWinnerAnnouncement(null);
+        startFallingLettersAnimation(isPlayer1Winner, letters);
       });
     }
     
@@ -628,11 +727,17 @@ export default function MultiplayerGameScreen() {
                 <View style={styles.headerRight} />
               </View>
               <View style={styles.playerPointsContainer}>
-                <View style={styles.playerPointsBox}>
+                <View 
+                  style={styles.playerPointsBox}
+                  ref={isPlayer1 ? player1ScoreRef : player2ScoreRef}
+                >
                   <Text style={styles.playerPointsLabel}>You</Text>
                   <Text style={styles.playerPointsValue}>{myPoints} pts</Text>
                 </View>
-                <View style={styles.playerPointsBox}>
+                <View 
+                  style={styles.playerPointsBox}
+                  ref={isPlayer1 ? player2ScoreRef : player1ScoreRef}
+                >
                   <Text style={styles.playerPointsLabel}>{opponentProfile?.username || 'Opponent'}</Text>
                   <Text style={styles.playerPointsValue}>{opponentPoints} pts</Text>
                 </View>
@@ -863,6 +968,61 @@ export default function MultiplayerGameScreen() {
           </View>
         </Animated.View>
       )}
+      
+      {fallingLetters.map((item) => {
+        const targetY = 400;
+        
+        const translateY = item.fallAnim.interpolate({
+          inputRange: [0, 0.3, 0.7, 1],
+          outputRange: [0, targetY * 0.2, targetY * 0.6, targetY],
+        });
+        
+        const translateX = item.fallAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0, item.randomXOffset],
+        });
+        
+        const opacity = item.fallAnim.interpolate({
+          inputRange: [0, 0.7, 1],
+          outputRange: [1, 1, 0],
+        });
+        
+        const scale = item.fallAnim.interpolate({
+          inputRange: [0, 0.5, 1],
+          outputRange: [1, 0.8, 0.5],
+        });
+        
+        const rotate = item.fallAnim.interpolate({
+          inputRange: [0, 1],
+          outputRange: ['0deg', `${item.randomRotation}deg`],
+        });
+
+        return (
+          <Animated.View
+            key={item.id}
+            style={[
+              styles.fallingLetter,
+              {
+                left: item.startX - 25,
+                top: item.startY - 30,
+                transform: [
+                  { translateX },
+                  { translateY },
+                  { scale },
+                  { rotate },
+                ],
+                opacity,
+              },
+            ]}
+            pointerEvents="none"
+          >
+            <View style={styles.fallingLetterTile}>
+              <Text style={styles.fallingLetterText}>{item.letter}</Text>
+              <Text style={styles.fallingLetterPoints}>{item.points}</Text>
+            </View>
+          </Animated.View>
+        );
+      })}
     </LinearGradient>
   );
 }
@@ -1268,5 +1428,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600' as const,
     color: 'rgba(255, 255, 255, 0.9)',
+  },
+  fallingLetter: {
+    position: 'absolute' as const,
+    width: 50,
+    height: 60,
+    zIndex: 9000,
+  },
+  fallingLetterTile: {
+    width: 50,
+    height: 60,
+    backgroundColor: 'rgba(255, 200, 100, 0.9)',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fallingLetterText: {
+    fontSize: 28,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+  },
+  fallingLetterPoints: {
+    position: 'absolute' as const,
+    top: 2,
+    right: 4,
+    fontSize: 10,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
   },
 });
