@@ -46,6 +46,10 @@ export const [GameContext, useGame] = createContextHook(() => {
       roundsWon: 0,
     };
 
+    setIsProcessingMove(false);
+    setIsAIThinking(false);
+    setLetterBombActive(false);
+
     setGameState({
       mode: 'ai',
       phase: 'playing',
