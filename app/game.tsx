@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Animated, Platform as RNPlatform, Image } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Animated, Platform as RNPlatform, Image, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '@/contexts/GameContext';
@@ -11,6 +11,8 @@ import { POINTS_PER_LETTER } from '@/constants/game';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
 import DanglingG from '@/components/DanglingG';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export default function GameScreen() {
   const router = useRouter();
@@ -25,7 +27,6 @@ export default function GameScreen() {
   const [hiddenLetterIndex, setHiddenLetterIndex] = useState<number>(-1);
   const wordBoardRef = useRef<View | null>(null);
   const [wordBoardPosition, setWordBoardPosition] = useState<{ x: number; y: number } | null>(null);
-  const [wordBoardWidth, setWordBoardWidth] = useState<number>(0);
   const [explosionLetter, setExplosionLetter] = useState<string>('');
   const explodingLetterRef = useRef<{ x: number; y: number } | null>(null);
   const [showBombIndicator, setShowBombIndicator] = useState<boolean>(false);
@@ -937,9 +938,7 @@ export default function GameScreen() {
                   <View 
                     style={styles.wordLettersDisplay}
                     ref={wordBoardRef}
-                    onLayout={(event) => {
-                      const { width } = event.nativeEvent.layout;
-                      setWordBoardWidth(width);
+                    onLayout={() => {
                       wordBoardRef.current?.measureInWindow((x, y, w, height) => {
                         setWordBoardPosition({ x: x + w / 2, y: y + height / 2 });
                       });
@@ -950,8 +949,8 @@ export default function GameScreen() {
                       const isExploding = index === hiddenLetterIndex;
                       const actualWordLength = currentRound.currentWord.length;
                       const letterCount = Math.max(displayedWord.length, actualWordLength);
-                      const effectiveWidth = wordBoardWidth || 320;
-                      const scaleFactor = Math.min(1, 70 / (effectiveWidth / letterCount));
+                      const containerWidth = SCREEN_WIDTH * 0.95 - 40;
+                      const scaleFactor = Math.min(1, 70 / (containerWidth / letterCount));
                       
                       const baseFontSize = 60;
                       const basePointsSize = 10;
