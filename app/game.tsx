@@ -48,6 +48,7 @@ export default function GameScreen() {
   const roundWinnerScale = useRef(new Animated.Value(0)).current;
   const roundWinnerOpacity = useRef(new Animated.Value(0)).current;
   const roundWinnerGlow = useRef(new Animated.Value(0)).current;
+  const processedRoundEndRef = useRef<number>(-1);
 
 
 
@@ -510,7 +511,14 @@ export default function GameScreen() {
     }
 
     if (gameState.phase === 'roundEnd') {
-      const currentRound = gameState.rounds[gameState.currentRound - 1];
+      const currentRoundNumber = gameState.currentRound;
+      
+      if (processedRoundEndRef.current === currentRoundNumber) {
+        return;
+      }
+      processedRoundEndRef.current = currentRoundNumber;
+      
+      const currentRound = gameState.rounds[currentRoundNumber - 1];
       const isPlayer1Winner = currentRound?.loser === 'player2';
       const winnerName = isPlayer1Winner ? gameState.player1.name : gameState.player2.name;
       
@@ -518,9 +526,7 @@ export default function GameScreen() {
         return sum + (POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER] || 0);
       }, 0);
       
-      const player1WinsAfterRound = isPlayer1Winner ? gameState.player1.roundsWon : gameState.player1.roundsWon;
-      const player2WinsAfterRound = !isPlayer1Winner ? gameState.player2.roundsWon : gameState.player2.roundsWon;
-      const matchIsOver = player1WinsAfterRound >= 2 || player2WinsAfterRound >= 2;
+      const matchIsOver = gameState.player1.roundsWon >= 2 || gameState.player2.roundsWon >= 2;
       
       setRoundWinnerName(winnerName);
       setRoundWinnerPoints(wordPoints);
