@@ -1083,7 +1083,7 @@ export default function GameScreen() {
                   <Text style={styles.wordValueText}>Word Value: {calculateWordValue()} pts</Text>
                 </View>
 
-                <View>
+                <View style={styles.keyboardSection}>
                   <View style={styles.keyboardContainer}>
                     {keyboardRows.map((row, rowIndex) => (
                       <View key={rowIndex} style={styles.keyboardRow}>
@@ -1099,7 +1099,8 @@ export default function GameScreen() {
                           const isBombedLetter = isBomberSelectingReplacement && 
                             letter === gameState?.letterBombedLetter;
                           
-                          const isKeyboardDisabled = !isPlayer1Turn || isAIThinking || isProcessingMove || isValidating;
+                          const isInChallengeMode = gameState?.phase === 'challenge';
+                          const isKeyboardDisabled = !isPlayer1Turn || isAIThinking || isValidating || (isProcessingMove && !isInChallengeMode);
                           const isLetterBlocked = isBombedLetter || (isKeyboardDisabled && !isBomberSelectingReplacement);
                           
                           return (
@@ -1369,7 +1370,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
     marginTop: 150,
-    minHeight: 100,
+    height: 100,
   },
   wordLettersContainer: {
     flexDirection: 'row',
@@ -1789,10 +1790,15 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
   },
+  keyboardSection: {
+    position: 'absolute' as const,
+    left: 20,
+    right: 20,
+    bottom: 140,
+  },
   keyboardContainer: {
     gap: 10,
     marginBottom: 20,
-    marginTop: 10,
   },
   keyboardRow: {
     flexDirection: 'row',
