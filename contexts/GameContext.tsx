@@ -148,6 +148,10 @@ export const [GameContext, useGame] = createContextHook(() => {
         timeLeft: GAME_CONFIG.TIME_PER_TURN,
       };
 
+      setIsProcessingMove(false);
+      setIsAIThinking(false);
+      setLetterBombActive(false);
+
       setGameState(prev => {
         if (!prev) return null;
         return {
