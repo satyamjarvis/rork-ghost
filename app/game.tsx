@@ -14,6 +14,16 @@ import DanglingG from '@/components/DanglingG';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
+interface FallingLetter {
+  id: string;
+  letter: string;
+  index: number;
+  points: number;
+  fallAnim: Animated.Value;
+  startX: number;
+  startY: number;
+}
+
 export default function GameScreen() {
   const router = useRouter();
   const { gameState, playLetter, isAIThinking, callWord, initiateChallenge, submitChallengeWord, letterBombActive, activateLetterBomb, useLetterBomb, lastLetterBombUsedBy, isValidating, isProcessingMove, nextRound } = useGame();
@@ -50,6 +60,9 @@ export default function GameScreen() {
   const roundWinnerOpacity = useRef(new Animated.Value(0)).current;
   const roundWinnerGlow = useRef(new Animated.Value(0)).current;
   const processedRoundEndRef = useRef<number>(-1);
+  const [fallingLetters, setFallingLetters] = useState<FallingLetter[]>([]);
+  const player1ScoreRef = useRef<View | null>(null);
+  const player2ScoreRef = useRef<View | null>(null);
 
 
 
@@ -568,6 +581,51 @@ export default function GameScreen() {
         ),
       ]).start();
       
+      // Start falling letters animation after 1 second
+      setTimeout(() => {
+        if (wordBoardPosition) {
+          const letters = currentRound.currentWord.split('').map((letter, index) => ({
+            letter,
+            points: POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER] || 0,
+            index,
+          }));
+          
+          const containerWidth = SCREEN_WIDTH * 0.95 - 40;
+          const letterCount = letters.length;
+          const tileWidth = Math.min(70, containerWidth / letterCount);
+          const totalWidth = letterCount * (tileWidth + 8);
+          const startXBase = wordBoardPosition.x - totalWidth / 2;
+          
+          const newFallingLetters: FallingLetter[] = letters.map((item, idx) => {
+            const fallAnim = new Animated.Value(0);
+            const startX = startXBase + idx * (tileWidth + 8) + tileWidth / 2;
+            
+            return {
+              id: `falling-${Date.now()}-${idx}`,
+              letter: item.letter,
+              index: idx,
+              points: item.points,
+              fallAnim,
+              startX,
+              startY: wordBoardPosition.y,
+            };
+          });
+          
+          setFallingLetters(newFallingLetters);
+          
+          // Stagger the animations
+          newFallingLetters.forEach((item, idx) => {
+            setTimeout(() => {
+              Animated.timing(item.fallAnim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+              }).start();
+            }, idx * 100);
+          });
+        }
+      }, 1000);
+      
       setTimeout(() => {
         Animated.parallel([
           Animated.timing(roundWinnerOpacity, {
@@ -582,6 +640,7 @@ export default function GameScreen() {
           }),
         ]).start(() => {
           setShowRoundWinner(false);
+          setFallingLetters([]);
           if (matchIsOver) {
             router.replace('/game-over');
           } else {
@@ -1252,6 +1311,39 @@ export default function GameScreen() {
             <Text style={styles.roundWinnerPoints}>+{roundWinnerPoints} pts</Text>
           </Animated.View>
         )}
+
+        {fallingLetters.map((item) => {
+          const translateY = item.fallAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 200],
+          });
+          
+          const opacity = item.fallAnim.interpolate({
+            inputRange: [0, 0.8, 1],
+            outputRange: [1, 1, 0],
+          });
+
+          return (
+            <Animated.View
+              key={item.id}
+              style={[
+                styles.fallingLetter,
+                {
+                  left: item.startX - 25,
+                  top: item.startY - 30,
+                  transform: [{ translateY }],
+                  opacity,
+                },
+              ]}
+              pointerEvents="none"
+            >
+              <View style={styles.fallingLetterTile}>
+                <Text style={styles.fallingLetterText}>{item.letter}</Text>
+                <Text style={styles.fallingLetterPoints}>{item.points}</Text>
+              </View>
+            </Animated.View>
+          );
+        })}
       </View>
     </LinearGradient>
   );
@@ -2110,5 +2202,39 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 3,
+  },
+  fallingLetter: {
+    position: 'absolute' as const,
+    width: 50,
+    height: 60,
+    zIndex: 9000,
+  },
+  fallingLetterTile: {
+    width: 50,
+    height: 60,
+    backgroundColor: 'rgba(255, 200, 100, 0.9)',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  fallingLetterText: {
+    fontSize: 28,
+    fontWeight: '700' as const,
+    color: '#1a1a1a',
+  },
+  fallingLetterPoints: {
+    position: 'absolute' as const,
+    top: 2,
+    right: 4,
+    fontSize: 10,
+    fontWeight: '600' as const,
+    color: '#1a1a1a',
   },
 });
