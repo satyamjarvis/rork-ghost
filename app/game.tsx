@@ -925,22 +925,7 @@ export default function GameScreen() {
                   </View>
                 )}
 
-                {showRoundWinner && (
-                  <Animated.View 
-                    style={[
-                      styles.roundWinnerBanner,
-                      { 
-                        opacity: roundWinnerOpacity,
-                        transform: [{ scale: roundWinnerScale }],
-                      },
-                    ]}
-                    pointerEvents="none"
-                  >
-                    <Text style={styles.roundWinnerLabel}>ROUND WINNER</Text>
-                    <Text style={styles.roundWinnerName}>{roundWinnerName}</Text>
-                    <Text style={styles.roundWinnerPoints}>+{roundWinnerPoints} pts</Text>
-                  </Animated.View>
-                )}
+
 
                 <View style={styles.wordDisplayContainer}>
                   <View 
@@ -1147,28 +1132,26 @@ export default function GameScreen() {
                       </View>
                     ))}
                   </View>
-                  {(isAIThinking || showBombIndicator || isValidating || (gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player2')) && (
-                    <View style={styles.indicatorContainer}>
-                      {isValidating ? (
-                        <>
-                          <Loader2 color={COLORS.gold} size={20} />
-                          <Text style={styles.indicatorText}>Validating word...</Text>
-                        </>
-                      ) : isAIThinking ? (
-                        <>
-                          <Loader2 color={COLORS.gold} size={20} />
-                          <Text style={styles.indicatorText}>AI thinking...</Text>
-                        </>
-                      ) : showBombIndicator ? (
-                        <Text style={styles.indicatorText}>Choose a replacement letter...</Text>
-                      ) : gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player2' ? (
-                        <>
-                          <Loader2 color={COLORS.gold} size={20} />
-                          <Text style={styles.indicatorText}>AI responding to challenge...</Text>
-                        </>
-                      ) : null}
-                    </View>
-                  )}
+                  <View style={styles.indicatorContainer}>
+                    {isValidating ? (
+                      <>
+                        <Loader2 color={COLORS.gold} size={20} />
+                        <Text style={styles.indicatorText}>Validating word...</Text>
+                      </>
+                    ) : isAIThinking ? (
+                      <>
+                        <Loader2 color={COLORS.gold} size={20} />
+                        <Text style={styles.indicatorText}>AI thinking...</Text>
+                      </>
+                    ) : showBombIndicator ? (
+                      <Text style={styles.indicatorText}>Choose a replacement letter...</Text>
+                    ) : gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player2' ? (
+                      <>
+                        <Loader2 color={COLORS.gold} size={20} />
+                        <Text style={styles.indicatorText}>AI responding to challenge...</Text>
+                      </>
+                    ) : null}
+                  </View>
                   {gameState.phase === 'challenge' && gameState.currentPlayer === 'player1' && (
                     <View style={styles.challengeInstructions}>
                       <AlertCircle color={COLORS.gold} size={24} />
@@ -1269,8 +1252,22 @@ export default function GameScreen() {
           </Animated.View>
         </SafeAreaView>
 
-
-
+        {showRoundWinner && (
+          <Animated.View 
+            style={[
+              styles.roundWinnerOverlay,
+              { 
+                opacity: roundWinnerOpacity,
+                transform: [{ scale: roundWinnerScale }],
+              },
+            ]}
+            pointerEvents="none"
+          >
+            <Text style={styles.roundWinnerLabel}>ROUND WINNER</Text>
+            <Text style={styles.roundWinnerName}>{roundWinnerName}</Text>
+            <Text style={styles.roundWinnerPoints}>+{roundWinnerPoints} pts</Text>
+          </Animated.View>
+        )}
       </View>
     </LinearGradient>
   );
@@ -1972,7 +1969,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingVertical: 12,
+    height: 44,
     marginTop: 8,
   },
   indicatorText: {
@@ -2108,46 +2105,40 @@ const styles = StyleSheet.create({
     fontWeight: '800' as const,
     color: COLORS.white,
   },
-  roundWinnerBanner: {
+  roundWinnerOverlay: {
+    position: 'absolute' as const,
+    top: '35%',
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 20,
-    marginBottom: 16,
-    maxWidth: '70%',
-    alignSelf: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.gold,
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 10,
+    zIndex: 10000,
   },
   roundWinnerLabel: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600' as const,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255, 255, 255, 0.9)',
     letterSpacing: 3,
     marginBottom: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
   roundWinnerName: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: '900' as const,
     color: COLORS.gold,
-    textShadowColor: 'rgba(255, 215, 0, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 6,
     letterSpacing: 1,
   },
   roundWinnerPoints: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '700' as const,
     color: COLORS.white,
     marginTop: 4,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
 });
