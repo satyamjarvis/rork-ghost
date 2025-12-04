@@ -18,6 +18,7 @@ export const [GameContext, useGame] = createContextHook(() => {
   const [isValidating, setIsValidating] = useState<boolean>(false);
   const validationInProgress = useRef<boolean>(false);
   const [isProcessingMove, setIsProcessingMove] = useState<boolean>(false);
+  const isProcessingMoveRef = useRef<boolean>(false);
 
   const startGame = useCallback((mode: GameMode = 'ai') => {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -46,6 +47,7 @@ export const [GameContext, useGame] = createContextHook(() => {
       roundsWon: 0,
     };
 
+    isProcessingMoveRef.current = false;
     setIsProcessingMove(false);
     setIsAIThinking(false);
     setLetterBombActive(false);
@@ -65,17 +67,20 @@ export const [GameContext, useGame] = createContextHook(() => {
   }, []);
 
   const playLetter = useCallback((letter: string, isAIMove: boolean = false) => {
-    if (isProcessingMove && !isAIMove) {
-      console.log('[playLetter] Move already being processed, ignoring tap');
-      return;
-    }
-    
-    if (!isAIMove) {
-      setIsProcessingMove(true);
-    }
-    
     setGameState(prevState => {
       if (!prevState) return null;
+
+      const isInChallengeMode = prevState.phase === 'challenge';
+      
+      if (isProcessingMoveRef.current && !isAIMove && !isInChallengeMode) {
+        console.log('[playLetter] Move already being processed, ignoring tap');
+        return prevState;
+      }
+      
+      if (!isAIMove && !isInChallengeMode) {
+        isProcessingMoveRef.current = true;
+        setIsProcessingMove(true);
+      }
 
       const currentRound = prevState.rounds[prevState.currentRound - 1];
       const isPlayer1 = prevState.currentPlayer === 'player1';
@@ -104,7 +109,6 @@ export const [GameContext, useGame] = createContextHook(() => {
       const updatedRounds = [...prevState.rounds];
       updatedRounds[prevState.currentRound - 1] = updatedRound;
 
-      const isInChallengeMode = prevState.phase === 'challenge';
       const nextPlayer = isInChallengeMode ? prevState.currentPlayer : (isPlayer1 ? 'player2' : 'player1');
 
       return {
@@ -117,7 +121,7 @@ export const [GameContext, useGame] = createContextHook(() => {
     });
 
     setTimeLeft(GAME_CONFIG.TIME_PER_TURN);
-  }, [isProcessingMove]);
+  }, []);
 
   const playLetterAI = useCallback((letter: string) => {
     playLetter(letter, true);
@@ -148,6 +152,7 @@ export const [GameContext, useGame] = createContextHook(() => {
         timeLeft: GAME_CONFIG.TIME_PER_TURN,
       };
 
+      isProcessingMoveRef.current = false;
       setIsProcessingMove(false);
       setIsAIThinking(false);
       setLetterBombActive(false);
@@ -653,6 +658,7 @@ export const [GameContext, useGame] = createContextHook(() => {
 
   useEffect(() => {
     if (gameState && gameState.currentPlayer === 'player1' && !isAIThinking) {
+      isProcessingMoveRef.current = false;
       setIsProcessingMove(false);
     }
   }, [gameState?.currentPlayer, isAIThinking]);
