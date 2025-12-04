@@ -25,7 +25,6 @@ export default function GameScreen() {
   const [hiddenLetterIndex, setHiddenLetterIndex] = useState<number>(-1);
   const wordBoardRef = useRef<View | null>(null);
   const [wordBoardPosition, setWordBoardPosition] = useState<{ x: number; y: number } | null>(null);
-  const [wordBoardWidth, setWordBoardWidth] = useState<number>(0);
   const [explosionLetter, setExplosionLetter] = useState<string>('');
   const explodingLetterRef = useRef<{ x: number; y: number } | null>(null);
   const [showBombIndicator, setShowBombIndicator] = useState<boolean>(false);
@@ -937,9 +936,7 @@ export default function GameScreen() {
                   <View 
                     style={styles.wordLettersDisplay}
                     ref={wordBoardRef}
-                    onLayout={(event) => {
-                      const { width } = event.nativeEvent.layout;
-                      setWordBoardWidth(width);
+                    onLayout={() => {
                       wordBoardRef.current?.measureInWindow((x, y, w, height) => {
                         setWordBoardPosition({ x: x + w / 2, y: y + height / 2 });
                       });
@@ -949,26 +946,28 @@ export default function GameScreen() {
                       const isAnimating = index === animatingIndex;
                       const isExploding = index === hiddenLetterIndex;
                       const letterCount = displayedWord.length;
-                      const scaleFactor = Math.min(1, 70 / (wordBoardWidth / letterCount));
                       
                       const baseFontSize = 60;
                       const basePointsSize = 10;
+                      const baseMargin = 4;
                       let dynamicFontSize = baseFontSize;
                       let dynamicPointsSize = basePointsSize;
+                      let dynamicMargin = baseMargin;
                       
-                      if (letterCount > 6) {
-                        const reductionFactor = Math.max(0.4, 1 - ((letterCount - 6) * 0.08));
-                        dynamicFontSize = baseFontSize * reductionFactor;
-                        dynamicPointsSize = basePointsSize * reductionFactor;
+                      if (letterCount > 5) {
+                        const scaleFactor = Math.max(0.35, 5 / letterCount);
+                        dynamicFontSize = baseFontSize * scaleFactor;
+                        dynamicPointsSize = Math.max(6, basePointsSize * scaleFactor);
+                        dynamicMargin = Math.max(1, baseMargin * scaleFactor);
                       }
                       
-                      const shadowBottomOffset = -4 * scaleFactor;
+                      const shadowBottomOffset = letterCount > 5 ? -4 * Math.max(0.35, 5 / letterCount) : -4;
                       
                       if (isExploding) {
                         return (
                           <View
                             key={`letter-${index}`}
-                            style={styles.wordLetterContainer}
+                            style={[styles.wordLetterContainer, { marginHorizontal: dynamicMargin }]}
                             ref={(ref) => {
                               letterViewRefs.set(index, ref);
                               if (ref && explosionLetter && !explodingParticles.length) {
@@ -1012,6 +1011,7 @@ export default function GameScreen() {
                                 {
                                   opacity,
                                   transform: [{ scale: animScale }],
+                                  marginHorizontal: dynamicMargin,
                                 },
                               ]}
                             >
@@ -1049,6 +1049,7 @@ export default function GameScreen() {
                               {
                                 transform: [{ scale: animScale }, { translateY }],
                                 opacity,
+                                marginHorizontal: dynamicMargin,
                               },
                             ]}
                           >
@@ -1066,7 +1067,7 @@ export default function GameScreen() {
                       return (
                         <View
                           key={`letter-${index}`}
-                          style={styles.wordLetterContainer}
+                          style={[styles.wordLetterContainer, { marginHorizontal: dynamicMargin }]}
                           ref={(ref) => { letterViewRefs.set(index, ref); }}
                         >
                           <View style={styles.wordLetter}>
@@ -1891,15 +1892,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     flexWrap: 'nowrap',
     alignItems: 'center',
-    width: '95%',
-    alignSelf: 'center',
+    width: '100%',
+    paddingHorizontal: 10,
   },
   wordLetterContainer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    maxWidth: 70,
-    marginHorizontal: 4,
+    minWidth: 20,
   },
   wordLetter: {
     backgroundColor: 'transparent',
