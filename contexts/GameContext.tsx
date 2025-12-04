@@ -60,13 +60,15 @@ export const [GameContext, useGame] = createContextHook(() => {
     setTimeLeft(GAME_CONFIG.TIME_PER_TURN);
   }, []);
 
-  const playLetter = useCallback((letter: string) => {
-    if (isProcessingMove) {
+  const playLetter = useCallback((letter: string, isAIMove: boolean = false) => {
+    if (isProcessingMove && !isAIMove) {
       console.log('[playLetter] Move already being processed, ignoring tap');
       return;
     }
     
-    setIsProcessingMove(true);
+    if (!isAIMove) {
+      setIsProcessingMove(true);
+    }
     
     setGameState(prevState => {
       if (!prevState) return null;
@@ -112,6 +114,10 @@ export const [GameContext, useGame] = createContextHook(() => {
 
     setTimeLeft(GAME_CONFIG.TIME_PER_TURN);
   }, [isProcessingMove]);
+
+  const playLetterAI = useCallback((letter: string) => {
+    playLetter(letter, true);
+  }, [playLetter]);
 
   const nextRound = useCallback(() => {
     if (!gameState) return;
@@ -688,14 +694,14 @@ export const [GameContext, useGame] = createContextHook(() => {
               throw new Error('Invalid AI letter');
             }
             
-            playLetter(aiLetter);
+            playLetterAI(aiLetter);
             setIsAIThinking(false);
           } catch (error) {
             console.error('[AI] Error during AI turn:', error);
             setIsAIThinking(false);
             const randomLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)];
             console.log('[AI] Using fallback random letter:', randomLetter);
-            playLetter(randomLetter);
+            playLetterAI(randomLetter);
           }
         }, 1500);
       } else if (gameState.phase === 'challenge') {
@@ -721,7 +727,7 @@ export const [GameContext, useGame] = createContextHook(() => {
         }, 2000);
       }
     }
-  }, [gameState, isAIThinking, playLetter, submitChallengeWord, aiDifficulty, initiateChallenge, useLetterBomb]);
+  }, [gameState, isAIThinking, playLetterAI, submitChallengeWord, aiDifficulty, initiateChallenge, useLetterBomb]);
 
   return {
     gameState,

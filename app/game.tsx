@@ -1124,15 +1124,6 @@ export default function GameScreen() {
                                   {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
                                 </Text>
                               </TouchableOpacity>
-                              {isLetterBlocked && (
-                                <View style={styles.ghostOverlay} pointerEvents="none">
-                                  <Image
-                                    source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/giooeoqlx8wvws1oy6m0k' }}
-                                    style={styles.ghostOverlayImage}
-                                    resizeMode="contain"
-                                  />
-                                </View>
-                              )}
                             </Animated.View>
                           );
                         })}
