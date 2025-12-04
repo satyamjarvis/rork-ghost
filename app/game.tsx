@@ -948,8 +948,10 @@ export default function GameScreen() {
                     {displayedWord.split('').map((letter, index) => {
                       const isAnimating = index === animatingIndex;
                       const isExploding = index === hiddenLetterIndex;
-                      const letterCount = displayedWord.length;
-                      const scaleFactor = Math.min(1, 70 / (wordBoardWidth / letterCount));
+                      const actualWordLength = currentRound.currentWord.length;
+                      const letterCount = Math.max(displayedWord.length, actualWordLength);
+                      const effectiveWidth = wordBoardWidth || 320;
+                      const scaleFactor = Math.min(1, 70 / (effectiveWidth / letterCount));
                       
                       const baseFontSize = 60;
                       const basePointsSize = 10;
@@ -1356,6 +1358,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     marginTop: 150,
     height: 100,
+    minHeight: 100,
   },
   wordLettersContainer: {
     flexDirection: 'row',
@@ -1892,6 +1895,7 @@ const styles = StyleSheet.create({
     flexWrap: 'nowrap',
     alignItems: 'center',
     width: '95%',
+    maxWidth: '95%',
     alignSelf: 'center',
   },
   wordLetterContainer: {
