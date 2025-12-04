@@ -78,6 +78,9 @@ export default function MultiplayerGameScreen() {
   const [player1Points, setPlayer1Points] = useState<number>(0);
   const [player2Points, setPlayer2Points] = useState<number>(0);
   
+  const [roundWinnerAnnouncement, setRoundWinnerAnnouncement] = useState<{ winner: string; points: number } | null>(null);
+  const announcementOpacity = useRef(new Animated.Value(0)).current;
+  
   const previousRoundRef = useRef<number>(1);
   const previousRoundsWonRef = useRef<{ player1: number; player2: number }>({ player1: 0, player2: 0 });
   
@@ -189,7 +192,23 @@ export default function MultiplayerGameScreen() {
         winnerName = !isPlayer1 ? 'You' : (opponentProfile?.username || 'Opponent');
       }
       
-      Alert.alert('Round Winner!', `${winnerName} won the round! +${wordPoints} pts`);
+      setRoundWinnerAnnouncement({ winner: winnerName, points: wordPoints });
+      announcementOpacity.setValue(0);
+      Animated.sequence([
+        Animated.timing(announcementOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.delay(2500),
+        Animated.timing(announcementOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setRoundWinnerAnnouncement(null);
+      });
     }
     
     previousRoundsWonRef.current = { player1: player1RoundsWon, player2: player2RoundsWon };
@@ -829,6 +848,21 @@ export default function MultiplayerGameScreen() {
       </View>
       
       
+    {roundWinnerAnnouncement && (
+        <Animated.View 
+          style={[
+            styles.roundWinnerOverlay,
+            { opacity: announcementOpacity }
+          ]}
+          pointerEvents="none"
+        >
+          <View style={styles.roundWinnerCard}>
+            <Text style={styles.roundWinnerLabel}>ROUND WINNER</Text>
+            <Text style={styles.roundWinnerName}>{roundWinnerAnnouncement.winner}</Text>
+            <Text style={styles.roundWinnerPoints}>+{roundWinnerAnnouncement.points} pts</Text>
+          </View>
+        </Animated.View>
+      )}
     </LinearGradient>
   );
 }
@@ -1192,5 +1226,47 @@ const styles = StyleSheet.create({
     top: 5,
     right: -10,
   },
-  
+  roundWinnerOverlay: {
+    position: 'absolute' as const,
+    top: 120,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 10000,
+  },
+  roundWinnerCard: {
+    backgroundColor: 'rgba(20, 15, 10, 0.9)',
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 28,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 200, 100, 0.4)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  roundWinnerLabel: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    color: 'rgba(255, 200, 100, 0.8)',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  roundWinnerName: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: '#FFD700',
+    textShadowColor: 'rgba(255, 200, 0, 0.4)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+    marginBottom: 4,
+  },
+  roundWinnerPoints: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
 });
