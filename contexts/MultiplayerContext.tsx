@@ -220,7 +220,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
       .single();
 
     if (gameError) {
-      console.error('[MP] Error creating game:', gameError);
+      console.error('[MP] Error creating game:', JSON.stringify(gameError, null, 2));
       return { error: gameError };
     }
 
@@ -296,7 +296,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
       setIsInQueue(false);
 
       if (gameError) {
-        console.error('[MP] Error creating game:', gameError);
+        console.error('[MP] Error creating game:', JSON.stringify(gameError, null, 2));
         return { error: gameError };
       }
 
