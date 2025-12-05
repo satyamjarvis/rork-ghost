@@ -485,10 +485,13 @@ export default function GameScreen() {
           setAnimatingIndex(currentRound.currentWord.length - 1);
           newLetterAnim.setValue(0);
           
+          // Check if AI just played (AI is player2, so after AI plays, currentPlayer becomes player1)
           const isAIMove = gameState.mode === 'ai' && gameState.currentPlayer === 'player1' && displayedWord.length > 0;
+          // Also check challenge response from AI
           const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
           
           if (isAIMove || isChallengeResponse) {
+            // AI/opponent letter appearing - use fade in animation with sound
             setIsAIAnimating(true);
             playOpponentLetterSound();
             Animated.timing(newLetterAnim, {
@@ -500,6 +503,7 @@ export default function GameScreen() {
               setIsAIAnimating(false);
             });
           } else {
+            // Player's own letter - use bounce animation (sound is played in handleLetterPress)
             Animated.sequence([
               Animated.timing(newLetterAnim, {
                 toValue: 0.5,
@@ -553,10 +557,13 @@ export default function GameScreen() {
       setShowRoundWinner(true);
       roundWinnerOpacity.setValue(0);
       
-      if (RNPlatform.OS !== 'web') {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // Only play victory sound and haptic if player1 (human) wins
+      if (isPlayer1Winner) {
+        if (RNPlatform.OS !== 'web') {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+        playRoundWinSound();
       }
-      playRoundWinSound();
       
       Animated.sequence([
         Animated.timing(roundWinnerOpacity, {
@@ -608,7 +615,7 @@ export default function GameScreen() {
           setScoringPlayerId(isPlayer1Winner ? 'player1' : 'player2');
           setDisplayedScoreBonus(0);
           
-          // Start score ticking animation
+          // Start score ticking animation with ascending pitch sounds
           let currentTick = 0;
           const tickInterval = setInterval(() => {
             currentTick++;
@@ -616,7 +623,7 @@ export default function GameScreen() {
             if (RNPlatform.OS !== 'web') {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }
-            playPointsTickSound();
+            playPointsTickSound(currentTick - 1, wordPoints);
             if (currentTick >= wordPoints) {
               clearInterval(tickInterval);
             }

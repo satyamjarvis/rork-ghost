@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 let letterTapSound: Audio.Sound | null = null;
 let opponentLetterSound: Audio.Sound | null = null;
 let roundWinSound: Audio.Sound | null = null;
-let pointsTickSound: Audio.Sound | null = null;
+let pointsPopSounds: Audio.Sound[] = [];
 
 export const initializeSounds = async () => {
   try {
@@ -37,11 +37,20 @@ export const initializeSounds = async () => {
       { shouldPlay: false }
     );
 
-    pointsTickSound = new Audio.Sound();
-    await pointsTickSound.loadAsync(
-      { uri: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3' },
-      { shouldPlay: false }
-    );
+    // Load ascending pitch pop sounds for points cascade
+    const popSoundUrls = [
+      'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', // base pop
+      'https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3', // slightly higher
+      'https://assets.mixkit.co/active_storage/sfx/2573/2573-preview.mp3', // medium
+      'https://assets.mixkit.co/active_storage/sfx/2574/2574-preview.mp3', // higher
+      'https://assets.mixkit.co/active_storage/sfx/1110/1110-preview.mp3', // coin/ding
+    ];
+    
+    for (const url of popSoundUrls) {
+      const sound = new Audio.Sound();
+      await sound.loadAsync({ uri: url }, { shouldPlay: false });
+      pointsPopSounds.push(sound);
+    }
 
     console.log('[Sounds] All sounds loaded successfully');
   } catch (error) {
@@ -82,14 +91,28 @@ export const playRoundWinSound = async () => {
   }
 };
 
-export const playPointsTickSound = async () => {
+export const playPointsTickSound = async (tickIndex: number = 0, totalTicks: number = 10) => {
   try {
-    if (pointsTickSound) {
-      await pointsTickSound.setPositionAsync(0);
-      await pointsTickSound.playAsync();
+    if (pointsPopSounds.length === 0) return;
+    
+    // Calculate which sound to play based on progress through the cascade
+    // Start with lower pitched sounds and progress to higher pitched ones
+    const progress = totalTicks > 1 ? tickIndex / (totalTicks - 1) : 0;
+    const soundIndex = Math.min(
+      Math.floor(progress * pointsPopSounds.length),
+      pointsPopSounds.length - 1
+    );
+    
+    const sound = pointsPopSounds[soundIndex];
+    if (sound) {
+      await sound.setPositionAsync(0);
+      // Increase playback rate slightly as we progress for ascending pitch effect
+      const playbackRate = 0.8 + (progress * 0.6); // 0.8 to 1.4
+      await sound.setRateAsync(playbackRate, true);
+      await sound.playAsync();
     }
   } catch (error) {
-    console.error('[Sounds] Error playing points tick:', error);
+    console.error('[Sounds] Error playing points pop:', error);
   }
 };
 
@@ -98,7 +121,10 @@ export const unloadSounds = async () => {
     if (letterTapSound) await letterTapSound.unloadAsync();
     if (opponentLetterSound) await opponentLetterSound.unloadAsync();
     if (roundWinSound) await roundWinSound.unloadAsync();
-    if (pointsTickSound) await pointsTickSound.unloadAsync();
+    for (const sound of pointsPopSounds) {
+      await sound.unloadAsync();
+    }
+    pointsPopSounds = [];
   } catch (error) {
     console.error('[Sounds] Error unloading sounds:', error);
   }
