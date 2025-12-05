@@ -1152,6 +1152,7 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 80,
   },
   headerWrapper: {
     marginBottom: 8,
@@ -1161,6 +1162,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 16,
+    marginTop: -80,
   },
   backButton: {
     width: 40,
@@ -1285,7 +1287,9 @@ const styles = StyleSheet.create({
   wordDisplayContainer: {
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 60,
+    marginTop: 100,
+    height: 100,
+    minHeight: 100,
   },
   wordLettersDisplay: {
     flexDirection: 'row',
@@ -1349,8 +1353,10 @@ const styles = StyleSheet.create({
     color: COLORS.whiteTransparent,
   },
   keyboardSection: {
-    marginTop: 'auto' as const,
-    paddingBottom: 8,
+    position: 'absolute' as const,
+    left: 20,
+    right: 20,
+    bottom: 140,
   },
   keyboardContainer: {
     gap: 10,
