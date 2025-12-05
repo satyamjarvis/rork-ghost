@@ -7,7 +7,7 @@ import { Loader2, Bomb, Zap, AlertCircle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
-import { initializeSounds, playLetterTapSound, playOpponentLetterSound, playRoundWinSound, playPointsTickSound, unloadSounds } from '@/utils/sounds';
+import { initializeSounds, playLetterTapSound, playRoundWinSound, playPointsTickSound, unloadSounds } from '@/utils/sounds';
 import { POINTS_PER_LETTER } from '@/constants/game';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
@@ -491,9 +491,9 @@ export default function GameScreen() {
           const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
           
           if (isAIMove || isChallengeResponse) {
-            // AI/opponent letter appearing - use fade in animation with sound
+            // AI/opponent letter appearing - use fade in animation with letter tap sound
             setIsAIAnimating(true);
-            playOpponentLetterSound();
+            playLetterTapSound();
             Animated.timing(newLetterAnim, {
               toValue: 1,
               duration: 1800,
