@@ -583,20 +583,6 @@ export default function MultiplayerGameScreen() {
     return 28;
   };
 
-  const getDynamicPointsSize = () => {
-    const letterCount = displayedWord.length;
-    if (letterCount <= 5) return 10;
-    if (letterCount <= 7) return 9;
-    return 8;
-  };
-
-  const getDynamicShadowScale = () => {
-    const letterCount = displayedWord.length;
-    if (letterCount <= 5) return 1;
-    if (letterCount <= 7) return 0.8;
-    return 0.65;
-  };
-
   if (isLoading || !currentGame) {
     return (
       <LinearGradient
@@ -617,10 +603,7 @@ export default function MultiplayerGameScreen() {
   const myPoints = isPlayer1 ? player1Points : player2Points;
   const opponentPoints = isPlayer1 ? player2Points : player1Points;
 
-  const tileWidth = getLetterTileWidth();
   const fontSize = getDynamicFontSize();
-  const pointsSize = getDynamicPointsSize();
-  const shadowScale = getDynamicShadowScale();
 
   return (
     <LinearGradient
@@ -769,16 +752,36 @@ export default function MultiplayerGameScreen() {
                   });
                 }}
               >
-                {displayedWord.split('').map((letter, index) => {
+                {currentGame.current_word.split('').map((letter, index) => {
                   const isAnimating = index === animatingIndex;
                   const isExploding = explodingLetter?.index === index;
+                  const letterCount = currentGame.current_word.length;
+                  const containerWidth = SCREEN_WIDTH * 0.95 - 40;
+                  const scaleFactor = Math.min(1, 70 / (containerWidth / letterCount));
+                  
+                  const baseFontSize = 60;
+                  const basePointsSize = 10;
+                  let dynamicFontSize = baseFontSize;
+                  let dynamicPointsSize = basePointsSize;
+                  
+                  if (letterCount > 6) {
+                    const reductionFactor = Math.max(0.4, 1 - ((letterCount - 6) * 0.08));
+                    dynamicFontSize = baseFontSize * reductionFactor;
+                    dynamicPointsSize = basePointsSize * reductionFactor;
+                  }
+                  
+                  const shadowBottomOffset = -4 * scaleFactor;
                   
                   if (isExploding) {
                     return (
                       <View 
                         key={`letter-${index}`} 
-                        style={[styles.wordLetterContainer, { width: tileWidth, marginHorizontal: 4 }]}
-                      />
+                        style={styles.wordLetterContainer}
+                      >
+                        <View style={styles.wordLetter}>
+                          <Text style={[styles.wordLetterText, { opacity: 0, fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
+                        </View>
+                      </View>
                     );
                   }
                   
@@ -793,44 +796,35 @@ export default function MultiplayerGameScreen() {
                         key={`letter-${index}`}
                         style={[
                           styles.wordLetterContainer,
-                          { 
-                            width: tileWidth, 
-                            marginHorizontal: 4,
-                          },
+                          { opacity: opponentLetterFadeAnim },
                         ]}
                       >
-                        <Animated.View style={[styles.wordLetter, { opacity: opponentLetterFadeAnim }]}>
+                        <View style={styles.wordLetter}>
                           <Animated.View 
                             style={[
                               styles.ghostlyGlow,
                               { opacity: glowOpacity }
                             ]} 
                           />
-                          <Text style={[styles.wordLetterText, { fontSize, lineHeight: fontSize * 1.1 }]}>{letter}</Text>
-                          <Text style={[styles.wordLetterPoints, { fontSize: pointsSize }]}>
+                          <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
+                          <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
                             {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
                           </Text>
-                          <View style={[
-                            styles.wordLetterShadow, 
-                            { transform: [{ scaleX: 1.3 * shadowScale }, { scaleY: 0.6 * shadowScale }] }
-                          ]} />
-                        </Animated.View>
+                          <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
+                        </View>
                       </Animated.View>
                     );
                   }
                   
                   if (isAnimating && !isOpponentMove) {
-                    const animScale = newLetterAnim.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: [0.8, 1.15, 1],
-                    });
-                    const translateY = newLetterAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [50, 0],
-                    });
                     const opacity = newLetterAnim.interpolate({
-                      inputRange: [0, 0.3, 1],
-                      outputRange: [0, 1, 1],
+                      inputRange: [0, 0.2, 0.5, 0.8, 1],
+                      outputRange: [0, 0.1, 0.4, 0.75, 1],
+                    });
+                    
+                    const animScale = newLetterAnim.interpolate({
+                      inputRange: [0, 0.3, 0.7, 1],
+                      outputRange: [0.95, 0.98, 1.02, 1],
                     });
                     
                     return (
@@ -838,23 +832,18 @@ export default function MultiplayerGameScreen() {
                         key={`letter-${index}`}
                         style={[
                           styles.wordLetterContainer,
-                          { 
-                            width: tileWidth, 
-                            marginHorizontal: 4,
-                            transform: [{ scale: animScale }, { translateY }], 
-                            opacity 
+                          {
+                            opacity,
+                            transform: [{ scale: animScale }],
                           },
                         ]}
                       >
                         <View style={styles.wordLetter}>
-                          <Text style={[styles.wordLetterText, { fontSize, lineHeight: fontSize * 1.1 }]}>{letter}</Text>
-                          <Text style={[styles.wordLetterPoints, { fontSize: pointsSize }]}>
+                          <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
+                          <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
                             {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
                           </Text>
-                          <View style={[
-                            styles.wordLetterShadow, 
-                            { transform: [{ scaleX: 1.3 * shadowScale }, { scaleY: 0.6 * shadowScale }] }
-                          ]} />
+                          <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
                         </View>
                       </Animated.View>
                     );
@@ -863,17 +852,14 @@ export default function MultiplayerGameScreen() {
                   return (
                     <View 
                       key={`letter-${index}`} 
-                      style={[styles.wordLetterContainer, { width: tileWidth, marginHorizontal: 4 }]}
+                      style={styles.wordLetterContainer}
                     >
                       <View style={styles.wordLetter}>
-                        <Text style={[styles.wordLetterText, { fontSize, lineHeight: fontSize * 1.1 }]}>{letter}</Text>
-                        <Text style={[styles.wordLetterPoints, { fontSize: pointsSize }]}>
+                        <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
+                        <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
                           {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
                         </Text>
-                        <View style={[
-                          styles.wordLetterShadow, 
-                          { transform: [{ scaleX: 1.3 * shadowScale }, { scaleY: 0.6 * shadowScale }] }
-                        ]} />
+                        <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
                       </View>
                     </View>
                   );
@@ -882,73 +868,89 @@ export default function MultiplayerGameScreen() {
               <Text style={styles.wordValueText}>Word Value: {calculateWordValue()} pts</Text>
             </View>
 
-            <View style={styles.keyboardContainer}>
-              {keyboardRows.map((row, rowIndex) => (
-                <View key={rowIndex} style={styles.keyboardRow}>
-                  {row.map((letter) => {
-                    const isBombedLetter = letterBombState.awaitingReplacement && letter === letterBombState.bombedLetter;
-                    const isDisabled = (!isMyTurn && !letterBombState.awaitingReplacement) || isBombedLetter;
-                    
-                    return (
-                      <TouchableOpacity
-                        key={letter}
-                        ref={(ref) => { keyRefs.current[letter] = ref; }}
-                        style={[
-                          styles.keyTile, 
-                          isDisabled && styles.keyTileDisabled,
-                          isBombedLetter && styles.keyTileBombed,
-                        ]}
-                        onPress={(event) => handleLetterPress(letter, event)}
-                        activeOpacity={0.7}
-                        disabled={isDisabled}
-                      >
-                        <Text style={[
-                          styles.keyLetter, 
-                          isDisabled && styles.keyLetterDisabled,
-                          isBombedLetter && styles.keyLetterBombed,
-                        ]}>
-                          {letter}
-                        </Text>
-                        <Text style={styles.keyPoints}>
-                          {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              ))}
+            <View style={styles.keyboardSection}>
+              <View style={styles.keyboardContainer}>
+                {keyboardRows.map((row, rowIndex) => (
+                  <View key={rowIndex} style={styles.keyboardRow}>
+                    {row.map((letter) => {
+                      const isBombedLetter = letterBombState.awaitingReplacement && letter === letterBombState.bombedLetter;
+                      const isDisabled = (!isMyTurn && !letterBombState.awaitingReplacement) || isBombedLetter;
+                      
+                      return (
+                        <TouchableOpacity
+                          key={letter}
+                          ref={(ref) => { keyRefs.current[letter] = ref; }}
+                          style={[
+                            styles.keyTile, 
+                            isDisabled && styles.keyTileDisabled,
+                            isBombedLetter && styles.keyTileBombed,
+                          ]}
+                          onPress={(event) => handleLetterPress(letter, event)}
+                          activeOpacity={0.7}
+                          disabled={isDisabled}
+                        >
+                          <Text style={[
+                            styles.keyLetter, 
+                            isDisabled && styles.keyLetterDisabled,
+                            isBombedLetter && styles.keyLetterBombed,
+                          ]}>
+                            {letter}
+                          </Text>
+                          <Text style={styles.keyPoints}>
+                            {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ))}
+              </View>
             </View>
 
-            {isMyTurn && !letterBombState.awaitingReplacement && (
-              <View style={styles.actionButtons}>
-                <TouchableOpacity
-                  style={styles.bombButton}
-                  onPress={handleLetterBomb}
-                  activeOpacity={0.7}
-                >
-                  <Bomb color={COLORS.white} size={20} />
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.passButton}
-                  onPress={handlePass}
-                  activeOpacity={0.7}
-                >
-                  <SkipForward color={COLORS.white} size={20} />
-                  <Text style={styles.passButtonText}>Pass</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.callWordButton, currentGame.current_word.length < 4 && styles.callWordButtonDisabled]}
-                  onPress={handleCallWord}
-                  activeOpacity={0.7}
-                  disabled={currentGame.current_word.length < 4}
-                >
-                  <AlertCircle color={COLORS.white} size={20} />
-                  <Text style={styles.callWordButtonText}>Call Word</Text>
-                </TouchableOpacity>
+            <View style={styles.bottomBar}>
+              <View style={styles.playerInfo}>
+                <View style={styles.playerRow}>
+                  <Text style={styles.playerLabel}>You:</Text>
+                  <Text style={styles.playerScore}>{myPoints} pts</Text>
+                </View>
+                <View style={styles.playerRow}>
+                  <Text style={styles.playerLabel}>{opponentProfile?.username || 'Opponent'}:</Text>
+                  <Text style={styles.playerScore}>{opponentPoints} pts</Text>
+                </View>
               </View>
-            )}
+
+              {isMyTurn && !letterBombState.awaitingReplacement && (
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity
+                    style={styles.iconButton}
+                    onPress={handleLetterBomb}
+                    activeOpacity={0.7}
+                  >
+                    <Bomb color={COLORS.white} size={28} />
+                    <Text style={styles.iconButtonLabel}>BOMB</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.iconButton}
+                    onPress={handlePass}
+                    activeOpacity={0.7}
+                  >
+                    <SkipForward color={COLORS.white} size={28} />
+                    <Text style={styles.iconButtonLabel}>PASS</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.iconButton, currentGame.current_word.length < 4 && styles.iconButtonDisabled]}
+                    onPress={handleCallWord}
+                    activeOpacity={0.7}
+                    disabled={currentGame.current_word.length < 4}
+                  >
+                    <AlertCircle color={COLORS.white} size={28} />
+                    <Text style={styles.iconButtonLabel}>CALL WORD</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
           </Animated.View>
         </SafeAreaView>
         
@@ -982,7 +984,7 @@ export default function MultiplayerGameScreen() {
 
       {!isMyTurn && !letterBombState.awaitingReplacement && (
         <View style={styles.waitingIndicator} pointerEvents="none">
-          <Text style={styles.waitingIndicatorText}>Opponent's turn</Text>
+          <Text style={styles.waitingIndicatorText}>Opponent&apos;s turn</Text>
         </View>
       )}
 
@@ -1156,7 +1158,8 @@ const styles = StyleSheet.create({
   wordDisplayContainer: {
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 80,
+    marginTop: 150,
+    height: 100,
     minHeight: 100,
   },
   wordLettersDisplay: {
@@ -1169,9 +1172,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   wordLetterContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     maxWidth: 70,
+    marginHorizontal: 4,
   },
   wordLetter: {
     backgroundColor: 'transparent',
@@ -1217,6 +1222,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
+  },
+  keyboardSection: {
+    position: 'absolute' as const,
+    left: 20,
+    right: 20,
+    bottom: 140,
   },
   keyboardContainer: {
     gap: 10,
@@ -1273,54 +1284,46 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: COLORS.white,
   },
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingBottom: 20,
+  },
+  playerInfo: {
+    gap: 8,
+  },
+  playerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  playerLabel: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: COLORS.white,
+  },
+  playerScore: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+    color: COLORS.gold,
+  },
   actionButtons: {
     flexDirection: 'row',
-    justifyContent: 'center',
     gap: 12,
-    marginTop: 20,
+    alignItems: 'flex-end',
   },
-  bombButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255, 100, 100, 0.6)',
+  iconButton: {
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 100, 100, 0.8)',
+    gap: 4,
   },
-  passButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: COLORS.whiteGlass,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  passButtonText: {
-    fontSize: 15,
+  iconButtonLabel: {
+    fontSize: 9,
     fontWeight: '600' as const,
     color: COLORS.white,
   },
-  callWordButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: COLORS.gold,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 14,
-  },
-  callWordButtonDisabled: {
-    opacity: 0.5,
-  },
-  callWordButtonText: {
-    fontSize: 15,
-    fontWeight: '600' as const,
-    color: COLORS.white,
+  iconButtonDisabled: {
+    opacity: 0.4,
   },
   floatingLetter: {
     position: 'absolute' as const,
