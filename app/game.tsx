@@ -478,31 +478,36 @@ export default function GameScreen() {
       setAnimatingIndex(-1);
     } else {
       const currentRound = gameState.rounds[gameState.currentRound - 1];
-      if (currentRound && currentRound.currentWord !== displayedWord) {
-        if (currentRound.currentWord.length > displayedWord.length) {
-          setAnimatingIndex(currentRound.currentWord.length - 1);
-          newLetterAnim.setValue(0);
-          
-          // Check if AI just played (AI is player2, so after AI plays, currentPlayer becomes player1)
-          const isAIMove = gameState.mode === 'ai' && gameState.currentPlayer === 'player1' && displayedWord.length > 0;
-          // Also check challenge response from AI
-          const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
-          
-          if (isAIMove || isChallengeResponse) {
-            // AI/opponent letter appearing - play letter tap sound
-            playLetterTapSound();
-          }
-          
-          // All letters use the same smooth fade-in animation
-          Animated.timing(newLetterAnim, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }).start(() => {
-            setAnimatingIndex(-1);
-          });
+      if (currentRound && currentRound.currentWord.length > displayedWord.length) {
+        // Set animating index FIRST (before updating displayedWord)
+        const newIndex = currentRound.currentWord.length - 1;
+        setAnimatingIndex(newIndex);
+        newLetterAnim.setValue(0);
+        
+        // Check if AI just played (AI is player2, so after AI plays, currentPlayer becomes player1)
+        const isAIMove = gameState.mode === 'ai' && gameState.currentPlayer === 'player1' && displayedWord.length > 0;
+        // Also check challenge response from AI
+        const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
+        
+        if (isAIMove || isChallengeResponse) {
+          // AI/opponent letter appearing - play letter tap sound
+          playLetterTapSound();
         }
+        
+        // All letters use the same smooth fade-in animation
+        // Only update displayedWord AFTER animation completes
+        Animated.timing(newLetterAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }).start(() => {
+          setDisplayedWord(currentRound.currentWord);
+          setAnimatingIndex(-1);
+        });
+      } else if (currentRound && currentRound.currentWord.length < displayedWord.length) {
+        // Word got shorter (e.g., reset) - sync immediately
         setDisplayedWord(currentRound.currentWord);
+        setAnimatingIndex(-1);
       }
     }
   }, [gameState, displayedWord, newLetterAnim]);
@@ -990,7 +995,7 @@ export default function GameScreen() {
                     }}
                   >
                     {currentRound.currentWord.split('').map((letter, index) => {
-                      const isAnimating = index === animatingIndex && displayedWord.length === currentRound.currentWord.length;
+                      const isAnimating = index === animatingIndex && index === displayedWord.length;
                       const isExploding = index === hiddenLetterIndex;
                       const letterCount = currentRound.currentWord.length;
                       const containerWidth = SCREEN_WIDTH * 0.95 - 40;
