@@ -759,7 +759,7 @@ export default function MultiplayerGameScreen() {
           );
         })}
 
-        <SafeAreaView style={styles.safeArea} edges={['top']}>
+        <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
           <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
             <View style={styles.headerWrapper}>
               <View style={styles.header}>
@@ -1147,9 +1147,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
+    paddingTop: 80,
   },
   headerWrapper: {
     marginBottom: 8,
+    marginTop: -80,
   },
   header: {
     flexDirection: 'row',
@@ -1280,7 +1282,7 @@ const styles = StyleSheet.create({
   wordDisplayContainer: {
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 150,
+    marginTop: 100,
     height: 100,
     minHeight: 100,
   },
@@ -1346,10 +1348,8 @@ const styles = StyleSheet.create({
     color: COLORS.whiteTransparent,
   },
   keyboardSection: {
-    position: 'absolute' as const,
-    left: 20,
-    right: 20,
-    bottom: 140,
+    marginTop: 'auto' as const,
+    paddingBottom: 10,
   },
   keyboardContainer: {
     gap: 10,
@@ -1410,7 +1410,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    paddingBottom: 20,
+    paddingBottom: 40,
+    paddingTop: 10,
   },
   playerInfo: {
     gap: 8,
