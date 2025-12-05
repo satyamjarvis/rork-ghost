@@ -7,7 +7,7 @@ import { Loader2, Bomb, Zap, AlertCircle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
-import { initializeSounds, playLetterTapSound, playRoundWinSound, playPointsTickSound, unloadSounds } from '@/utils/sounds';
+
 import { POINTS_PER_LETTER } from '@/constants/game';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
@@ -442,11 +442,7 @@ export default function GameScreen() {
       useNativeDriver: true,
     }).start();
 
-    initializeSounds();
 
-    return () => {
-      unloadSounds();
-    };
   }, [fadeAnim]);
 
   useEffect(() => {
@@ -489,10 +485,7 @@ export default function GameScreen() {
         // Also check challenge response from AI
         const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
         
-        if (isAIMove || isChallengeResponse) {
-          // AI/opponent letter appearing - play letter tap sound
-          playLetterTapSound();
-        }
+
         
         // All letters use the same slow, ghostly fade-in animation
         // Only update displayedWord AFTER animation completes
@@ -548,7 +541,7 @@ export default function GameScreen() {
         if (RNPlatform.OS !== 'web') {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
-        playRoundWinSound();
+
       }
       
       Animated.sequence([
@@ -609,7 +602,7 @@ export default function GameScreen() {
             if (RNPlatform.OS !== 'web') {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }
-            playPointsTickSound(currentTick - 1, wordPoints);
+
             if (currentTick >= wordPoints) {
               clearInterval(tickInterval);
             }
@@ -723,7 +716,7 @@ export default function GameScreen() {
     if (RNPlatform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    playLetterTapSound();
+
 
     const nativeEvent = event?.nativeEvent;
     if (nativeEvent && wordBoardPosition) {

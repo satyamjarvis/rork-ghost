@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayer } from '@/contexts/MultiplayerContext';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
-import { initializeSounds, playLetterTapSound, playOpponentLetterSound, playRoundWinSound, playPointsTickSound, unloadSounds } from '@/utils/sounds';
+
 import { POINTS_PER_LETTER } from '@/constants/game';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
@@ -121,11 +121,7 @@ export default function MultiplayerGameScreen() {
       useNativeDriver: true,
     }).start();
 
-    initializeSounds();
 
-    return () => {
-      unloadSounds();
-    };
   }, [fadeAnim]);
 
   useEffect(() => {
@@ -142,7 +138,7 @@ export default function MultiplayerGameScreen() {
           setIsOpponentMove(true);
           setAnimatingIndex(currentGame.current_word.length - 1);
           opponentLetterFadeAnim.setValue(0);
-          playOpponentLetterSound();
+
           
           Animated.sequence([
             Animated.timing(opponentLetterFadeAnim, {
@@ -306,7 +302,7 @@ export default function MultiplayerGameScreen() {
       
       setRoundWinnerAnnouncement({ winner: winnerName, points: wordPoints });
       announcementOpacity.setValue(0);
-      playRoundWinSound();
+
       Animated.sequence([
         Animated.timing(announcementOpacity, {
           toValue: 1,
@@ -390,7 +386,7 @@ export default function MultiplayerGameScreen() {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    playLetterTapSound();
+
 
     const nativeEvent = event?.nativeEvent;
     if (nativeEvent && wordBoardPosition) {
