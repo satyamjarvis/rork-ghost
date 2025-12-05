@@ -1287,7 +1287,7 @@ const styles = StyleSheet.create({
   wordDisplayContainer: {
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 100,
+    marginTop: 150,
     height: 100,
     minHeight: 100,
   },
@@ -1353,8 +1353,10 @@ const styles = StyleSheet.create({
     color: COLORS.whiteTransparent,
   },
   keyboardSection: {
-    marginTop: 'auto' as const,
-    paddingBottom: 10,
+    position: 'absolute' as const,
+    left: 20,
+    right: 20,
+    bottom: 140,
   },
   keyboardContainer: {
     gap: 10,
@@ -1415,8 +1417,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    paddingBottom: 40,
-    paddingTop: 10,
+    paddingBottom: 20,
   },
   playerInfo: {
     gap: 8,
