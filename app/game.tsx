@@ -52,7 +52,6 @@ export default function GameScreen() {
   const bombFallOpacity = useRef(new Animated.Value(0)).current;
   const [displayedWord, setDisplayedWord] = useState<string>('');
   const [animatingIndex, setAnimatingIndex] = useState<number>(-1);
-  const [isAIAnimating, setIsAIAnimating] = useState<boolean>(false);
   const newLetterAnim = useRef(new Animated.Value(0)).current;
   const [showRoundWinner, setShowRoundWinner] = useState<boolean>(false);
   const [roundWinnerName, setRoundWinnerName] = useState<string>('');
@@ -477,7 +476,6 @@ export default function GameScreen() {
     if (!gameState) {
       setDisplayedWord('');
       setAnimatingIndex(-1);
-      setIsAIAnimating(false);
     } else {
       const currentRound = gameState.rounds[gameState.currentRound - 1];
       if (currentRound && currentRound.currentWord !== displayedWord) {
@@ -491,35 +489,18 @@ export default function GameScreen() {
           const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
           
           if (isAIMove || isChallengeResponse) {
-            // AI/opponent letter appearing - use fade in animation with letter tap sound
-            setIsAIAnimating(true);
+            // AI/opponent letter appearing - play letter tap sound
             playLetterTapSound();
-            Animated.timing(newLetterAnim, {
-              toValue: 1,
-              duration: 1800,
-              useNativeDriver: true,
-            }).start(() => {
-              setAnimatingIndex(-1);
-              setIsAIAnimating(false);
-            });
-          } else {
-            // Player's own letter - use bounce animation (sound is played in handleLetterPress)
-            Animated.sequence([
-              Animated.timing(newLetterAnim, {
-                toValue: 0.5,
-                duration: 200,
-                useNativeDriver: true,
-              }),
-              Animated.spring(newLetterAnim, {
-                toValue: 1,
-                useNativeDriver: true,
-                friction: 6,
-                tension: 40,
-              }),
-            ]).start(() => {
-              setAnimatingIndex(-1);
-            });
           }
+          
+          // All letters use the same smooth fade-in animation
+          Animated.timing(newLetterAnim, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }).start(() => {
+            setAnimatingIndex(-1);
+          });
         }
         setDisplayedWord(currentRound.currentWord);
       }
@@ -1057,52 +1038,15 @@ export default function GameScreen() {
                       }
                       
                       if (isAnimating) {
-                        if (isAIAnimating) {
-                          const opacity = newLetterAnim.interpolate({
-                            inputRange: [0, 0.15, 0.35, 0.6, 0.8, 1],
-                            outputRange: [0, 0.05, 0.2, 0.5, 0.8, 1],
-                          });
-                          
-                          const animScale = newLetterAnim.interpolate({
-                            inputRange: [0, 0.6, 1],
-                            outputRange: [0.95, 1.03, 1],
-                          });
-                          
-                          return (
-                            <Animated.View
-                              key={`letter-${index}`}
-                              style={[
-                                styles.wordLetterContainer,
-                                {
-                                  opacity,
-                                  transform: [{ scale: animScale }],
-                                },
-                              ]}
-                            >
-                              <View style={styles.wordLetter}>
-                                <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
-                                <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
-                                  {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
-                                </Text>
-                                <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
-                              </View>
-                            </Animated.View>
-                          );
-                        }
+                        // Universal smooth fade-in for all letters
+                        const opacity = newLetterAnim.interpolate({
+                          inputRange: [0, 0.3, 0.6, 1],
+                          outputRange: [0, 0.3, 0.7, 1],
+                        });
                         
                         const animScale = newLetterAnim.interpolate({
                           inputRange: [0, 0.5, 1],
-                          outputRange: [0.8, 1.15, 1],
-                        });
-                        
-                        const translateY = newLetterAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [50, 0],
-                        });
-                        
-                        const opacity = newLetterAnim.interpolate({
-                          inputRange: [0, 0.3, 1],
-                          outputRange: [0, 1, 1],
+                          outputRange: [0.9, 1.05, 1],
                         });
                         
                         return (
@@ -1111,8 +1055,8 @@ export default function GameScreen() {
                             style={[
                               styles.wordLetterContainer,
                               {
-                                transform: [{ scale: animScale }, { translateY }],
                                 opacity,
+                                transform: [{ scale: animScale }],
                               },
                             ]}
                           >
