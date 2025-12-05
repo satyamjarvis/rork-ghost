@@ -485,18 +485,18 @@ export default function GameScreen() {
           setAnimatingIndex(currentRound.currentWord.length - 1);
           newLetterAnim.setValue(0);
           
-          // Check if AI just played (AI is player2, so after AI plays, currentPlayer becomes player1)
-          const isAIMove = gameState.mode === 'ai' && gameState.currentPlayer === 'player1' && displayedWord.length > 0;
-          // Also check challenge response from AI
-          const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
+          // Determine if this is an AI/opponent move by checking the word history
+          // The last entry in wordHistory tells us who played the last letter
+          const lastMove = currentRound.wordHistory[currentRound.wordHistory.length - 1];
+          const isOpponentMove = lastMove && lastMove.playerId === 'player2';
           
-          if (isAIMove || isChallengeResponse) {
+          if (isOpponentMove) {
             // AI/opponent letter appearing - use fade in animation with letter tap sound
             setIsAIAnimating(true);
             playLetterTapSound();
             Animated.timing(newLetterAnim, {
               toValue: 1,
-              duration: 1800,
+              duration: 800,
               useNativeDriver: true,
             }).start(() => {
               setAnimatingIndex(-1);
