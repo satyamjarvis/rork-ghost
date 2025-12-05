@@ -11,8 +11,9 @@ import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
 import KeyboardGhost from '@/components/KeyboardGhost';
 import DanglingG from '@/components/DanglingG';
-import { ArrowLeft, AlertCircle, SkipForward, Bomb } from 'lucide-react-native';
+import { ArrowLeft, AlertCircle, SkipForward, Bomb, Zap } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { isValidWord } from '@/utils/game';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -103,6 +104,7 @@ export default function MultiplayerGameScreen() {
   
   const previousTurnRef = useRef<string | null>(null);
   const previousWordRef = useRef<string>('');
+  const [challengeState, setChallengeState] = useState<{ active: boolean; challengerId: string | null; originalWord: string }>({ active: false, challengerId: null, originalWord: '' });
 
   useEffect(() => {
     if (gameId) {
@@ -129,59 +131,50 @@ export default function MultiplayerGameScreen() {
       const wordChanged = currentGame.current_word !== previousWordRef.current;
       const wordGrew = currentGame.current_word.length > previousWordRef.current.length;
       
-      if (wordChanged && wordGrew) {
+      if (wordChanged && wordGrew && currentGame.current_word.length > displayedWord.length) {
         const lastMove = currentGame.word_history?.[currentGame.word_history.length - 1];
         const wasPlayedByMe = lastMove?.playerId === user?.id;
+        
+        const newIndex = currentGame.current_word.length - 1;
+        setAnimatingIndex(newIndex);
         
         if (!wasPlayedByMe && lastMove?.playerId !== 'system' && !letterBombState.awaitingReplacement) {
           console.log('[GAME] Opponent played a letter, triggering fade-in animation');
           setIsOpponentMove(true);
-          setAnimatingIndex(currentGame.current_word.length - 1);
           opponentLetterFadeAnim.setValue(0);
-
           
-          Animated.sequence([
-            Animated.timing(opponentLetterFadeAnim, {
-              toValue: 0.1,
-              duration: 100,
-              useNativeDriver: true,
-            }),
-            Animated.timing(opponentLetterFadeAnim, {
-              toValue: 1,
-              duration: 1200,
-              useNativeDriver: true,
-            }),
-          ]).start(() => {
+          Animated.timing(opponentLetterFadeAnim, {
+            toValue: 1,
+            duration: 1800,
+            useNativeDriver: true,
+          }).start(() => {
+            setDisplayedWord(currentGame.current_word);
             setAnimatingIndex(-1);
             setIsOpponentMove(false);
           });
-        } else if (wasPlayedByMe) {
-          setAnimatingIndex(currentGame.current_word.length - 1);
+        } else if (wasPlayedByMe || lastMove?.playerId === 'system') {
           newLetterAnim.setValue(0);
           
-          Animated.sequence([
-            Animated.timing(newLetterAnim, {
-              toValue: 0.5,
-              duration: 200,
-              useNativeDriver: true,
-            }),
-            Animated.spring(newLetterAnim, {
-              toValue: 1,
-              useNativeDriver: true,
-              friction: 6,
-              tension: 40,
-            }),
-          ]).start(() => {
+          Animated.timing(newLetterAnim, {
+            toValue: 1,
+            duration: 1800,
+            useNativeDriver: true,
+          }).start(() => {
+            setDisplayedWord(currentGame.current_word);
             setAnimatingIndex(-1);
           });
         }
+      } else if (wordChanged && currentGame.current_word.length < displayedWord.length) {
+        setDisplayedWord(currentGame.current_word);
+        setAnimatingIndex(-1);
+      } else if (!wordChanged && displayedWord !== currentGame.current_word) {
+        setDisplayedWord(currentGame.current_word);
       }
       
-      setDisplayedWord(currentGame.current_word);
       previousTurnRef.current = currentGame.current_turn;
       previousWordRef.current = currentGame.current_word;
     }
-  }, [currentGame, user?.id, letterBombState.awaitingReplacement, newLetterAnim, opponentLetterFadeAnim]);
+  }, [currentGame, user?.id, letterBombState.awaitingReplacement, newLetterAnim, opponentLetterFadeAnim, displayedWord]);
 
   const calculateWordPoints = useCallback((word: string): number => {
     return word.split('').reduce((sum, letter) => {
@@ -451,6 +444,7 @@ export default function MultiplayerGameScreen() {
     if (!currentGame || currentGame.current_turn !== user?.id) return;
     if (currentGame.current_word.length < 4) return;
     if (letterBombState.awaitingReplacement) return;
+    if (challengeState.active) return;
 
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -460,7 +454,66 @@ export default function MultiplayerGameScreen() {
     if (result.error) {
       Alert.alert('Error', result.error.message);
     }
-  }, [currentGame, user?.id, callWord, letterBombState.awaitingReplacement]);
+  }, [currentGame, user?.id, callWord, letterBombState.awaitingReplacement, challengeState.active]);
+
+  const handleChallenge = useCallback(() => {
+    if (!currentGame || currentGame.current_turn !== user?.id) return;
+    if (currentGame.current_word.length < 3) return;
+    if (letterBombState.awaitingReplacement) return;
+
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+
+    console.log('[MP] Initiating challenge');
+    setChallengeState({
+      active: true,
+      challengerId: user.id,
+      originalWord: currentGame.current_word,
+    });
+  }, [currentGame, user?.id, letterBombState.awaitingReplacement]);
+
+  const handleConfirmChallenge = useCallback(async () => {
+    if (!currentGame || !challengeState.active) return;
+    
+    const word = currentGame.current_word;
+    console.log('[MP] Confirming challenge with word:', word);
+
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+
+    if (word.length < 4) {
+      Alert.alert('Invalid', 'Word must be at least 4 letters');
+      return;
+    }
+
+    if (!word.startsWith(challengeState.originalWord)) {
+      Alert.alert('Invalid', 'Word must start with the original letters');
+      return;
+    }
+
+    const wordIsValid = isValidWord(word);
+    
+    if (wordIsValid) {
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      Alert.alert('Success!', `"${word}" is a valid word! Challenger loses the round.`);
+    } else {
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      }
+      Alert.alert('Failed!', `"${word}" is not a valid word. You lose the round.`);
+    }
+
+    setChallengeState({ active: false, challengerId: null, originalWord: '' });
+    
+    const result = await callWord();
+    if (result.error) {
+      Alert.alert('Error', result.error.message);
+    }
+  }, [currentGame, challengeState, callWord]);
 
   const handleLetterBomb = useCallback(async () => {
     if (!currentGame || currentGame.current_turn !== user?.id) return;
@@ -596,7 +649,7 @@ export default function MultiplayerGameScreen() {
     );
   }
 
-  const isMyTurn = currentGame.current_turn === user?.id || letterBombState.awaitingReplacement;
+  const isMyTurn = currentGame.current_turn === user?.id || letterBombState.awaitingReplacement || (challengeState.active && challengeState.challengerId !== user?.id);
   const isPlayer1 = currentGame.player1_id === user?.id;
   const myScore = isPlayer1 ? currentGame.player1_rounds_won : currentGame.player2_rounds_won;
   const opponentScore = isPlayer1 ? currentGame.player2_rounds_won : currentGame.player1_rounds_won;
@@ -752,8 +805,8 @@ export default function MultiplayerGameScreen() {
                   });
                 }}
               >
-                {currentGame.current_word.split('').map((letter, index) => {
-                  const isAnimating = index === animatingIndex;
+                {(challengeState.active ? currentGame.current_word : currentGame.current_word).split('').map((letter, index) => {
+                  const isAnimating = index === animatingIndex && index === displayedWord.length;
                   const isExploding = explodingLetter?.index === index;
                   const letterCount = currentGame.current_word.length;
                   const containerWidth = SCREEN_WIDTH * 0.95 - 40;
@@ -921,33 +974,57 @@ export default function MultiplayerGameScreen() {
 
               {isMyTurn && !letterBombState.awaitingReplacement && (
                 <View style={styles.actionButtons}>
-                  <TouchableOpacity
-                    style={styles.iconButton}
-                    onPress={handleLetterBomb}
-                    activeOpacity={0.7}
-                  >
-                    <Bomb color={COLORS.white} size={28} />
-                    <Text style={styles.iconButtonLabel}>BOMB</Text>
-                  </TouchableOpacity>
+                  {challengeState.active ? (
+                    <TouchableOpacity
+                      style={styles.iconButton}
+                      onPress={handleConfirmChallenge}
+                      activeOpacity={0.7}
+                    >
+                      <AlertCircle color={COLORS.white} size={28} />
+                      <Text style={styles.iconButtonLabel}>CONFIRM</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <>
+                      <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={handleLetterBomb}
+                        activeOpacity={0.7}
+                      >
+                        <Bomb color={COLORS.white} size={28} />
+                        <Text style={styles.iconButtonLabel}>BOMB</Text>
+                      </TouchableOpacity>
 
-                  <TouchableOpacity
-                    style={styles.iconButton}
-                    onPress={handlePass}
-                    activeOpacity={0.7}
-                  >
-                    <SkipForward color={COLORS.white} size={28} />
-                    <Text style={styles.iconButtonLabel}>PASS</Text>
-                  </TouchableOpacity>
+                      {currentGame.current_word.length >= 3 && (
+                        <TouchableOpacity
+                          style={styles.iconButton}
+                          onPress={handleChallenge}
+                          activeOpacity={0.7}
+                        >
+                          <Zap color={COLORS.white} size={28} />
+                          <Text style={styles.iconButtonLabel}>CHALLENGE</Text>
+                        </TouchableOpacity>
+                      )}
 
-                  <TouchableOpacity
-                    style={[styles.iconButton, currentGame.current_word.length < 4 && styles.iconButtonDisabled]}
-                    onPress={handleCallWord}
-                    activeOpacity={0.7}
-                    disabled={currentGame.current_word.length < 4}
-                  >
-                    <AlertCircle color={COLORS.white} size={28} />
-                    <Text style={styles.iconButtonLabel}>CALL WORD</Text>
-                  </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={handlePass}
+                        activeOpacity={0.7}
+                      >
+                        <SkipForward color={COLORS.white} size={28} />
+                        <Text style={styles.iconButtonLabel}>PASS</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.iconButton, currentGame.current_word.length < 4 && styles.iconButtonDisabled]}
+                        onPress={handleCallWord}
+                        activeOpacity={0.7}
+                        disabled={currentGame.current_word.length < 4}
+                      >
+                        <AlertCircle color={COLORS.white} size={28} />
+                        <Text style={styles.iconButtonLabel}>CALL WORD</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
                 </View>
               )}
             </View>
@@ -979,6 +1056,19 @@ export default function MultiplayerGameScreen() {
           <Text style={styles.challengeIndicatorText}>
             Pick letter (not {letterBombState.bombedLetter})
           </Text>
+        </View>
+      )}
+
+      {challengeState.active && challengeState.challengerId !== user?.id && (
+        <View style={styles.challengedIndicator} pointerEvents="none">
+          <Text style={styles.challengedIndicatorTitle}>⚠️ CHALLENGED</Text>
+          <Text style={styles.challengedIndicatorSubtitle}>Spell a valid word</Text>
+        </View>
+      )}
+
+      {challengeState.active && challengeState.challengerId === user?.id && (
+        <View style={styles.waitingChallengeIndicator} pointerEvents="none">
+          <Text style={styles.waitingIndicatorText}>Waiting for opponent...</Text>
         </View>
       )}
 
@@ -1154,6 +1244,38 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
+  },
+  challengedIndicator: {
+    position: 'absolute' as const,
+    top: 180,
+    left: 20,
+    zIndex: 9999,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    maxWidth: 160,
+  },
+  challengedIndicatorTitle: {
+    fontSize: 13,
+    fontWeight: '700' as const,
+    color: '#FFD700',
+    marginBottom: 2,
+  },
+  challengedIndicatorSubtitle: {
+    fontSize: 11,
+    fontWeight: '500' as const,
+    color: 'rgba(255, 255, 255, 0.9)',
+  },
+  waitingChallengeIndicator: {
+    position: 'absolute' as const,
+    top: 180,
+    left: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    zIndex: 8000,
   },
   wordDisplayContainer: {
     alignItems: 'center',
