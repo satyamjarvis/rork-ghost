@@ -7,6 +7,7 @@ import { Loader2, Bomb, Zap, AlertCircle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
+import { initializeSounds, playLetterTapSound, playOpponentLetterSound, playRoundWinSound, playPointsTickSound, unloadSounds } from '@/utils/sounds';
 import { POINTS_PER_LETTER } from '@/constants/game';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
@@ -441,6 +442,12 @@ export default function GameScreen() {
       duration: 400,
       useNativeDriver: true,
     }).start();
+
+    initializeSounds();
+
+    return () => {
+      unloadSounds();
+    };
   }, [fadeAnim]);
 
   useEffect(() => {
@@ -483,6 +490,7 @@ export default function GameScreen() {
           
           if (isAIMove || isChallengeResponse) {
             setIsAIAnimating(true);
+            playOpponentLetterSound();
             Animated.timing(newLetterAnim, {
               toValue: 1,
               duration: 1800,
@@ -548,6 +556,7 @@ export default function GameScreen() {
       if (RNPlatform.OS !== 'web') {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
+      playRoundWinSound();
       
       Animated.sequence([
         Animated.timing(roundWinnerOpacity, {
@@ -607,6 +616,7 @@ export default function GameScreen() {
             if (RNPlatform.OS !== 'web') {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }
+            playPointsTickSound();
             if (currentTick >= wordPoints) {
               clearInterval(tickInterval);
             }
@@ -720,6 +730,7 @@ export default function GameScreen() {
     if (RNPlatform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
+    playLetterTapSound();
 
     const nativeEvent = event?.nativeEvent;
     if (nativeEvent && wordBoardPosition) {
