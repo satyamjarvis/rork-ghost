@@ -71,6 +71,8 @@ export default function MultiplayerGameScreen() {
     playBombReplacement,
     cancelLetterBomb,
   } = useMultiplayer();
+
+  console.log("MULTIPLAYER GAME RENDER", { isLoading, currentGame: currentGame ? { id: currentGame.id, status: currentGame.status, current_word: currentGame.current_word } : null, currentUser: user?.id, gameId });
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [displayedWord, setDisplayedWord] = useState<string>('');
@@ -637,6 +639,7 @@ export default function MultiplayerGameScreen() {
   };
 
   if (isLoading || !currentGame) {
+    console.log("SHOWING LOADING SCREEN", { isLoading, hasCurrentGame: !!currentGame });
     return (
       <LinearGradient
         colors={[COLOR_SCHEMES.peachy.top, COLOR_SCHEMES.peachy.middle, COLOR_SCHEMES.peachy.bottom]}
@@ -651,6 +654,8 @@ export default function MultiplayerGameScreen() {
 
   const isMyTurn = currentGame.current_turn === user?.id || letterBombState.awaitingReplacement || (challengeState.active && challengeState.challengerId !== user?.id);
   const isPlayer1 = currentGame.player1_id === user?.id;
+
+  console.log("SHOWING GAME UI", { currentWord: currentGame?.current_word, isMyTurn, player1_id: currentGame.player1_id, player2_id: currentGame.player2_id, current_turn: currentGame.current_turn });
   const myScore = isPlayer1 ? currentGame.player1_rounds_won : currentGame.player2_rounds_won;
   const opponentScore = isPlayer1 ? currentGame.player2_rounds_won : currentGame.player1_rounds_won;
   const myPoints = isPlayer1 ? player1Points : player2Points;
