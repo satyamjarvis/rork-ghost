@@ -56,9 +56,7 @@ export default function GameScreen() {
   const [showRoundWinner, setShowRoundWinner] = useState<boolean>(false);
   const [roundWinnerName, setRoundWinnerName] = useState<string>('');
   const [roundWinnerPoints, setRoundWinnerPoints] = useState<number>(0);
-  const roundWinnerScale = useRef(new Animated.Value(0)).current;
   const roundWinnerOpacity = useRef(new Animated.Value(0)).current;
-  const roundWinnerGlow = useRef(new Animated.Value(0)).current;
   const processedRoundEndRef = useRef<number>(-1);
   const [fallingLetters, setFallingLetters] = useState<FallingLetter[]>([]);
   const [displayedScoreBonus, setDisplayedScoreBonus] = useState<number>(0);
@@ -545,41 +543,27 @@ export default function GameScreen() {
       setRoundWinnerName(winnerName);
       setRoundWinnerPoints(wordPoints);
       setShowRoundWinner(true);
-      roundWinnerScale.setValue(0);
       roundWinnerOpacity.setValue(0);
-      roundWinnerGlow.setValue(0);
       
       if (RNPlatform.OS !== 'web') {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
       
-      Animated.parallel([
-        Animated.spring(roundWinnerScale, {
-          toValue: 1,
-          friction: 4,
-          tension: 60,
-          useNativeDriver: true,
-        }),
+      Animated.sequence([
         Animated.timing(roundWinnerOpacity, {
           toValue: 1,
           duration: 300,
           useNativeDriver: true,
         }),
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(roundWinnerGlow, {
-              toValue: 1,
-              duration: 600,
-              useNativeDriver: true,
-            }),
-            Animated.timing(roundWinnerGlow, {
-              toValue: 0.5,
-              duration: 600,
-              useNativeDriver: true,
-            }),
-          ])
-        ),
-      ]).start();
+        Animated.delay(1500),
+        Animated.timing(roundWinnerOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setShowRoundWinner(false);
+      });
       
       // Start falling letters animation after 1 second
       setTimeout(() => {
@@ -642,28 +626,14 @@ export default function GameScreen() {
       }, 1000);
       
       setTimeout(() => {
-        Animated.parallel([
-          Animated.timing(roundWinnerOpacity, {
-            toValue: 0,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-          Animated.timing(roundWinnerScale, {
-            toValue: 1.2,
-            duration: 300,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          setShowRoundWinner(false);
-          setFallingLetters([]);
-          setDisplayedScoreBonus(0);
-          setScoringPlayerId(null);
-          if (matchIsOver) {
-            router.replace('/game-over');
-          } else {
-            nextRound();
-          }
-        });
+        setFallingLetters([]);
+        setDisplayedScoreBonus(0);
+        setScoringPlayerId(null);
+        if (matchIsOver) {
+          router.replace('/game-over');
+        } else {
+          nextRound();
+        }
       }, 3000);
       return;
     }
@@ -672,7 +642,7 @@ export default function GameScreen() {
       router.replace('/game-over');
       return;
     }
-  }, [gameState, router, roundWinnerScale, roundWinnerOpacity, roundWinnerGlow, nextRound]);
+  }, [gameState, router, roundWinnerOpacity, nextRound]);
 
 
 
@@ -1326,14 +1296,15 @@ export default function GameScreen() {
               styles.roundWinnerOverlay,
               { 
                 opacity: roundWinnerOpacity,
-                transform: [{ scale: roundWinnerScale }],
               },
             ]}
             pointerEvents="none"
           >
-            <Text style={styles.roundWinnerLabel}>ROUND WINNER</Text>
-            <Text style={styles.roundWinnerName}>{roundWinnerName}</Text>
-            <Text style={styles.roundWinnerPoints}>+{roundWinnerPoints} pts</Text>
+            <View style={styles.roundWinnerCard}>
+              <Text style={styles.roundWinnerLabel}>ROUND WINNER</Text>
+              <Text style={styles.roundWinnerName}>{roundWinnerName}</Text>
+              <Text style={styles.roundWinnerPoints}>+{roundWinnerPoints} pts</Text>
+            </View>
           </Animated.View>
         )}
 
@@ -2194,39 +2165,54 @@ const styles = StyleSheet.create({
   },
   roundWinnerOverlay: {
     position: 'absolute' as const,
-    top: '18%',
+    top: 140,
     left: 0,
     right: 0,
     alignItems: 'center',
-    zIndex: 20000,
+    zIndex: 99999,
+    elevation: 99999,
+  },
+  roundWinnerCard: {
+    backgroundColor: 'rgba(20, 15, 10, 0.95)',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 200, 100, 0.5)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 10,
   },
   roundWinnerLabel: {
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: '600' as const,
-    color: 'rgba(255, 255, 255, 0.9)',
-    letterSpacing: 2,
+    color: 'rgba(255, 200, 100, 0.9)',
+    letterSpacing: 1.5,
     marginBottom: 2,
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 2,
   },
   roundWinnerName: {
-    fontSize: 24,
-    fontWeight: '900' as const,
+    fontSize: 18,
+    fontWeight: '800' as const,
     color: COLORS.gold,
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 5,
+    textShadowRadius: 4,
     letterSpacing: 0.5,
+    marginBottom: 2,
   },
   roundWinnerPoints: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '700' as const,
     color: COLORS.white,
-    marginTop: 2,
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 3,
+    textShadowRadius: 2,
   },
   fallingLetter: {
     position: 'absolute' as const,
