@@ -61,8 +61,8 @@ export default function GameScreen() {
   const roundWinnerGlow = useRef(new Animated.Value(0)).current;
   const processedRoundEndRef = useRef<number>(-1);
   const [fallingLetters, setFallingLetters] = useState<FallingLetter[]>([]);
-  const player1ScoreRef = useRef<View | null>(null);
-  const player2ScoreRef = useRef<View | null>(null);
+  const [displayedScoreBonus, setDisplayedScoreBonus] = useState<number>(0);
+  const [scoringPlayerId, setScoringPlayerId] = useState<string | null>(null);
 
 
 
@@ -612,6 +612,21 @@ export default function GameScreen() {
           });
           
           setFallingLetters(newFallingLetters);
+          setScoringPlayerId(isPlayer1Winner ? 'player1' : 'player2');
+          setDisplayedScoreBonus(0);
+          
+          // Start score ticking animation
+          let currentTick = 0;
+          const tickInterval = setInterval(() => {
+            currentTick++;
+            setDisplayedScoreBonus(currentTick);
+            if (RNPlatform.OS !== 'web') {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }
+            if (currentTick >= wordPoints) {
+              clearInterval(tickInterval);
+            }
+          }, 80);
           
           // Stagger the animations
           newFallingLetters.forEach((item, idx) => {
@@ -641,6 +656,8 @@ export default function GameScreen() {
         ]).start(() => {
           setShowRoundWinner(false);
           setFallingLetters([]);
+          setDisplayedScoreBonus(0);
+          setScoringPlayerId(null);
           if (matchIsOver) {
             router.replace('/game-over');
           } else {
@@ -1217,11 +1234,19 @@ export default function GameScreen() {
                   <View style={styles.playerInfo}>
                     <View style={styles.playerRow}>
                       <Text style={styles.playerLabel}>{gameState.player1.name}:</Text>
-                      <Text style={styles.playerScore}>{gameState.player1.score} pts</Text>
+                      <Text style={styles.playerScore}>
+                        {scoringPlayerId === 'player1' 
+                          ? (gameState.player1.score - roundWinnerPoints + displayedScoreBonus)
+                          : gameState.player1.score} pts
+                      </Text>
                     </View>
                     <View style={styles.playerRow}>
                       <Text style={styles.playerLabel}>{gameState.player2.name}:</Text>
-                      <Text style={styles.playerScore}>{gameState.player2.score} pts</Text>
+                      <Text style={styles.playerScore}>
+                        {scoringPlayerId === 'player2'
+                          ? (gameState.player2.score - roundWinnerPoints + displayedScoreBonus)
+                          : gameState.player2.score} pts
+                      </Text>
                     </View>
                   </View>
 
