@@ -494,11 +494,11 @@ export default function GameScreen() {
           playLetterTapSound();
         }
         
-        // All letters use the same smooth fade-in animation
+        // All letters use the same slow, ghostly fade-in animation
         // Only update displayedWord AFTER animation completes
         Animated.timing(newLetterAnim, {
           toValue: 1,
-          duration: 600,
+          duration: 1800,
           useNativeDriver: true,
         }).start(() => {
           setDisplayedWord(currentRound.currentWord);
@@ -1043,15 +1043,16 @@ export default function GameScreen() {
                       }
                       
                       if (isAnimating) {
-                        // Universal smooth fade-in for all letters
+                        // Universal slow, ghostly fade-in for all letters
+                        // Letter starts completely invisible and slowly materializes
                         const opacity = newLetterAnim.interpolate({
-                          inputRange: [0, 0.3, 0.6, 1],
-                          outputRange: [0, 0.3, 0.7, 1],
+                          inputRange: [0, 0.2, 0.5, 0.8, 1],
+                          outputRange: [0, 0.1, 0.4, 0.75, 1],
                         });
                         
                         const animScale = newLetterAnim.interpolate({
-                          inputRange: [0, 0.5, 1],
-                          outputRange: [0.9, 1.05, 1],
+                          inputRange: [0, 0.3, 0.7, 1],
+                          outputRange: [0.95, 0.98, 1.02, 1],
                         });
                         
                         return (
