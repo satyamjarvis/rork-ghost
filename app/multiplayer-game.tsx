@@ -11,7 +11,7 @@ import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
 import KeyboardGhost from '@/components/KeyboardGhost';
 import DanglingG from '@/components/DanglingG';
-import { ArrowLeft, AlertCircle, SkipForward, Bomb, Zap } from 'lucide-react-native';
+import { AlertCircle, SkipForward, Bomb, Zap } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { isValidWord } from '@/utils/game';
 
@@ -72,7 +72,7 @@ export default function MultiplayerGameScreen() {
     cancelLetterBomb,
   } = useMultiplayer();
 
-  console.log("MULTIPLAYER GAME RENDER", { isLoading, currentGame: currentGame ? { id: currentGame.id, status: currentGame.status, current_word: currentGame.current_word } : null, currentUser: user?.id, gameId });
+  console.log("[MP-GAME] RENDER", { isLoading, hasGame: !!currentGame, word: currentGame?.current_word, turn: currentGame?.current_turn, userId: user?.id });
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [displayedWord, setDisplayedWord] = useState<string>('');
@@ -98,8 +98,7 @@ export default function MultiplayerGameScreen() {
   const announcementOpacity = useRef(new Animated.Value(0)).current;
   
   const [fallingLetters, setFallingLetters] = useState<FallingLetter[]>([]);
-  const player1ScoreRef = useRef<View | null>(null);
-  const player2ScoreRef = useRef<View | null>(null);
+
   
   const previousRoundRef = useRef<number>(1);
   const previousRoundsWonRef = useRef<{ player1: number; player2: number }>({ player1: 0, player2: 0 });
@@ -639,7 +638,7 @@ export default function MultiplayerGameScreen() {
   };
 
   if (isLoading || !currentGame) {
-    console.log("SHOWING LOADING SCREEN", { isLoading, hasCurrentGame: !!currentGame });
+    console.log("[MP-GAME] SHOWING LOADING - isLoading:", isLoading, "hasGame:", !!currentGame);
     return (
       <LinearGradient
         colors={[COLOR_SCHEMES.peachy.top, COLOR_SCHEMES.peachy.middle, COLOR_SCHEMES.peachy.bottom]}
@@ -655,7 +654,7 @@ export default function MultiplayerGameScreen() {
   const isMyTurn = currentGame.current_turn === user?.id || letterBombState.awaitingReplacement || (challengeState.active && challengeState.challengerId !== user?.id);
   const isPlayer1 = currentGame.player1_id === user?.id;
 
-  console.log("SHOWING GAME UI", { currentWord: currentGame?.current_word, isMyTurn, player1_id: currentGame.player1_id, player2_id: currentGame.player2_id, current_turn: currentGame.current_turn });
+  console.log("[MP-GAME] SHOWING GAME UI", { word: currentGame.current_word, isMyTurn, round: currentGame.current_round });
   const myScore = isPlayer1 ? currentGame.player1_rounds_won : currentGame.player2_rounds_won;
   const opponentScore = isPlayer1 ? currentGame.player2_rounds_won : currentGame.player1_rounds_won;
   const myPoints = isPlayer1 ? player1Points : player2Points;
@@ -764,41 +763,21 @@ export default function MultiplayerGameScreen() {
           );
         })}
 
-        <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <SafeAreaView style={styles.safeArea} edges={['top']}>
           <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-            <View style={styles.headerWrapper}>
-              <View style={styles.header}>
-                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                  <ArrowLeft color={COLORS.white} size={24} />
-                </TouchableOpacity>
-                <View style={styles.headerCenter}>
-                  <Text style={styles.vsText}>vs {opponentProfile?.username || 'Opponent'}</Text>
-                  <View style={styles.scoreContainer}>
-                    <Text style={styles.scoreText}>{myScore} - {opponentScore}</Text>
-                    <Text style={styles.roundText}>Round {currentGame.current_round}</Text>
-                  </View>
-                </View>
-                <View style={styles.headerRight} />
-              </View>
-              <View style={styles.playerPointsContainer}>
-                <View 
-                  style={styles.playerPointsBox}
-                  ref={isPlayer1 ? player1ScoreRef : player2ScoreRef}
-                >
-                  <Text style={styles.playerPointsLabel}>You</Text>
-                  <Text style={styles.playerPointsValue}>{myPoints} pts</Text>
-                </View>
-                <View 
-                  style={styles.playerPointsBox}
-                  ref={isPlayer1 ? player2ScoreRef : player1ScoreRef}
-                >
-                  <Text style={styles.playerPointsLabel}>{opponentProfile?.username || 'Opponent'}</Text>
-                  <Text style={styles.playerPointsValue}>{opponentPoints} pts</Text>
+            <View style={styles.header}>
+              <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                <Text style={styles.backText}>BACK{"\n"}TO LIST</Text>
+              </TouchableOpacity>
+              <View style={styles.headerCenter}>
+                <Text style={styles.vsText}>vs {opponentProfile?.username || 'Opponent'}</Text>
+                <View style={styles.scoreContainer}>
+                  <Text style={styles.scoreText}>{myScore} - {opponentScore}</Text>
+                  <Text style={styles.roundText}>Round {currentGame.current_round}</Text>
                 </View>
               </View>
+              <View style={styles.headerRight} />
             </View>
-
-
 
             <View style={styles.wordDisplayContainer}>
               <View 
@@ -1154,15 +1133,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 80,
   },
-  headerWrapper: {
-    marginBottom: 8,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 16,
     marginTop: -80,
+  },
+  backText: {
+    fontSize: 10,
+    fontWeight: '700' as const,
+    color: COLORS.white,
+    textAlign: 'center' as const,
+    lineHeight: 14,
   },
   backButton: {
     width: 40,
@@ -1172,6 +1155,7 @@ const styles = StyleSheet.create({
   },
   headerCenter: {
     alignItems: 'center',
+    gap: 4,
   },
   vsText: {
     fontSize: 18,
@@ -1182,7 +1166,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginTop: 4,
   },
   scoreText: {
     fontSize: 16,
@@ -1193,26 +1176,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
-  },
-  playerPointsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 24,
-    marginTop: 8,
-  },
-  playerPointsBox: {
-    alignItems: 'center',
-  },
-  playerPointsLabel: {
-    fontSize: 11,
-    fontWeight: '500' as const,
-    color: COLORS.whiteTransparent,
-    marginBottom: 2,
-  },
-  playerPointsValue: {
-    fontSize: 14,
-    fontWeight: '700' as const,
-    color: COLORS.white,
   },
   headerRight: {
     width: 40,
@@ -1287,7 +1250,7 @@ const styles = StyleSheet.create({
   wordDisplayContainer: {
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 100,
+    marginTop: 150,
     height: 100,
     minHeight: 100,
   },
