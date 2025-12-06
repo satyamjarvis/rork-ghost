@@ -28,6 +28,7 @@ export default function MultiplayerScreen() {
     sendGameInvite,
     acceptInvite,
     declineInvite,
+    cancelSentInvite,
     fetchActiveGames,
     fetchPendingInvites,
     loadGame,
@@ -131,6 +132,13 @@ export default function MultiplayerScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     await declineInvite(inviteId);
+  };
+
+  const handleCancelSentInvite = async (inviteId: string) => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    await cancelSentInvite(inviteId);
   };
 
   const handleOpenGame = async (gameId: string) => {
@@ -364,6 +372,14 @@ export default function MultiplayerScreen() {
                 <Text style={styles.inviteUsername}>{invite.to_profile?.username || 'Unknown'}</Text>
                 <Text style={styles.invitePending}>Pending...</Text>
               </View>
+              <TouchableOpacity
+                style={styles.cancelInviteButton}
+                onPress={() => handleCancelSentInvite(invite.id)}
+                activeOpacity={0.7}
+              >
+                <X color="#FF6B6B" size={18} />
+                <Text style={styles.cancelInviteText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
           ))}
         </>
@@ -749,7 +765,21 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   sentInviteCard: {
-    opacity: 0.7,
+    opacity: 1,
+  },
+  cancelInviteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+  cancelInviteText: {
+    fontSize: 13,
+    fontWeight: '600' as const,
+    color: '#FF6B6B',
   },
   inviteInfo: {
     gap: 4,

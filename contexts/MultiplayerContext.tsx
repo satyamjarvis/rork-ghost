@@ -255,6 +255,27 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
     return { error: null };
   }, [fetchPendingInvites]);
 
+  const cancelSentInvite = useCallback(async (inviteId: string) => {
+    if (!user) return { error: new Error('Not logged in') };
+
+    console.log('[MP] Cancelling sent invite:', inviteId);
+    
+    const { error } = await supabase
+      .from('game_invites')
+      .delete()
+      .eq('id', inviteId)
+      .eq('from_user_id', user.id)
+      .eq('status', 'pending');
+
+    if (error) {
+      console.error('[MP] Error cancelling invite:', error);
+      return { error };
+    }
+
+    fetchSentInvites();
+    return { error: null };
+  }, [user, fetchSentInvites]);
+
   const joinMatchmaking = useCallback(async () => {
     if (!user) return { error: new Error('Not logged in') };
 
@@ -791,6 +812,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
     sendGameInvite,
     acceptInvite,
     declineInvite,
+    cancelSentInvite,
     joinMatchmaking,
     leaveMatchmaking,
     loadGame,
