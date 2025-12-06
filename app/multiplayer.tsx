@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Animated, Platform, ActivityIndicator, TextInput, RefreshControl } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Animated, Platform, ActivityIndicator, TextInput, RefreshControl, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/contexts/AuthContext';
@@ -149,9 +149,11 @@ export default function MultiplayerScreen() {
         console.log('[MP] Invite cancelled successfully');
       } else {
         console.error('[MP] Failed to cancel invite:', result.error);
+        Alert.alert('Error', 'Failed to cancel invite. Please try again.');
       }
     } catch (error) {
       console.error('[MP] Error cancelling invite:', error);
+      Alert.alert('Error', 'Something went wrong. Please try again.');
     } finally {
       setCancellingInviteId(null);
     }

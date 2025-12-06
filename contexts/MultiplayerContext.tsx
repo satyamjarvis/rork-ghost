@@ -260,7 +260,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
 
     console.log('[MP] Cancelling sent invite:', inviteId);
     
-    const { error } = await supabase
+    const { error, count } = await supabase
       .from('game_invites')
       .delete()
       .eq('id', inviteId)
@@ -272,9 +272,13 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
       return { error };
     }
 
-    fetchSentInvites();
+    console.log('[MP] Invite cancelled successfully, removed count:', count);
+    
+    // Immediately remove from local state for instant UI feedback
+    setSentInvites(prev => prev.filter(invite => invite.id !== inviteId));
+    
     return { error: null };
-  }, [user, fetchSentInvites]);
+  }, [user]);
 
   const joinMatchmaking = useCallback(async () => {
     if (!user) return { error: new Error('Not logged in') };
