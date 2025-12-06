@@ -69,9 +69,6 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
   
   const gameChannelRef = useRef<RealtimeChannel | null>(null);
   const inviteChannelRef = useRef<RealtimeChannel | null>(null);
-  const sentInvitesChannelRef = useRef<RealtimeChannel | null>(null);
-  const pendingGameIdRef = useRef<string | null>(null);
-  const [acceptedGameId, setAcceptedGameId] = useState<string | null>(null);
 
   const fetchActiveGames = useCallback(async () => {
     if (!user) return;
@@ -223,7 +220,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
       .single();
 
     if (gameError) {
-      console.error('[MP] Error creating game:', JSON.stringify(gameError, null, 2));
+      console.error('[MP] Error creating game:', gameError);
       return { error: gameError };
     }
 
@@ -299,7 +296,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
       setIsInQueue(false);
 
       if (gameError) {
-        console.error('[MP] Error creating game:', JSON.stringify(gameError, null, 2));
+        console.error('[MP] Error creating game:', gameError);
         return { error: gameError };
       }
 
@@ -335,7 +332,6 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
   const loadGame = useCallback(async (gameId: string) => {
     console.log('[MP] Loading game:', gameId);
     setIsLoading(true);
-    pendingGameIdRef.current = gameId;
 
     const { data, error } = await supabase
       .from('games')
@@ -353,7 +349,6 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
       return { error };
     }
 
-    console.log('[MP] Game loaded successfully:', data.id, 'status:', data.status);
     setCurrentGame(data);
     
     const isPlayer1 = data.player1_id === user?.id;
@@ -375,7 +370,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
           filter: `id=eq.${gameId}`,
         },
         (payload) => {
-          console.log('[MP] Game updated via realtime:', payload);
+          console.log('[MP] Game updated:', payload);
           setCurrentGame(payload.new as Game);
         }
       )
@@ -383,7 +378,6 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
 
     gameChannelRef.current = channel;
     setIsLoading(false);
-    pendingGameIdRef.current = null;
     return { data };
   }, [user]);
 
@@ -742,8 +736,7 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
             schema: 'public',
             table: 'games',
           },
-          (payload) => {
-            console.log('[MP] Games table changed:', payload.eventType);
+          () => {
             fetchActiveGames();
             fetchCompletedGames();
           }
@@ -752,87 +745,11 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
 
       inviteChannelRef.current = channel;
 
-      const sentInvitesChannel = supabase
-        .channel('sent-invites')
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'game_invites',
-            filter: `from_user_id=eq.${user.id}`,
-          },
-          async (payload) => {
-            console.log('[MP] Sent invite updated:', payload);
-            const updatedInvite = payload.new as GameInvite;
-            
-            if (updatedInvite.status === 'accepted' && updatedInvite.game_id) {
-              console.log('[MP] Invite accepted! Game created:', updatedInvite.game_id);
-              fetchSentInvites();
-              fetchActiveGames();
-              setAcceptedGameId(updatedInvite.game_id);
-              
-              if (pendingGameIdRef.current === updatedInvite.game_id || !currentGame) {
-                console.log('[MP] Auto-loading newly created game');
-                const { data: gameData } = await supabase
-                  .from('games')
-                  .select(`
-                    *,
-                    player1_profile:profiles!games_player1_id_fkey(username, display_name),
-                    player2_profile:profiles!games_player2_id_fkey(username, display_name)
-                  `)
-                  .eq('id', updatedInvite.game_id)
-                  .single();
-                
-                if (gameData) {
-                  console.log('[MP] Setting current game from accepted invite');
-                  setCurrentGame(gameData);
-                  const isPlayer1 = gameData.player1_id === user.id;
-                  const opponent = isPlayer1 ? gameData.player2_profile : gameData.player1_profile;
-                  setOpponentProfile(opponent);
-                  setIsLoading(false);
-                  
-                  if (gameChannelRef.current) {
-                    supabase.removeChannel(gameChannelRef.current);
-                  }
-                  const gameChannel = supabase
-                    .channel(`game-${updatedInvite.game_id}`)
-                    .on(
-                      'postgres_changes',
-                      {
-                        event: 'UPDATE',
-                        schema: 'public',
-                        table: 'games',
-                        filter: `id=eq.${updatedInvite.game_id}`,
-                      },
-                      (gamePayload) => {
-                        console.log('[MP] Game updated via realtime:', gamePayload);
-                        setCurrentGame(gamePayload.new as Game);
-                      }
-                    )
-                    .subscribe();
-                  gameChannelRef.current = gameChannel;
-                }
-              }
-            } else {
-              fetchSentInvites();
-            }
-          }
-        )
-        .subscribe();
-
-      sentInvitesChannelRef.current = sentInvitesChannel;
-
       return () => {
         supabase.removeChannel(channel);
-        supabase.removeChannel(sentInvitesChannel);
       };
     }
-  }, [user, fetchActiveGames, fetchCompletedGames, fetchPendingInvites, fetchSentInvites, currentGame]);
-
-  const clearAcceptedGameId = useCallback(() => {
-    setAcceptedGameId(null);
-  }, []);
+  }, [user, fetchActiveGames, fetchCompletedGames, fetchPendingInvites, fetchSentInvites]);
 
   return {
     activeGames,
@@ -844,7 +761,6 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
     isInQueue,
     isLoading,
     letterBombState,
-    acceptedGameId,
     fetchActiveGames,
     fetchCompletedGames,
     fetchPendingInvites,
@@ -862,6 +778,5 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
     playBombReplacement,
     cancelLetterBomb,
     leaveGame,
-    clearAcceptedGameId,
   };
 });

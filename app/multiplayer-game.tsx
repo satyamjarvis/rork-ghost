@@ -5,15 +5,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayer } from '@/contexts/MultiplayerContext';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
-
 import { POINTS_PER_LETTER } from '@/constants/game';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
 import KeyboardGhost from '@/components/KeyboardGhost';
 import DanglingG from '@/components/DanglingG';
-import { AlertCircle, SkipForward, Bomb, Zap } from 'lucide-react-native';
+import { ArrowLeft, AlertCircle, SkipForward, Bomb } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { isValidWord } from '@/utils/game';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -71,8 +69,6 @@ export default function MultiplayerGameScreen() {
     playBombReplacement,
     cancelLetterBomb,
   } = useMultiplayer();
-
-  console.log("[MP-GAME] RENDER", { isLoading, hasGame: !!currentGame, word: currentGame?.current_word, turn: currentGame?.current_turn, userId: user?.id });
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [displayedWord, setDisplayedWord] = useState<string>('');
@@ -98,14 +94,14 @@ export default function MultiplayerGameScreen() {
   const announcementOpacity = useRef(new Animated.Value(0)).current;
   
   const [fallingLetters, setFallingLetters] = useState<FallingLetter[]>([]);
-
+  const player1ScoreRef = useRef<View | null>(null);
+  const player2ScoreRef = useRef<View | null>(null);
   
   const previousRoundRef = useRef<number>(1);
   const previousRoundsWonRef = useRef<{ player1: number; player2: number }>({ player1: 0, player2: 0 });
   
   const previousTurnRef = useRef<string | null>(null);
   const previousWordRef = useRef<string>('');
-  const [challengeState, setChallengeState] = useState<{ active: boolean; challengerId: string | null; originalWord: string }>({ active: false, challengerId: null, originalWord: '' });
 
   useEffect(() => {
     if (gameId) {
@@ -123,8 +119,6 @@ export default function MultiplayerGameScreen() {
       duration: 400,
       useNativeDriver: true,
     }).start();
-
-
   }, [fadeAnim]);
 
   useEffect(() => {
@@ -132,50 +126,58 @@ export default function MultiplayerGameScreen() {
       const wordChanged = currentGame.current_word !== previousWordRef.current;
       const wordGrew = currentGame.current_word.length > previousWordRef.current.length;
       
-      if (wordChanged && wordGrew && currentGame.current_word.length > displayedWord.length) {
+      if (wordChanged && wordGrew) {
         const lastMove = currentGame.word_history?.[currentGame.word_history.length - 1];
         const wasPlayedByMe = lastMove?.playerId === user?.id;
-        
-        const newIndex = currentGame.current_word.length - 1;
-        setAnimatingIndex(newIndex);
         
         if (!wasPlayedByMe && lastMove?.playerId !== 'system' && !letterBombState.awaitingReplacement) {
           console.log('[GAME] Opponent played a letter, triggering fade-in animation');
           setIsOpponentMove(true);
+          setAnimatingIndex(currentGame.current_word.length - 1);
           opponentLetterFadeAnim.setValue(0);
           
-          Animated.timing(opponentLetterFadeAnim, {
-            toValue: 1,
-            duration: 1800,
-            useNativeDriver: true,
-          }).start(() => {
-            setDisplayedWord(currentGame.current_word);
+          Animated.sequence([
+            Animated.timing(opponentLetterFadeAnim, {
+              toValue: 0.1,
+              duration: 100,
+              useNativeDriver: true,
+            }),
+            Animated.timing(opponentLetterFadeAnim, {
+              toValue: 1,
+              duration: 1200,
+              useNativeDriver: true,
+            }),
+          ]).start(() => {
             setAnimatingIndex(-1);
             setIsOpponentMove(false);
           });
-        } else if (wasPlayedByMe || lastMove?.playerId === 'system') {
+        } else if (wasPlayedByMe) {
+          setAnimatingIndex(currentGame.current_word.length - 1);
           newLetterAnim.setValue(0);
           
-          Animated.timing(newLetterAnim, {
-            toValue: 1,
-            duration: 1800,
-            useNativeDriver: true,
-          }).start(() => {
-            setDisplayedWord(currentGame.current_word);
+          Animated.sequence([
+            Animated.timing(newLetterAnim, {
+              toValue: 0.5,
+              duration: 200,
+              useNativeDriver: true,
+            }),
+            Animated.spring(newLetterAnim, {
+              toValue: 1,
+              useNativeDriver: true,
+              friction: 6,
+              tension: 40,
+            }),
+          ]).start(() => {
             setAnimatingIndex(-1);
           });
         }
-      } else if (wordChanged && currentGame.current_word.length < displayedWord.length) {
-        setDisplayedWord(currentGame.current_word);
-        setAnimatingIndex(-1);
-      } else if (!wordChanged && displayedWord !== currentGame.current_word) {
-        setDisplayedWord(currentGame.current_word);
       }
       
+      setDisplayedWord(currentGame.current_word);
       previousTurnRef.current = currentGame.current_turn;
       previousWordRef.current = currentGame.current_word;
     }
-  }, [currentGame, user?.id, letterBombState.awaitingReplacement, newLetterAnim, opponentLetterFadeAnim, displayedWord]);
+  }, [currentGame, user?.id, letterBombState.awaitingReplacement, newLetterAnim, opponentLetterFadeAnim]);
 
   const calculateWordPoints = useCallback((word: string): number => {
     return word.split('').reduce((sum, letter) => {
@@ -296,7 +298,6 @@ export default function MultiplayerGameScreen() {
       
       setRoundWinnerAnnouncement({ winner: winnerName, points: wordPoints });
       announcementOpacity.setValue(0);
-
       Animated.sequence([
         Animated.timing(announcementOpacity, {
           toValue: 1,
@@ -381,7 +382,6 @@ export default function MultiplayerGameScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
 
-
     const nativeEvent = event?.nativeEvent;
     if (nativeEvent && wordBoardPosition) {
       const { pageX, pageY } = nativeEvent;
@@ -445,7 +445,6 @@ export default function MultiplayerGameScreen() {
     if (!currentGame || currentGame.current_turn !== user?.id) return;
     if (currentGame.current_word.length < 4) return;
     if (letterBombState.awaitingReplacement) return;
-    if (challengeState.active) return;
 
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -455,66 +454,7 @@ export default function MultiplayerGameScreen() {
     if (result.error) {
       Alert.alert('Error', result.error.message);
     }
-  }, [currentGame, user?.id, callWord, letterBombState.awaitingReplacement, challengeState.active]);
-
-  const handleChallenge = useCallback(() => {
-    if (!currentGame || currentGame.current_turn !== user?.id) return;
-    if (currentGame.current_word.length < 3) return;
-    if (letterBombState.awaitingReplacement) return;
-
-    if (Platform.OS !== 'web') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    }
-
-    console.log('[MP] Initiating challenge');
-    setChallengeState({
-      active: true,
-      challengerId: user.id,
-      originalWord: currentGame.current_word,
-    });
-  }, [currentGame, user?.id, letterBombState.awaitingReplacement]);
-
-  const handleConfirmChallenge = useCallback(async () => {
-    if (!currentGame || !challengeState.active) return;
-    
-    const word = currentGame.current_word;
-    console.log('[MP] Confirming challenge with word:', word);
-
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-
-    if (word.length < 4) {
-      Alert.alert('Invalid', 'Word must be at least 4 letters');
-      return;
-    }
-
-    if (!word.startsWith(challengeState.originalWord)) {
-      Alert.alert('Invalid', 'Word must start with the original letters');
-      return;
-    }
-
-    const wordIsValid = isValidWord(word);
-    
-    if (wordIsValid) {
-      if (Platform.OS !== 'web') {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      }
-      Alert.alert('Success!', `"${word}" is a valid word! Challenger loses the round.`);
-    } else {
-      if (Platform.OS !== 'web') {
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      }
-      Alert.alert('Failed!', `"${word}" is not a valid word. You lose the round.`);
-    }
-
-    setChallengeState({ active: false, challengerId: null, originalWord: '' });
-    
-    const result = await callWord();
-    if (result.error) {
-      Alert.alert('Error', result.error.message);
-    }
-  }, [currentGame, challengeState, callWord]);
+  }, [currentGame, user?.id, callWord, letterBombState.awaitingReplacement]);
 
   const handleLetterBomb = useCallback(async () => {
     if (!currentGame || currentGame.current_turn !== user?.id) return;
@@ -637,8 +577,21 @@ export default function MultiplayerGameScreen() {
     return 28;
   };
 
+  const getDynamicPointsSize = () => {
+    const letterCount = displayedWord.length;
+    if (letterCount <= 5) return 10;
+    if (letterCount <= 7) return 9;
+    return 8;
+  };
+
+  const getDynamicShadowScale = () => {
+    const letterCount = displayedWord.length;
+    if (letterCount <= 5) return 1;
+    if (letterCount <= 7) return 0.8;
+    return 0.65;
+  };
+
   if (isLoading || !currentGame) {
-    console.log("[MP-GAME] SHOWING LOADING - isLoading:", isLoading, "hasGame:", !!currentGame);
     return (
       <LinearGradient
         colors={[COLOR_SCHEMES.peachy.top, COLOR_SCHEMES.peachy.middle, COLOR_SCHEMES.peachy.bottom]}
@@ -651,16 +604,17 @@ export default function MultiplayerGameScreen() {
     );
   }
 
-  const isMyTurn = currentGame.current_turn === user?.id || letterBombState.awaitingReplacement || (challengeState.active && challengeState.challengerId !== user?.id);
+  const isMyTurn = currentGame.current_turn === user?.id || letterBombState.awaitingReplacement;
   const isPlayer1 = currentGame.player1_id === user?.id;
-
-  console.log("[MP-GAME] SHOWING GAME UI", { word: currentGame.current_word, isMyTurn, round: currentGame.current_round });
   const myScore = isPlayer1 ? currentGame.player1_rounds_won : currentGame.player2_rounds_won;
   const opponentScore = isPlayer1 ? currentGame.player2_rounds_won : currentGame.player1_rounds_won;
   const myPoints = isPlayer1 ? player1Points : player2Points;
   const opponentPoints = isPlayer1 ? player2Points : player1Points;
 
+  const tileWidth = getLetterTileWidth();
   const fontSize = getDynamicFontSize();
+  const pointsSize = getDynamicPointsSize();
+  const shadowScale = getDynamicShadowScale();
 
   return (
     <LinearGradient
@@ -765,19 +719,39 @@ export default function MultiplayerGameScreen() {
 
         <SafeAreaView style={styles.safeArea} edges={['top']}>
           <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
-            <View style={styles.header}>
-              <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-                <Text style={styles.backText}>BACK{"\n"}TO LIST</Text>
-              </TouchableOpacity>
-              <View style={styles.headerCenter}>
-                <Text style={styles.vsText}>vs {opponentProfile?.username || 'Opponent'}</Text>
-                <View style={styles.scoreContainer}>
-                  <Text style={styles.scoreText}>{myScore} - {opponentScore}</Text>
-                  <Text style={styles.roundText}>Round {currentGame.current_round}</Text>
+            <View style={styles.headerWrapper}>
+              <View style={styles.header}>
+                <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+                  <ArrowLeft color={COLORS.white} size={24} />
+                </TouchableOpacity>
+                <View style={styles.headerCenter}>
+                  <Text style={styles.vsText}>vs {opponentProfile?.username || 'Opponent'}</Text>
+                  <View style={styles.scoreContainer}>
+                    <Text style={styles.scoreText}>{myScore} - {opponentScore}</Text>
+                    <Text style={styles.roundText}>Round {currentGame.current_round}</Text>
+                  </View>
+                </View>
+                <View style={styles.headerRight} />
+              </View>
+              <View style={styles.playerPointsContainer}>
+                <View 
+                  style={styles.playerPointsBox}
+                  ref={isPlayer1 ? player1ScoreRef : player2ScoreRef}
+                >
+                  <Text style={styles.playerPointsLabel}>You</Text>
+                  <Text style={styles.playerPointsValue}>{myPoints} pts</Text>
+                </View>
+                <View 
+                  style={styles.playerPointsBox}
+                  ref={isPlayer1 ? player2ScoreRef : player1ScoreRef}
+                >
+                  <Text style={styles.playerPointsLabel}>{opponentProfile?.username || 'Opponent'}</Text>
+                  <Text style={styles.playerPointsValue}>{opponentPoints} pts</Text>
                 </View>
               </View>
-              <View style={styles.headerRight} />
             </View>
+
+
 
             <View style={styles.wordDisplayContainer}>
               <View 
@@ -789,36 +763,16 @@ export default function MultiplayerGameScreen() {
                   });
                 }}
               >
-                {(challengeState.active ? currentGame.current_word : currentGame.current_word).split('').map((letter, index) => {
-                  const isAnimating = index === animatingIndex && index === displayedWord.length;
+                {displayedWord.split('').map((letter, index) => {
+                  const isAnimating = index === animatingIndex;
                   const isExploding = explodingLetter?.index === index;
-                  const letterCount = currentGame.current_word.length;
-                  const containerWidth = SCREEN_WIDTH * 0.95 - 40;
-                  const scaleFactor = Math.min(1, 70 / (containerWidth / letterCount));
-                  
-                  const baseFontSize = 60;
-                  const basePointsSize = 10;
-                  let dynamicFontSize = baseFontSize;
-                  let dynamicPointsSize = basePointsSize;
-                  
-                  if (letterCount > 6) {
-                    const reductionFactor = Math.max(0.4, 1 - ((letterCount - 6) * 0.08));
-                    dynamicFontSize = baseFontSize * reductionFactor;
-                    dynamicPointsSize = basePointsSize * reductionFactor;
-                  }
-                  
-                  const shadowBottomOffset = -4 * scaleFactor;
                   
                   if (isExploding) {
                     return (
                       <View 
                         key={`letter-${index}`} 
-                        style={styles.wordLetterContainer}
-                      >
-                        <View style={styles.wordLetter}>
-                          <Text style={[styles.wordLetterText, { opacity: 0, fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
-                        </View>
-                      </View>
+                        style={[styles.wordLetterContainer, { width: tileWidth, marginHorizontal: 4 }]}
+                      />
                     );
                   }
                   
@@ -833,35 +787,44 @@ export default function MultiplayerGameScreen() {
                         key={`letter-${index}`}
                         style={[
                           styles.wordLetterContainer,
-                          { opacity: opponentLetterFadeAnim },
+                          { 
+                            width: tileWidth, 
+                            marginHorizontal: 4,
+                          },
                         ]}
                       >
-                        <View style={styles.wordLetter}>
+                        <Animated.View style={[styles.wordLetter, { opacity: opponentLetterFadeAnim }]}>
                           <Animated.View 
                             style={[
                               styles.ghostlyGlow,
                               { opacity: glowOpacity }
                             ]} 
                           />
-                          <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
-                          <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
+                          <Text style={[styles.wordLetterText, { fontSize, lineHeight: fontSize * 1.1 }]}>{letter}</Text>
+                          <Text style={[styles.wordLetterPoints, { fontSize: pointsSize }]}>
                             {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
                           </Text>
-                          <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
-                        </View>
+                          <View style={[
+                            styles.wordLetterShadow, 
+                            { transform: [{ scaleX: 1.3 * shadowScale }, { scaleY: 0.6 * shadowScale }] }
+                          ]} />
+                        </Animated.View>
                       </Animated.View>
                     );
                   }
                   
                   if (isAnimating && !isOpponentMove) {
-                    const opacity = newLetterAnim.interpolate({
-                      inputRange: [0, 0.2, 0.5, 0.8, 1],
-                      outputRange: [0, 0.1, 0.4, 0.75, 1],
-                    });
-                    
                     const animScale = newLetterAnim.interpolate({
-                      inputRange: [0, 0.3, 0.7, 1],
-                      outputRange: [0.95, 0.98, 1.02, 1],
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0.8, 1.15, 1],
+                    });
+                    const translateY = newLetterAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    });
+                    const opacity = newLetterAnim.interpolate({
+                      inputRange: [0, 0.3, 1],
+                      outputRange: [0, 1, 1],
                     });
                     
                     return (
@@ -869,18 +832,23 @@ export default function MultiplayerGameScreen() {
                         key={`letter-${index}`}
                         style={[
                           styles.wordLetterContainer,
-                          {
-                            opacity,
-                            transform: [{ scale: animScale }],
+                          { 
+                            width: tileWidth, 
+                            marginHorizontal: 4,
+                            transform: [{ scale: animScale }, { translateY }], 
+                            opacity 
                           },
                         ]}
                       >
                         <View style={styles.wordLetter}>
-                          <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
-                          <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
+                          <Text style={[styles.wordLetterText, { fontSize, lineHeight: fontSize * 1.1 }]}>{letter}</Text>
+                          <Text style={[styles.wordLetterPoints, { fontSize: pointsSize }]}>
                             {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
                           </Text>
-                          <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
+                          <View style={[
+                            styles.wordLetterShadow, 
+                            { transform: [{ scaleX: 1.3 * shadowScale }, { scaleY: 0.6 * shadowScale }] }
+                          ]} />
                         </View>
                       </Animated.View>
                     );
@@ -889,14 +857,17 @@ export default function MultiplayerGameScreen() {
                   return (
                     <View 
                       key={`letter-${index}`} 
-                      style={styles.wordLetterContainer}
+                      style={[styles.wordLetterContainer, { width: tileWidth, marginHorizontal: 4 }]}
                     >
                       <View style={styles.wordLetter}>
-                        <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
-                        <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
+                        <Text style={[styles.wordLetterText, { fontSize, lineHeight: fontSize * 1.1 }]}>{letter}</Text>
+                        <Text style={[styles.wordLetterPoints, { fontSize: pointsSize }]}>
                           {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
                         </Text>
-                        <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
+                        <View style={[
+                          styles.wordLetterShadow, 
+                          { transform: [{ scaleX: 1.3 * shadowScale }, { scaleY: 0.6 * shadowScale }] }
+                        ]} />
                       </View>
                     </View>
                   );
@@ -905,113 +876,73 @@ export default function MultiplayerGameScreen() {
               <Text style={styles.wordValueText}>Word Value: {calculateWordValue()} pts</Text>
             </View>
 
-            <View style={styles.keyboardSection}>
-              <View style={styles.keyboardContainer}>
-                {keyboardRows.map((row, rowIndex) => (
-                  <View key={rowIndex} style={styles.keyboardRow}>
-                    {row.map((letter) => {
-                      const isBombedLetter = letterBombState.awaitingReplacement && letter === letterBombState.bombedLetter;
-                      const isDisabled = (!isMyTurn && !letterBombState.awaitingReplacement) || isBombedLetter;
-                      
-                      return (
-                        <TouchableOpacity
-                          key={letter}
-                          ref={(ref) => { keyRefs.current[letter] = ref; }}
-                          style={[
-                            styles.keyTile, 
-                            isDisabled && styles.keyTileDisabled,
-                            isBombedLetter && styles.keyTileBombed,
-                          ]}
-                          onPress={(event) => handleLetterPress(letter, event)}
-                          activeOpacity={0.7}
-                          disabled={isDisabled}
-                        >
-                          <Text style={[
-                            styles.keyLetter, 
-                            isDisabled && styles.keyLetterDisabled,
-                            isBombedLetter && styles.keyLetterBombed,
-                          ]}>
-                            {letter}
-                          </Text>
-                          <Text style={styles.keyPoints}>
-                            {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
-                ))}
-              </View>
+            <View style={styles.keyboardContainer}>
+              {keyboardRows.map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.keyboardRow}>
+                  {row.map((letter) => {
+                    const isBombedLetter = letterBombState.awaitingReplacement && letter === letterBombState.bombedLetter;
+                    const isDisabled = (!isMyTurn && !letterBombState.awaitingReplacement) || isBombedLetter;
+                    
+                    return (
+                      <TouchableOpacity
+                        key={letter}
+                        ref={(ref) => { keyRefs.current[letter] = ref; }}
+                        style={[
+                          styles.keyTile, 
+                          isDisabled && styles.keyTileDisabled,
+                          isBombedLetter && styles.keyTileBombed,
+                        ]}
+                        onPress={(event) => handleLetterPress(letter, event)}
+                        activeOpacity={0.7}
+                        disabled={isDisabled}
+                      >
+                        <Text style={[
+                          styles.keyLetter, 
+                          isDisabled && styles.keyLetterDisabled,
+                          isBombedLetter && styles.keyLetterBombed,
+                        ]}>
+                          {letter}
+                        </Text>
+                        <Text style={styles.keyPoints}>
+                          {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ))}
             </View>
 
-            <View style={styles.bottomBar}>
-              <View style={styles.playerInfo}>
-                <View style={styles.playerRow}>
-                  <Text style={styles.playerLabel}>You:</Text>
-                  <Text style={styles.playerScore}>{myPoints} pts</Text>
-                </View>
-                <View style={styles.playerRow}>
-                  <Text style={styles.playerLabel}>{opponentProfile?.username || 'Opponent'}:</Text>
-                  <Text style={styles.playerScore}>{opponentPoints} pts</Text>
-                </View>
+            {isMyTurn && !letterBombState.awaitingReplacement && (
+              <View style={styles.actionButtons}>
+                <TouchableOpacity
+                  style={styles.bombButton}
+                  onPress={handleLetterBomb}
+                  activeOpacity={0.7}
+                >
+                  <Bomb color={COLORS.white} size={20} />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.passButton}
+                  onPress={handlePass}
+                  activeOpacity={0.7}
+                >
+                  <SkipForward color={COLORS.white} size={20} />
+                  <Text style={styles.passButtonText}>Pass</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.callWordButton, currentGame.current_word.length < 4 && styles.callWordButtonDisabled]}
+                  onPress={handleCallWord}
+                  activeOpacity={0.7}
+                  disabled={currentGame.current_word.length < 4}
+                >
+                  <AlertCircle color={COLORS.white} size={20} />
+                  <Text style={styles.callWordButtonText}>Call Word</Text>
+                </TouchableOpacity>
               </View>
-
-              {isMyTurn && !letterBombState.awaitingReplacement && (
-                <View style={styles.actionButtons}>
-                  {challengeState.active ? (
-                    <TouchableOpacity
-                      style={styles.iconButton}
-                      onPress={handleConfirmChallenge}
-                      activeOpacity={0.7}
-                    >
-                      <AlertCircle color={COLORS.white} size={28} />
-                      <Text style={styles.iconButtonLabel}>CONFIRM</Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <>
-                      <TouchableOpacity
-                        style={styles.iconButton}
-                        onPress={handleLetterBomb}
-                        activeOpacity={0.7}
-                      >
-                        <Bomb color={COLORS.white} size={28} />
-                        <Text style={styles.iconButtonLabel}>BOMB</Text>
-                      </TouchableOpacity>
-
-                      {currentGame.current_word.length >= 3 && (
-                        <TouchableOpacity
-                          style={styles.iconButton}
-                          onPress={handleChallenge}
-                          activeOpacity={0.7}
-                        >
-                          <Zap color={COLORS.white} size={28} />
-                          <Text style={styles.iconButtonLabel}>CHALLENGE</Text>
-                        </TouchableOpacity>
-                      )}
-
-                      <TouchableOpacity
-                        style={styles.iconButton}
-                        onPress={handlePass}
-                        activeOpacity={0.7}
-                      >
-                        <SkipForward color={COLORS.white} size={28} />
-                        <Text style={styles.iconButtonLabel}>PASS</Text>
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[styles.iconButton, currentGame.current_word.length < 4 && styles.iconButtonDisabled]}
-                        onPress={handleCallWord}
-                        activeOpacity={0.7}
-                        disabled={currentGame.current_word.length < 4}
-                      >
-                        <AlertCircle color={COLORS.white} size={28} />
-                        <Text style={styles.iconButtonLabel}>CALL WORD</Text>
-                      </TouchableOpacity>
-                    </>
-                  )}
-                </View>
-              )}
-            </View>
+            )}
           </Animated.View>
         </SafeAreaView>
         
@@ -1043,22 +974,9 @@ export default function MultiplayerGameScreen() {
         </View>
       )}
 
-      {challengeState.active && challengeState.challengerId !== user?.id && (
-        <View style={styles.challengedIndicator} pointerEvents="none">
-          <Text style={styles.challengedIndicatorTitle}>⚠️ CHALLENGED</Text>
-          <Text style={styles.challengedIndicatorSubtitle}>Spell a valid word</Text>
-        </View>
-      )}
-
-      {challengeState.active && challengeState.challengerId === user?.id && (
-        <View style={styles.waitingChallengeIndicator} pointerEvents="none">
-          <Text style={styles.waitingIndicatorText}>Waiting for opponent...</Text>
-        </View>
-      )}
-
       {!isMyTurn && !letterBombState.awaitingReplacement && (
         <View style={styles.waitingIndicator} pointerEvents="none">
-          <Text style={styles.waitingIndicatorText}>Opponent&apos;s turn</Text>
+          <Text style={styles.waitingIndicatorText}>Opponent's turn</Text>
         </View>
       )}
 
@@ -1131,21 +1049,15 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 80,
+  },
+  headerWrapper: {
+    marginBottom: 8,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 16,
-    marginTop: -80,
-  },
-  backText: {
-    fontSize: 10,
-    fontWeight: '700' as const,
-    color: COLORS.white,
-    textAlign: 'center' as const,
-    lineHeight: 14,
   },
   backButton: {
     width: 40,
@@ -1155,7 +1067,6 @@ const styles = StyleSheet.create({
   },
   headerCenter: {
     alignItems: 'center',
-    gap: 4,
   },
   vsText: {
     fontSize: 18,
@@ -1166,6 +1077,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    marginTop: 4,
   },
   scoreText: {
     fontSize: 16,
@@ -1176,6 +1088,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
+  },
+  playerPointsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 24,
+    marginTop: 8,
+  },
+  playerPointsBox: {
+    alignItems: 'center',
+  },
+  playerPointsLabel: {
+    fontSize: 11,
+    fontWeight: '500' as const,
+    color: COLORS.whiteTransparent,
+    marginBottom: 2,
+  },
+  playerPointsValue: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+    color: COLORS.white,
   },
   headerRight: {
     width: 40,
@@ -1215,43 +1147,10 @@ const styles = StyleSheet.create({
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
   },
-  challengedIndicator: {
-    position: 'absolute' as const,
-    top: 180,
-    left: 20,
-    zIndex: 9999,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
-    borderRadius: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    maxWidth: 160,
-  },
-  challengedIndicatorTitle: {
-    fontSize: 13,
-    fontWeight: '700' as const,
-    color: '#FFD700',
-    marginBottom: 2,
-  },
-  challengedIndicatorSubtitle: {
-    fontSize: 11,
-    fontWeight: '500' as const,
-    color: 'rgba(255, 255, 255, 0.9)',
-  },
-  waitingChallengeIndicator: {
-    position: 'absolute' as const,
-    top: 180,
-    left: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    zIndex: 8000,
-  },
   wordDisplayContainer: {
     alignItems: 'center',
     marginBottom: 24,
-    marginTop: 150,
-    height: 100,
+    marginTop: 80,
     minHeight: 100,
   },
   wordLettersDisplay: {
@@ -1264,11 +1163,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   wordLetterContainer: {
-    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     maxWidth: 70,
-    marginHorizontal: 4,
   },
   wordLetter: {
     backgroundColor: 'transparent',
@@ -1314,12 +1211,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
-  },
-  keyboardSection: {
-    position: 'absolute' as const,
-    left: 20,
-    right: 20,
-    bottom: 140,
   },
   keyboardContainer: {
     gap: 10,
@@ -1376,47 +1267,54 @@ const styles = StyleSheet.create({
     fontWeight: '600' as const,
     color: COLORS.white,
   },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingBottom: 30,
-    paddingTop: 12,
-  },
-  playerInfo: {
-    gap: 8,
-  },
-  playerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  playerLabel: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: COLORS.white,
-  },
-  playerScore: {
-    fontSize: 14,
-    fontWeight: '700' as const,
-    color: COLORS.gold,
-  },
   actionButtons: {
     flexDirection: 'row',
+    justifyContent: 'center',
     gap: 12,
-    alignItems: 'flex-end',
+    marginTop: 20,
   },
-  iconButton: {
+  bombButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 100, 100, 0.6)',
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 100, 100, 0.8)',
   },
-  iconButtonLabel: {
-    fontSize: 9,
+  passButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: COLORS.whiteGlass,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  passButtonText: {
+    fontSize: 15,
     fontWeight: '600' as const,
     color: COLORS.white,
   },
-  iconButtonDisabled: {
-    opacity: 0.4,
+  callWordButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: COLORS.gold,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 14,
+  },
+  callWordButtonDisabled: {
+    opacity: 0.5,
+  },
+  callWordButtonText: {
+    fontSize: 15,
+    fontWeight: '600' as const,
+    color: COLORS.white,
   },
   floatingLetter: {
     position: 'absolute' as const,

@@ -21,7 +21,6 @@ export default function MultiplayerScreen() {
     pendingInvites,
     sentInvites,
     isInQueue,
-    acceptedGameId,
     joinMatchmaking,
     leaveMatchmaking,
     searchUserByUsername,
@@ -31,7 +30,6 @@ export default function MultiplayerScreen() {
     fetchActiveGames,
     fetchPendingInvites,
     loadGame,
-    clearAcceptedGameId,
   } = useMultiplayer();
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -46,14 +44,6 @@ export default function MultiplayerScreen() {
       router.replace('/auth');
     }
   }, [isAuthenticated, router]);
-
-  useEffect(() => {
-    if (acceptedGameId) {
-      console.log('[MP Screen] Invite accepted, navigating to game:', acceptedGameId);
-      clearAcceptedGameId();
-      router.push({ pathname: '/multiplayer-game', params: { id: acceptedGameId } });
-    }
-  }, [acceptedGameId, clearAcceptedGameId, router]);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {

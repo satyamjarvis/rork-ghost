@@ -7,7 +7,6 @@ import { Loader2, Bomb, Zap, AlertCircle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
-
 import { POINTS_PER_LETTER } from '@/constants/game';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
@@ -52,6 +51,7 @@ export default function GameScreen() {
   const bombFallOpacity = useRef(new Animated.Value(0)).current;
   const [displayedWord, setDisplayedWord] = useState<string>('');
   const [animatingIndex, setAnimatingIndex] = useState<number>(-1);
+  const [isAIAnimating, setIsAIAnimating] = useState<boolean>(false);
   const newLetterAnim = useRef(new Animated.Value(0)).current;
   const [showRoundWinner, setShowRoundWinner] = useState<boolean>(false);
   const [roundWinnerName, setRoundWinnerName] = useState<string>('');
@@ -441,8 +441,6 @@ export default function GameScreen() {
       duration: 400,
       useNativeDriver: true,
     }).start();
-
-
   }, [fadeAnim]);
 
   useEffect(() => {
@@ -472,35 +470,46 @@ export default function GameScreen() {
     if (!gameState) {
       setDisplayedWord('');
       setAnimatingIndex(-1);
+      setIsAIAnimating(false);
     } else {
       const currentRound = gameState.rounds[gameState.currentRound - 1];
-      if (currentRound && currentRound.currentWord.length > displayedWord.length) {
-        // Set animating index FIRST (before updating displayedWord)
-        const newIndex = currentRound.currentWord.length - 1;
-        setAnimatingIndex(newIndex);
-        newLetterAnim.setValue(0);
-        
-        // Check if AI just played (AI is player2, so after AI plays, currentPlayer becomes player1)
-        const isAIMove = gameState.mode === 'ai' && gameState.currentPlayer === 'player1' && displayedWord.length > 0;
-        // Also check challenge response from AI
-        const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
-        
-
-        
-        // All letters use the same slow, ghostly fade-in animation
-        // Only update displayedWord AFTER animation completes
-        Animated.timing(newLetterAnim, {
-          toValue: 1,
-          duration: 1800,
-          useNativeDriver: true,
-        }).start(() => {
-          setDisplayedWord(currentRound.currentWord);
-          setAnimatingIndex(-1);
-        });
-      } else if (currentRound && currentRound.currentWord.length < displayedWord.length) {
-        // Word got shorter (e.g., reset) - sync immediately
+      if (currentRound && currentRound.currentWord !== displayedWord) {
+        if (currentRound.currentWord.length > displayedWord.length) {
+          setAnimatingIndex(currentRound.currentWord.length - 1);
+          newLetterAnim.setValue(0);
+          
+          const isAIMove = gameState.mode === 'ai' && gameState.currentPlayer === 'player1' && displayedWord.length > 0;
+          const isChallengeResponse = gameState.phase === 'challenge' && gameState.mode === 'ai' && gameState.currentPlayer === 'player1';
+          
+          if (isAIMove || isChallengeResponse) {
+            setIsAIAnimating(true);
+            Animated.timing(newLetterAnim, {
+              toValue: 1,
+              duration: 1800,
+              useNativeDriver: true,
+            }).start(() => {
+              setAnimatingIndex(-1);
+              setIsAIAnimating(false);
+            });
+          } else {
+            Animated.sequence([
+              Animated.timing(newLetterAnim, {
+                toValue: 0.5,
+                duration: 200,
+                useNativeDriver: true,
+              }),
+              Animated.spring(newLetterAnim, {
+                toValue: 1,
+                useNativeDriver: true,
+                friction: 6,
+                tension: 40,
+              }),
+            ]).start(() => {
+              setAnimatingIndex(-1);
+            });
+          }
+        }
         setDisplayedWord(currentRound.currentWord);
-        setAnimatingIndex(-1);
       }
     }
   }, [gameState, displayedWord, newLetterAnim]);
@@ -536,12 +545,8 @@ export default function GameScreen() {
       setShowRoundWinner(true);
       roundWinnerOpacity.setValue(0);
       
-      // Only play victory sound and haptic if player1 (human) wins
-      if (isPlayer1Winner) {
-        if (RNPlatform.OS !== 'web') {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        }
-
+      if (RNPlatform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
       
       Animated.sequence([
@@ -594,7 +599,7 @@ export default function GameScreen() {
           setScoringPlayerId(isPlayer1Winner ? 'player1' : 'player2');
           setDisplayedScoreBonus(0);
           
-          // Start score ticking animation with ascending pitch sounds
+          // Start score ticking animation
           let currentTick = 0;
           const tickInterval = setInterval(() => {
             currentTick++;
@@ -602,7 +607,6 @@ export default function GameScreen() {
             if (RNPlatform.OS !== 'web') {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }
-
             if (currentTick >= wordPoints) {
               clearInterval(tickInterval);
             }
@@ -716,7 +720,6 @@ export default function GameScreen() {
     if (RNPlatform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-
 
     const nativeEvent = event?.nativeEvent;
     if (nativeEvent && wordBoardPosition) {
@@ -988,7 +991,7 @@ export default function GameScreen() {
                     }}
                   >
                     {currentRound.currentWord.split('').map((letter, index) => {
-                      const isAnimating = index === animatingIndex && index === displayedWord.length;
+                      const isAnimating = index === animatingIndex && displayedWord.length === currentRound.currentWord.length;
                       const isExploding = index === hiddenLetterIndex;
                       const letterCount = currentRound.currentWord.length;
                       const containerWidth = SCREEN_WIDTH * 0.95 - 40;
@@ -1036,16 +1039,52 @@ export default function GameScreen() {
                       }
                       
                       if (isAnimating) {
-                        // Universal slow, ghostly fade-in for all letters
-                        // Letter starts completely invisible and slowly materializes
-                        const opacity = newLetterAnim.interpolate({
-                          inputRange: [0, 0.2, 0.5, 0.8, 1],
-                          outputRange: [0, 0.1, 0.4, 0.75, 1],
-                        });
+                        if (isAIAnimating) {
+                          const opacity = newLetterAnim.interpolate({
+                            inputRange: [0, 0.15, 0.35, 0.6, 0.8, 1],
+                            outputRange: [0, 0.05, 0.2, 0.5, 0.8, 1],
+                          });
+                          
+                          const animScale = newLetterAnim.interpolate({
+                            inputRange: [0, 0.6, 1],
+                            outputRange: [0.95, 1.03, 1],
+                          });
+                          
+                          return (
+                            <Animated.View
+                              key={`letter-${index}`}
+                              style={[
+                                styles.wordLetterContainer,
+                                {
+                                  opacity,
+                                  transform: [{ scale: animScale }],
+                                },
+                              ]}
+                            >
+                              <View style={styles.wordLetter}>
+                                <Text style={[styles.wordLetterText, { fontSize: dynamicFontSize, lineHeight: dynamicFontSize * 1.13 }]}>{letter}</Text>
+                                <Text style={[styles.wordLetterPoints, { fontSize: dynamicPointsSize }]}>
+                                  {POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER]}
+                                </Text>
+                                <View style={[styles.wordLetterShadow, { bottom: shadowBottomOffset }]} />
+                              </View>
+                            </Animated.View>
+                          );
+                        }
                         
                         const animScale = newLetterAnim.interpolate({
-                          inputRange: [0, 0.3, 0.7, 1],
-                          outputRange: [0.95, 0.98, 1.02, 1],
+                          inputRange: [0, 0.5, 1],
+                          outputRange: [0.8, 1.15, 1],
+                        });
+                        
+                        const translateY = newLetterAnim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [50, 0],
+                        });
+                        
+                        const opacity = newLetterAnim.interpolate({
+                          inputRange: [0, 0.3, 1],
+                          outputRange: [0, 1, 1],
                         });
                         
                         return (
@@ -1054,8 +1093,8 @@ export default function GameScreen() {
                             style={[
                               styles.wordLetterContainer,
                               {
+                                transform: [{ scale: animScale }, { translateY }],
                                 opacity,
-                                transform: [{ scale: animScale }],
                               },
                             ]}
                           >

@@ -17,11 +17,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.Pixofactor.Ghost",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to access your Face ID biometric data.",
-        "UIBackgroundModes": [
-          "audio"
-        ],
-        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
+        "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -36,8 +32,7 @@
       "package": "app.rork.ios_word_game",
       "permissions": [
         "android.permission.VIBRATE",
-        "android.permission.HIGH_SAMPLING_RATE_SENSORS",
-        "RECORD_AUDIO"
+        "android.permission.HIGH_SAMPLING_RATE_SENSORS"
       ]
     },
     "web": {
@@ -59,13 +54,7 @@
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
         }
       ],
-      "expo-apple-authentication",
-      [
-        "expo-av",
-        {
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
-        }
-      ]
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true
