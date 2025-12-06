@@ -61,13 +61,24 @@ export const [PlayerContext, usePlayer] = createContextHook(() => {
           setSupabaseUserId(savedUserId);
           await syncCoinsWithSupabase(savedUserId);
         } else if (coinsData) {
-          const parsedWallet = JSON.parse(coinsData);
-          if (parsedWallet.ghostCoins < 200) {
+          try {
+            const parsedWallet = JSON.parse(coinsData);
+            if (parsedWallet && typeof parsedWallet.ghostCoins === 'number') {
+              if (parsedWallet.ghostCoins < 200) {
+                const newWallet = { ghostCoins: 200 };
+                await AsyncStorage.setItem(GHOST_COINS_KEY, JSON.stringify(newWallet));
+                setWallet(newWallet);
+              } else {
+                setWallet(parsedWallet);
+              }
+            } else {
+              throw new Error('Invalid wallet data format');
+            }
+          } catch (parseError) {
+            console.error('[Player] Failed to parse wallet data, resetting:', parseError);
             const newWallet = { ghostCoins: 200 };
             await AsyncStorage.setItem(GHOST_COINS_KEY, JSON.stringify(newWallet));
             setWallet(newWallet);
-          } else {
-            setWallet(parsedWallet);
           }
         } else {
           const newWallet = { ghostCoins: 200 };
@@ -76,15 +87,53 @@ export const [PlayerContext, usePlayer] = createContextHook(() => {
         }
 
         if (inventoryData) {
-          setInventory(JSON.parse(inventoryData));
+          try {
+            const parsedInventory = JSON.parse(inventoryData);
+            if (parsedInventory && typeof parsedInventory.letterBombs === 'number') {
+              setInventory(parsedInventory);
+            } else {
+              throw new Error('Invalid inventory data format');
+            }
+          } catch (parseError) {
+            console.error('[Player] Failed to parse inventory data, resetting:', parseError);
+            await AsyncStorage.setItem(INVENTORY_KEY, JSON.stringify({ letterBombs: 0 }));
+          }
         }
 
         if (settingsData) {
-          setSettings(JSON.parse(settingsData));
+          try {
+            const parsedSettings = JSON.parse(settingsData);
+            if (parsedSettings && parsedSettings.aiDifficulty) {
+              setSettings(parsedSettings);
+            } else {
+              throw new Error('Invalid settings data format');
+            }
+          } catch (parseError) {
+            console.error('[Player] Failed to parse settings data, resetting:', parseError);
+            await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify({ aiDifficulty: 'medium' }));
+          }
         }
 
         if (statsData) {
-          setStats(JSON.parse(statsData));
+          try {
+            const parsedStats = JSON.parse(statsData);
+            if (parsedStats && typeof parsedStats.gamesPlayed === 'number') {
+              setStats(parsedStats);
+            } else {
+              throw new Error('Invalid stats data format');
+            }
+          } catch (parseError) {
+            console.error('[Player] Failed to parse stats data, resetting:', parseError);
+            await AsyncStorage.setItem(STATS_KEY, JSON.stringify({
+              gamesPlayed: 0,
+              gamesWon: 0,
+              gamesLost: 0,
+              roundsWon: 0,
+              roundsLost: 0,
+              winStreak: 0,
+              longestWinStreak: 0,
+            }));
+          }
         }
       } catch (error) {
         console.error('Failed to load player data:', error);
