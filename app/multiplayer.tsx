@@ -41,6 +41,7 @@ export default function MultiplayerScreen() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [cancellingInviteId, setCancellingInviteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -138,7 +139,22 @@ export default function MultiplayerScreen() {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    await cancelSentInvite(inviteId);
+    setCancellingInviteId(inviteId);
+    try {
+      const result = await cancelSentInvite(inviteId);
+      if (!result.error) {
+        if (Platform.OS !== 'web') {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+        console.log('[MP] Invite cancelled successfully');
+      } else {
+        console.error('[MP] Failed to cancel invite:', result.error);
+      }
+    } catch (error) {
+      console.error('[MP] Error cancelling invite:', error);
+    } finally {
+      setCancellingInviteId(null);
+    }
   };
 
   const handleOpenGame = async (gameId: string) => {
@@ -366,22 +382,32 @@ export default function MultiplayerScreen() {
       {sentInvites.length > 0 && (
         <>
           <Text style={styles.sectionTitle}>Sent ({sentInvites.length})</Text>
-          {sentInvites.map((invite: any) => (
-            <View key={invite.id} style={[styles.inviteCard, styles.sentInviteCard]}>
-              <View style={styles.inviteInfo}>
-                <Text style={styles.inviteUsername}>{invite.to_profile?.username || 'Unknown'}</Text>
-                <Text style={styles.invitePending}>Pending...</Text>
+          {sentInvites.map((invite: any) => {
+            const isCancelling = cancellingInviteId === invite.id;
+            return (
+              <View key={invite.id} style={[styles.inviteCard, styles.sentInviteCard, isCancelling && styles.cancellingCard]}>
+                <View style={styles.inviteInfo}>
+                  <Text style={styles.inviteUsername}>{invite.to_profile?.username || 'Unknown'}</Text>
+                  <Text style={styles.invitePending}>Pending...</Text>
+                </View>
+                <TouchableOpacity
+                  style={[styles.cancelInviteButton, isCancelling && styles.cancellingButton]}
+                  onPress={() => handleCancelSentInvite(invite.id)}
+                  activeOpacity={0.7}
+                  disabled={isCancelling}
+                >
+                  {isCancelling ? (
+                    <ActivityIndicator color="#FF6B6B" size="small" />
+                  ) : (
+                    <>
+                      <X color="#FF6B6B" size={18} />
+                      <Text style={styles.cancelInviteText}>Cancel</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.cancelInviteButton}
-                onPress={() => handleCancelSentInvite(invite.id)}
-                activeOpacity={0.7}
-              >
-                <X color="#FF6B6B" size={18} />
-                <Text style={styles.cancelInviteText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+            );
+          })}
         </>
       )}
     </ScrollView>
@@ -780,6 +806,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600' as const,
     color: '#FF6B6B',
+  },
+  cancellingCard: {
+    opacity: 0.6,
+  },
+  cancellingButton: {
+    minWidth: 80,
+    justifyContent: 'center',
   },
   inviteInfo: {
     gap: 4,
