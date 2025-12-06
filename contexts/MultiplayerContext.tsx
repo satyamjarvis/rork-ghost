@@ -707,6 +707,29 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
     });
   }, []);
 
+  const deleteGame = useCallback(async (gameId: string) => {
+    if (!user) return { error: new Error('Not logged in') };
+
+    console.log('[MP] Deleting/leaving game:', gameId);
+    
+    const { error } = await supabase
+      .from('games')
+      .update({
+        status: 'completed',
+        winner_id: null,
+      })
+      .eq('id', gameId);
+
+    if (error) {
+      console.error('[MP] Error deleting game:', error);
+      return { error };
+    }
+
+    setActiveGames(prev => prev.filter(g => g.id !== gameId));
+    fetchCompletedGames();
+    return { error: null };
+  }, [user, fetchCompletedGames]);
+
   useEffect(() => {
     if (user) {
       fetchActiveGames();
@@ -778,5 +801,6 @@ export const [MultiplayerContext, useMultiplayer] = createContextHook(() => {
     playBombReplacement,
     cancelLetterBomb,
     leaveGame,
+    deleteGame,
   };
 });

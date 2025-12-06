@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
+import SwipeableGameCard from '@/components/SwipeableGameCard';
 import { ArrowLeft, Search, Users, Mail, Gamepad2, Trophy, Clock, X, Check, Loader2 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -30,6 +31,7 @@ export default function MultiplayerScreen() {
     fetchActiveGames,
     fetchPendingInvites,
     loadGame,
+    deleteGame,
   } = useMultiplayer();
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -139,6 +141,13 @@ export default function MultiplayerScreen() {
     router.push({ pathname: '/multiplayer-game', params: { id: gameId } });
   };
 
+  const handleDeleteGame = async (gameId: string) => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    await deleteGame(gameId);
+  };
+
   const renderGamesTab = () => (
     <ScrollView 
       style={styles.tabContent}
@@ -191,27 +200,29 @@ export default function MultiplayerScreen() {
           const opponentScore = isPlayer1 ? game.player2_rounds_won : game.player1_rounds_won;
           
           return (
-            <TouchableOpacity 
-              key={game.id} 
-              style={styles.gameCard}
+            <SwipeableGameCard
+              key={game.id}
+              gameId={game.id}
               onPress={() => handleOpenGame(game.id)}
-              activeOpacity={0.8}
+              onDelete={() => handleDeleteGame(game.id)}
             >
-              <View style={styles.gameCardHeader}>
-                <Text style={styles.opponentName}>
-                  vs {opponent?.username || 'Waiting...'}
-                </Text>
-                <View style={[styles.turnBadge, isMyTurn && styles.turnBadgeActive]}>
-                  <Text style={[styles.turnBadgeText, isMyTurn && styles.turnBadgeTextActive]}>
-                    {isMyTurn ? 'Your Turn' : 'Their Turn'}
+              <View style={styles.gameCard}>
+                <View style={styles.gameCardHeader}>
+                  <Text style={styles.opponentName}>
+                    vs {opponent?.username || 'Waiting...'}
                   </Text>
+                  <View style={[styles.turnBadge, isMyTurn && styles.turnBadgeActive]}>
+                    <Text style={[styles.turnBadgeText, isMyTurn && styles.turnBadgeTextActive]}>
+                      {isMyTurn ? 'Your Turn' : 'Their Turn'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.gameCardContent}>
+                  <Text style={styles.gameWord}>{game.current_word || '...'}</Text>
+                  <Text style={styles.gameScore}>{myScore} - {opponentScore}</Text>
                 </View>
               </View>
-              <View style={styles.gameCardContent}>
-                <Text style={styles.gameWord}>{game.current_word || '...'}</Text>
-                <Text style={styles.gameScore}>{myScore} - {opponentScore}</Text>
-              </View>
-            </TouchableOpacity>
+            </SwipeableGameCard>
           );
         })
       )}
@@ -598,7 +609,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.whiteGlass,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
