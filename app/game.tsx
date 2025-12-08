@@ -659,10 +659,9 @@ export default function GameScreen() {
   const currentRound = gameState.rounds[gameState.currentRound - 1];
   
   const keyboardRows = [
-    'ABCDEFG'.split(''),
-    'HIJKLM'.split(''),
-    'NOPQRST'.split(''),
-    'UVWXYZ'.split(''),
+    'QWERTYUIOP'.split(''),
+    'ASDFGHJKL'.split(''),
+    'ZXCVBNM'.split(''),
   ];
 
   const calculateWordValue = () => {
@@ -1861,8 +1860,11 @@ const styles = StyleSheet.create({
   },
   wordValueText: {
     fontSize: 16,
-    fontWeight: '500' as const,
-    color: COLORS.whiteTransparent,
+    fontWeight: '600' as const,
+    color: '#DFFF00',
+    textShadowColor: 'rgba(223, 255, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
   keyboardSection: {
     position: 'absolute' as const,
@@ -1871,19 +1873,19 @@ const styles = StyleSheet.create({
     bottom: 140,
   },
   keyboardContainer: {
-    gap: 10,
+    gap: 6,
     marginBottom: 20,
   },
   keyboardRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 4,
     justifyContent: 'center',
   },
   keyTile: {
-    width: 45,
-    height: 48,
+    width: 32,
+    height: 44,
     backgroundColor: COLORS.keyBackground,
-    borderRadius: 8,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -1900,7 +1902,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   keyLetter: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '700' as const,
     color: COLORS.white,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
