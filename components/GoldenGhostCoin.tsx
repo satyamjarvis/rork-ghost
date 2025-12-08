@@ -4,7 +4,7 @@ interface GoldenGhostCoinProps {
   size?: number;
 }
 
-const COIN_IMAGE_URL = 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ozq5ak803jwtbh9i44dkw';
+const COIN_IMAGE_URL = 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/nsumd31rqusfvatr89zfn';
 
 export default function GoldenGhostCoin({ size = 20 }: GoldenGhostCoinProps) {
   return (
