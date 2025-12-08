@@ -3,12 +3,11 @@ import { useRouter } from 'expo-router';
 import { useGame } from '@/contexts/GameContext';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { ArrowRight } from 'lucide-react-native';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import { POINTS_PER_LETTER } from '@/constants/game';
 import FloatingGhost from '@/components/FloatingGhost';
-import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 
 
@@ -21,17 +20,6 @@ export default function RoundResultScreen() {
   const letterAnims = useRef<Animated.Value[]>([]).current;
   const winLossAnim = useRef(new Animated.Value(0)).current;
   const bounceAnim = useRef(new Animated.Value(0)).current;
-  const coinAnim = useRef(new Animated.Value(0)).current;
-  const coinRotateAnim = useRef(new Animated.Value(0)).current;
-  const coinScaleAnim = useRef(new Animated.Value(0)).current;
-  const shineAnim = useRef(new Animated.Value(0)).current;
-  const coinFlyAnim = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(0)).current;
-  const entryBounceAnim = useRef(new Animated.Value(0)).current;
-  const [coinPosition, setCoinPosition] = useState<{ x: number; y: number } | null>(null);
-  const [profilePosition, setProfilePosition] = useState<{ x: number; y: number } | null>(null);
-  const [showFlyingCoin, setShowFlyingCoin] = useState(false);
-  const coinContainerRef = useRef<View>(null);
   const profileRef = useRef<View>(null);
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
@@ -98,100 +86,7 @@ export default function RoundResultScreen() {
         ),
       ]).start();
     }, 600);
-
-    if (youWon) {
-      setTimeout(() => {
-        // Entry bounce animation
-        Animated.sequence([
-          Animated.spring(entryBounceAnim, {
-            toValue: 1.15,
-            friction: 3,
-            tension: 200,
-            useNativeDriver: true,
-          }),
-          Animated.spring(entryBounceAnim, {
-            toValue: 0.95,
-            friction: 4,
-            tension: 180,
-            useNativeDriver: true,
-          }),
-          Animated.spring(entryBounceAnim, {
-            toValue: 1,
-            friction: 5,
-            tension: 100,
-            useNativeDriver: true,
-          }),
-        ]).start();
-
-        Animated.parallel([
-          Animated.spring(coinAnim, {
-            toValue: 1,
-            friction: 5,
-            tension: 40,
-            useNativeDriver: true,
-          }),
-          Animated.spring(coinScaleAnim, {
-            toValue: 1,
-            friction: 4,
-            tension: 40,
-            useNativeDriver: true,
-          }),
-          Animated.timing(coinRotateAnim, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ]).start(() => {
-          // Start pulsing light burst animation
-          Animated.loop(
-            Animated.sequence([
-              Animated.timing(pulseAnim, {
-                toValue: 1,
-                duration: 1200,
-                useNativeDriver: true,
-              }),
-              Animated.timing(pulseAnim, {
-                toValue: 0,
-                duration: 1200,
-                useNativeDriver: true,
-              }),
-            ])
-          ).start();
-
-          Animated.loop(
-            Animated.timing(shineAnim, {
-              toValue: 1,
-              duration: 2000,
-              useNativeDriver: true,
-            })
-          ).start();
-          
-          setTimeout(() => {
-            if (coinContainerRef.current && profileRef.current) {
-              coinContainerRef.current.measureInWindow((cx, cy, cw, ch) => {
-                setCoinPosition({ x: cx + cw / 2, y: cy + ch / 2 });
-                profileRef.current?.measureInWindow((px, py, pw, ph) => {
-                  setProfilePosition({ x: px + pw / 2, y: py + ph / 2 });
-                  setShowFlyingCoin(true);
-                  
-                  Animated.timing(coinFlyAnim, {
-                    toValue: 1,
-                    duration: 800,
-                    useNativeDriver: true,
-                  }).start(() => {
-                    setShowFlyingCoin(false);
-                    if (Platform.OS !== 'web') {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                    }
-                  });
-                });
-              });
-            }
-          }, 1500);
-        });
-      }, 1000);
-    }
-  }, [fadeAnim, scaleAnim, letterAnims, winLossAnim, bounceAnim, coinAnim, coinRotateAnim, coinScaleAnim, shineAnim, coinFlyAnim, pulseAnim, entryBounceAnim]);
+  }, [fadeAnim, scaleAnim, letterAnims, winLossAnim, bounceAnim]);
 
   if (!gameState) {
     router.replace('/');
@@ -278,75 +173,6 @@ export default function RoundResultScreen() {
     outputRange: [1, 1.1],
   });
 
-  const coinOpacity = coinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
-
-  const coinTranslateY = coinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-50, 0],
-  });
-
-  const coinRotate = coinRotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const coinScale = coinScaleAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0, 1.3, 1],
-  });
-
-  const shineRotate = shineAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const shineOpacity = shineAnim.interpolate({
-    inputRange: [0, 0.3, 0.5, 0.7, 1],
-    outputRange: [0.4, 0.8, 1, 0.8, 0.4],
-  });
-
-  const pulseOpacity = pulseAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.3, 0.9, 0.3],
-  });
-
-  const pulseScale = pulseAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.8, 1.2, 0.8],
-  });
-
-  const flyingCoinTranslateX = coinFlyAnim.interpolate({
-    inputRange: [0, 0.3, 1],
-    outputRange: [
-      0,
-      profilePosition && coinPosition ? (profilePosition.x - coinPosition.x) * 0.3 : 0,
-      profilePosition && coinPosition ? profilePosition.x - coinPosition.x : 0,
-    ],
-  });
-
-  const flyingCoinTranslateY = coinFlyAnim.interpolate({
-    inputRange: [0, 0.3, 0.6, 1],
-    outputRange: [
-      0,
-      -80,
-      profilePosition && coinPosition ? (profilePosition.y - coinPosition.y) * 0.5 - 40 : 0,
-      profilePosition && coinPosition ? profilePosition.y - coinPosition.y : 0,
-    ],
-  });
-
-  const flyingCoinScale = coinFlyAnim.interpolate({
-    inputRange: [0, 0.2, 0.5, 1],
-    outputRange: [1, 1.3, 0.8, 0.4],
-  });
-
-  const flyingCoinOpacity = coinFlyAnim.interpolate({
-    inputRange: [0, 0.8, 1],
-    outputRange: [1, 1, 0],
-  });
-
   return (
     <Animated.View style={[styles.container, { backgroundColor: middleColor }]}>
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: topColor }]} />
@@ -412,88 +238,6 @@ export default function RoundResultScreen() {
       {isPlayer1Winner && (
         <Animated.View style={[styles.pointsEarnedContainer, { opacity: fadeAnim }]}>
           <Text style={styles.pointsEarnedText}>+{wordValue} points</Text>
-          
-          <Animated.View 
-            ref={coinContainerRef}
-            style={[
-              styles.goldenCoinContainer,
-              {
-                opacity: coinOpacity,
-                transform: [
-                  { translateY: coinTranslateY },
-                  { scale: Animated.multiply(coinScale, entryBounceAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [1, 1],
-                  })) },
-                ],
-              },
-            ]}
-          >
-            <Animated.View style={[styles.coinWithShine, { transform: [{ scale: entryBounceAnim }] }]}>
-              {/* Pulsing radial light burst */}
-              <Animated.View 
-                style={[
-                  styles.radialBurstOuter,
-                  {
-                    opacity: pulseOpacity,
-                    transform: [{ scale: pulseScale }],
-                  },
-                ]}
-              />
-              <Animated.View 
-                style={[
-                  styles.radialBurstMiddle,
-                  {
-                    opacity: pulseOpacity,
-                    transform: [{ scale: Animated.add(pulseScale, 0.1) }],
-                  },
-                ]}
-              />
-              <Animated.View 
-                style={[
-                  styles.radialBurstInner,
-                  {
-                    opacity: pulseAnim.interpolate({
-                      inputRange: [0, 0.5, 1],
-                      outputRange: [0.5, 1, 0.5],
-                    }),
-                  },
-                ]}
-              />
-              {/* Rotating shine rays */}
-              <Animated.View 
-                style={[
-                  styles.shineContainer,
-                  {
-                    opacity: shineOpacity,
-                    transform: [{ rotate: shineRotate }],
-                  },
-                ]}
-              >
-                {[...Array(12)].map((_, i) => (
-                  <View 
-                    key={i} 
-                    style={[
-                      styles.shineRay,
-                      { transform: [{ rotate: `${i * 30}deg` }] },
-                    ]} 
-                  />
-                ))}
-              </Animated.View>
-              {/* 3D Metallic Coin */}
-              <View style={styles.goldenCoinShadow} />
-              <Animated.View style={[
-                styles.goldenCoin3D,
-                { transform: [{ rotate: coinRotate }] },
-              ]}>
-                <View style={styles.coinInnerRing} />
-                <View style={styles.coinHighlight} />
-                <View style={styles.coinHighlightSmall} />
-                <Text style={styles.goldenCoinG}>G</Text>
-              </Animated.View>
-            </Animated.View>
-            <Text style={styles.goldenCoinLabel}>Golden Ghost Coin</Text>
-          </Animated.View>
         </Animated.View>
       )}
       </View>
@@ -532,39 +276,6 @@ export default function RoundResultScreen() {
           <Text style={styles.nextText}>NEXT</Text>
         </TouchableOpacity>
       </View>
-    {showFlyingCoin && coinPosition && (
-        <Animated.View
-          style={[
-            styles.flyingCoinContainer,
-            {
-              left: coinPosition.x - 40,
-              top: coinPosition.y - 40,
-              transform: [
-                { translateX: flyingCoinTranslateX },
-                { translateY: flyingCoinTranslateY },
-                { scale: flyingCoinScale },
-              ],
-              opacity: flyingCoinOpacity,
-            },
-          ]}
-          pointerEvents="none"
-        >
-          <View style={styles.flyingCoinShineContainer}>
-            {[...Array(6)].map((_, i) => (
-              <View 
-                key={i} 
-                style={[
-                  styles.flyingShineRay,
-                  { transform: [{ rotate: `${i * 60}deg` }] },
-                ]} 
-              />
-            ))}
-          </View>
-          <View style={styles.flyingCoin}>
-            <GoldenGhostCoin size={28} />
-          </View>
-        </Animated.View>
-      )}
     </Animated.View>
   );
 }
@@ -650,187 +361,7 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
-    marginBottom: 20,
   },
-  goldenCoinContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  coinWithShine: {
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shineContainer: {
-    position: 'absolute' as const,
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shineRay: {
-    position: 'absolute' as const,
-    width: 4,
-    height: 60,
-    backgroundColor: 'rgba(255, 248, 220, 0.9)',
-    borderRadius: 2,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  shineGlow: {
-    position: 'absolute' as const,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255, 215, 0, 0.3)',
-  },
-  goldenCoin3D: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#FFD700',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 5,
-    borderTopColor: '#FFF4B8',
-    borderLeftColor: '#FFE566',
-    borderRightColor: '#DAA520',
-    borderBottomColor: '#B8860B',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 25,
-    elevation: 20,
-    overflow: 'hidden' as const,
-  },
-  coinInnerRing: {
-    position: 'absolute' as const,
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 3,
-    borderColor: '#DAA520',
-    backgroundColor: 'transparent',
-  },
-  coinHighlight: {
-    position: 'absolute' as const,
-    top: 8,
-    left: 12,
-    width: 35,
-    height: 20,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
-    transform: [{ rotate: '-25deg' }],
-  },
-  coinHighlightSmall: {
-    position: 'absolute' as const,
-    top: 18,
-    left: 55,
-    width: 12,
-    height: 8,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  goldenCoinG: {
-    fontSize: 42,
-    fontWeight: '900' as const,
-    color: '#FFF8DC',
-    textShadowColor: '#B8860B',
-    textShadowOffset: { width: 2, height: 3 },
-    textShadowRadius: 1,
-  },
-  coinShadow: {
-    position: 'absolute' as const,
-    bottom: -8,
-    width: 70,
-    height: 20,
-    borderRadius: 35,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
-  },
-  goldenCoinShadow: {
-    position: 'absolute' as const,
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: 'rgba(139, 69, 19, 0.4)',
-    top: 6,
-    left: 3,
-  },
-  radialBurstOuter: {
-    position: 'absolute' as const,
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-  },
-  radialBurstMiddle: {
-    position: 'absolute' as const,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255, 248, 220, 0.25)',
-  },
-  radialBurstInner: {
-    position: 'absolute' as const,
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: 'rgba(255, 215, 0, 0.35)',
-  },
-  goldenCoinLabel: {
-    fontSize: 16,
-    fontWeight: '700' as const,
-    color: COLORS.gold,
-    marginTop: 12,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
-  flyingCoinContainer: {
-    position: 'absolute' as const,
-    width: 80,
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  },
-  flyingCoinShineContainer: {
-    position: 'absolute' as const,
-    width: 80,
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flyingShineRay: {
-    position: 'absolute' as const,
-    width: 3,
-    height: 40,
-    backgroundColor: 'rgba(255, 248, 220, 0.8)',
-    borderRadius: 2,
-  },
-  flyingCoin: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: COLORS.gold,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: COLORS.goldLight,
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 15,
-    elevation: 10,
-  },
-  flyingCoinText: {
-    fontSize: 28,
-  },
-
   footer: {
     position: 'absolute',
     bottom: 0,
@@ -884,7 +415,6 @@ const styles = StyleSheet.create({
     gap: 4,
     marginLeft: 20,
   },
-
   nextText: {
     fontSize: 18,
     fontWeight: '700' as const,
