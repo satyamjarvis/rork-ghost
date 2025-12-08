@@ -218,6 +218,8 @@ export default function GameOverScreen() {
   };
 
   console.log('[GameOver RENDER] player1Won:', player1Won, 'showCoinReward:', showCoinReward);
+  console.log('[GameOver RENDER] gameState.winner:', gameState?.winner);
+  console.log('[GameOver RENDER] Will show coin overlay:', player1Won && showCoinReward);
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: middleColor }]}>
@@ -226,7 +228,7 @@ export default function GameOverScreen() {
       <FloatingGhost />
       
       {/* Reward Coin Overlay - Full screen overlay on top of everything */}
-      {player1Won && showCoinReward && (
+      {player1Won && (
         <View style={styles.coinOverlayContainer} pointerEvents="none">
           <Animated.View style={[
             styles.coinOverlay,
