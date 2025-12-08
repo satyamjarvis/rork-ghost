@@ -130,46 +130,42 @@ export const [GameContext, useGame] = createContextHook(() => {
   const nextRound = useCallback(() => {
     if (!gameState) return;
 
-    if (gameState.player1.roundsWon >= 2 || gameState.player2.roundsWon >= 2) {
-      const winner = gameState.player1.roundsWon >= 2 ? 'player1' : 'player2';
-
-      setGameState(prev => {
-        if (!prev) return null;
+    setGameState(prev => {
+      if (!prev) return null;
+      
+      if (prev.player1.roundsWon >= 2 || prev.player2.roundsWon >= 2) {
+        const winner = prev.player1.roundsWon >= 2 ? 'player1' : 'player2';
         return {
           ...prev,
           phase: 'gameOver',
           winner,
         };
-      });
-    } else {
+      }
+      
       const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       const randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
       
       const newRound: Round = {
-        number: gameState.currentRound + 1,
+        number: prev.currentRound + 1,
         currentWord: randomLetter,
         wordHistory: [{ letter: randomLetter, playerId: 'system' }],
         timeLeft: GAME_CONFIG.TIME_PER_TURN,
       };
 
-      isProcessingMoveRef.current = false;
-      setIsProcessingMove(false);
-      setIsAIThinking(false);
-      setLetterBombActive(false);
+      return {
+        ...prev,
+        phase: 'playing',
+        currentRound: prev.currentRound + 1,
+        rounds: [...prev.rounds, newRound],
+        currentPlayer: 'player1',
+      };
+    });
 
-      setGameState(prev => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          phase: 'playing',
-          currentRound: prev.currentRound + 1,
-          rounds: [...prev.rounds, newRound],
-          currentPlayer: 'player1',
-        };
-      });
-
-      setTimeLeft(GAME_CONFIG.TIME_PER_TURN);
-    }
+    isProcessingMoveRef.current = false;
+    setIsProcessingMove(false);
+    setIsAIThinking(false);
+    setLetterBombActive(false);
+    setTimeLeft(GAME_CONFIG.TIME_PER_TURN);
   }, [gameState]);
 
   const resetGame = useCallback(() => {
