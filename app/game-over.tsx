@@ -10,6 +10,7 @@ import { COLORS } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
 import { trpc } from '@/lib/trpc';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
+import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 
 export default function GameOverScreen() {
   const router = useRouter();
@@ -282,18 +283,14 @@ export default function GameOverScreen() {
                     />
                   ))}
                 </Animated.View>
-                {/* 3D Metallic Coin */}
-                <View style={styles.goldenCoinShadow} />
+                {/* Golden Ghost Coin Reward */}
                 <Animated.View style={[
-                  styles.goldenGhostCoin3D,
+                  styles.coinImageContainer,
                   {
                     transform: [{ rotate: coinRotate }],
                   },
                 ]}>
-                  <View style={styles.coinInnerRing} />
-                  <View style={styles.coinHighlight} />
-                  <View style={styles.coinHighlightSmall} />
-                  <Text style={styles.goldenCoinG}>G</Text>
+                  <GoldenGhostCoin size={70} />
                 </Animated.View>
               </Animated.View>
             </Animated.View>
@@ -521,99 +518,61 @@ const styles = StyleSheet.create({
   },
   shineRay: {
     position: 'absolute' as const,
-    width: 3,
-    height: 45,
-    backgroundColor: 'rgba(255, 248, 220, 0.9)',
+    width: 4,
+    height: 60,
+    backgroundColor: 'rgba(255, 248, 220, 0.95)',
     borderRadius: 2,
     shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   radialBurstOuter: {
     position: 'absolute' as const,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 20,
+    elevation: 10,
   },
   radialBurstMiddle: {
     position: 'absolute' as const,
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: 'rgba(255, 248, 220, 0.25)',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 248, 220, 0.35)',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.9,
+    shadowRadius: 15,
+    elevation: 8,
   },
   radialBurstInner: {
     position: 'absolute' as const,
-    width: 85,
-    height: 85,
-    borderRadius: 42.5,
-    backgroundColor: 'rgba(255, 215, 0, 0.35)',
+    width: 95,
+    height: 95,
+    borderRadius: 47.5,
+    backgroundColor: 'rgba(255, 215, 0, 0.45)',
+    shadowColor: '#FFD700',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 6,
   },
-  goldenCoinShadow: {
-    position: 'absolute' as const,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(139, 69, 19, 0.4)',
-    top: 4,
-    left: 2,
-  },
-  goldenGhostCoin3D: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#FFD700',
+  coinImageContainer: {
+    width: 70,
+    height: 70,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 4,
-    borderTopColor: '#FFF4B8',
-    borderLeftColor: '#FFE566',
-    borderRightColor: '#DAA520',
-    borderBottomColor: '#B8860B',
     shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 6 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
-    shadowRadius: 20,
-    elevation: 15,
-    overflow: 'hidden' as const,
-  },
-  coinInnerRing: {
-    position: 'absolute' as const,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#DAA520',
-    backgroundColor: 'transparent',
-  },
-  coinHighlight: {
-    position: 'absolute' as const,
-    top: 6,
-    left: 8,
-    width: 24,
-    height: 14,
-    borderRadius: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
-    transform: [{ rotate: '-25deg' }],
-  },
-  coinHighlightSmall: {
-    position: 'absolute' as const,
-    top: 12,
-    left: 36,
-    width: 8,
-    height: 5,
-    borderRadius: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  goldenCoinG: {
-    fontSize: 28,
-    fontWeight: '900' as const,
-    color: '#FFF8DC',
-    textShadowColor: '#B8860B',
-    textShadowOffset: { width: 1, height: 2 },
-    textShadowRadius: 1,
+    shadowRadius: 25,
+    elevation: 20,
   },
 });
