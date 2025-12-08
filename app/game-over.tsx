@@ -21,12 +21,10 @@ export default function GameOverScreen() {
   const recordGameMutation = trpc.user.recordGame.useMutation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const confettiAnim = useRef(new Animated.Value(0)).current;
   const coinAnim = useRef(new Animated.Value(0)).current;
-  const coinRotateAnim = useRef(new Animated.Value(0)).current;
-  const shineAnim = useRef(new Animated.Value(0)).current;
-  const pulseAnim = useRef(new Animated.Value(0)).current;
-  const entryBounceAnim = useRef(new Animated.Value(1)).current;
+  const coinScaleAnim = useRef(new Animated.Value(0.3)).current;
+  const shineRotateAnim = useRef(new Animated.Value(0)).current;
+  const glowAnim = useRef(new Animated.Value(0.5)).current;
   const [showCoinReward, setShowCoinReward] = useState(false);
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
@@ -50,29 +48,15 @@ export default function GameOverScreen() {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 500,
+        duration: 400,
         useNativeDriver: true,
       }),
       Animated.spring(scaleAnim, {
         toValue: 1,
-        friction: 4,
-        tension: 30,
+        friction: 6,
+        tension: 80,
         useNativeDriver: true,
       }),
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(confettiAnim, {
-            toValue: 1,
-            duration: 2000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(confettiAnim, {
-            toValue: 0,
-            duration: 0,
-            useNativeDriver: true,
-          }),
-        ])
-      ),
     ]).start();
 
     const playerWon = gameState?.winner === 'player1';
@@ -80,69 +64,45 @@ export default function GameOverScreen() {
       setTimeout(() => {
         setShowCoinReward(true);
         
-        // Entry bounce animation
-        Animated.sequence([
-          Animated.spring(entryBounceAnim, {
-            toValue: 1.15,
-            friction: 3,
-            tension: 200,
-            useNativeDriver: true,
-          }),
-          Animated.spring(entryBounceAnim, {
-            toValue: 0.95,
-            friction: 4,
-            tension: 180,
-            useNativeDriver: true,
-          }),
-          Animated.spring(entryBounceAnim, {
+        Animated.parallel([
+          Animated.timing(coinAnim, {
             toValue: 1,
-            friction: 5,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+          Animated.spring(coinScaleAnim, {
+            toValue: 1,
+            friction: 4,
             tension: 100,
             useNativeDriver: true,
           }),
         ]).start();
 
-        Animated.parallel([
-          Animated.spring(coinAnim, {
+        Animated.loop(
+          Animated.timing(shineRotateAnim, {
             toValue: 1,
-            friction: 5,
-            tension: 40,
+            duration: 3000,
             useNativeDriver: true,
-          }),
-          Animated.loop(
-            Animated.timing(coinRotateAnim, {
-              toValue: 1,
-              duration: 2000,
-              useNativeDriver: true,
-            })
-          ),
-          Animated.loop(
-            Animated.timing(shineAnim, {
-              toValue: 1,
-              duration: 2500,
-              useNativeDriver: true,
-            })
-          ),
-        ]).start();
+          })
+        ).start();
 
-        // Start pulsing light burst
         Animated.loop(
           Animated.sequence([
-            Animated.timing(pulseAnim, {
+            Animated.timing(glowAnim, {
               toValue: 1,
-              duration: 1200,
+              duration: 800,
               useNativeDriver: true,
             }),
-            Animated.timing(pulseAnim, {
-              toValue: 0,
-              duration: 1200,
+            Animated.timing(glowAnim, {
+              toValue: 0.5,
+              duration: 800,
               useNativeDriver: true,
             }),
           ])
         ).start();
-      }, 600);
+      }, 400);
     }
-  }, [fadeAnim, scaleAnim, confettiAnim, coinAnim, coinRotateAnim, shineAnim, pulseAnim, entryBounceAnim, gameState, awardGameWin, recordGameMutation]);
+  }, []);
 
   useEffect(() => {
     if (!gameState) {
@@ -161,44 +121,9 @@ export default function GameOverScreen() {
   const player1RoundsDisplay = Math.min(gameState.player1.roundsWon, 2);
   const player2RoundsDisplay = Math.min(gameState.player2.roundsWon, 2);
 
-  const coinOpacity = coinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
-
-  const coinScale = coinAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0, 1.3, 1],
-  });
-
-  const coinRotate = coinRotateAnim.interpolate({
+  const shineRotate = shineRotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
-  });
-
-  const coinTranslateY = coinAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-30, 0],
-  });
-
-  const shineRotate = shineAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const shineOpacity = shineAnim.interpolate({
-    inputRange: [0, 0.3, 0.5, 0.7, 1],
-    outputRange: [0.5, 0.9, 1, 0.9, 0.5],
-  });
-
-  const pulseOpacity = pulseAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.3, 0.9, 0.3],
-  });
-
-  const pulseScale = pulseAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [0.8, 1.2, 0.8],
   });
 
   const handlePlayAgain = () => {
@@ -215,81 +140,32 @@ export default function GameOverScreen() {
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: bottomColor, opacity: 0.7 }]} />
       <FloatingGhost />
       
-      {/* Reward Coin Overlay - Full screen overlay on top of everything */}
-      {(FORCE_SHOW_COIN || player1Won) && (
+      {/* Reward Coin Overlay */}
+      {(FORCE_SHOW_COIN || player1Won) && showCoinReward && (
         <View style={styles.coinOverlayContainer} pointerEvents="none">
           <Animated.View style={[
             styles.coinOverlay,
             {
-              opacity: coinOpacity,
-              transform: [
-                { translateY: coinTranslateY },
-                { scale: coinScale },
-              ],
+              opacity: coinAnim,
+              transform: [{ scale: coinScaleAnim }],
             },
           ]}>
-            <View style={styles.coinRewardContent}>
-              <Text style={styles.coinRewardText}>+1</Text>
-              <Animated.View style={[styles.coinWithShine, { transform: [{ scale: entryBounceAnim }] }]}>
-                {/* Pulsing radial light burst */}
-                <Animated.View 
-                  style={[
-                    styles.radialBurstOuter,
-                    {
-                      opacity: pulseOpacity,
-                      transform: [{ scale: pulseScale }],
-                    },
-                  ]}
-                />
-                <Animated.View 
-                  style={[
-                    styles.radialBurstMiddle,
-                    {
-                      opacity: pulseOpacity,
-                    },
-                  ]}
-                />
-                <Animated.View 
-                  style={[
-                    styles.radialBurstInner,
-                    {
-                      opacity: pulseAnim.interpolate({
-                        inputRange: [0, 0.5, 1],
-                        outputRange: [0.5, 1, 0.5],
-                      }),
-                    },
-                  ]}
-                />
-                {/* Rotating shine rays */}
-                <Animated.View 
-                  style={[
-                    styles.shineContainer,
-                    {
-                      opacity: shineOpacity,
-                      transform: [{ rotate: shineRotate }],
-                    },
-                  ]}
-                >
-                  {[...Array(12)].map((_, i) => (
-                    <View 
-                      key={i} 
-                      style={[
-                        styles.shineRay,
-                        { transform: [{ rotate: `${i * 30}deg` }] },
-                      ]} 
-                    />
-                  ))}
-                </Animated.View>
-                {/* Golden Ghost Coin Reward */}
-                <Animated.View style={[
-                  styles.coinImageContainer,
-                  {
-                    transform: [{ rotate: coinRotate }],
-                  },
-                ]}>
-                  <GoldenGhostCoin size={80} />
-                </Animated.View>
-              </Animated.View>
+            <Animated.View style={[styles.glowCircle, { opacity: glowAnim }]} />
+            <Animated.View 
+              style={[
+                styles.shineContainer,
+                { transform: [{ rotate: shineRotate }] },
+              ]}
+            >
+              {[0, 45, 90, 135].map((deg) => (
+                <View key={deg} style={[styles.shineRay, { transform: [{ rotate: `${deg}deg` }] }]} />
+              ))}
+            </Animated.View>
+            <View style={styles.coinWrapper}>
+              <GoldenGhostCoin size={80} />
+            </View>
+            <View style={styles.rewardBadge}>
+              <Text style={styles.rewardText}>+1 Coin</Text>
             </View>
           </Animated.View>
         </View>
@@ -503,9 +379,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 99999,
-    elevation: 99999,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    zIndex: 9999,
+    elevation: 9999,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -513,101 +389,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  coinRewardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    backgroundColor: 'rgba(30, 30, 50, 0.85)',
-    paddingHorizontal: 28,
-    paddingVertical: 20,
-    paddingRight: 40,
-    borderRadius: 28,
-    borderWidth: 3,
-    borderColor: COLORS.gold,
-    shadowColor: COLORS.gold,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 20,
-    elevation: 30,
-  },
-  coinRewardText: {
-    fontSize: 36,
-    fontWeight: '800' as const,
-    color: COLORS.gold,
-    textShadowColor: 'rgba(255, 215, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 15,
-  },
-  coinWithShine: {
-    width: 120,
-    height: 120,
-    alignItems: 'center',
-    justifyContent: 'center',
+  glowCircle: {
+    position: 'absolute' as const,
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: 'rgba(255, 215, 0, 0.3)',
   },
   shineContainer: {
     position: 'absolute' as const,
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 200,
     alignItems: 'center',
     justifyContent: 'center',
   },
   shineRay: {
     position: 'absolute' as const,
-    width: 5,
-    height: 80,
-    backgroundColor: 'rgba(255, 248, 220, 0.95)',
-    borderRadius: 3,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  radialBurstOuter: {
-    position: 'absolute' as const,
-    width: 200,
+    width: 4,
     height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9,
-    shadowRadius: 30,
-    elevation: 15,
+    backgroundColor: 'rgba(255, 215, 0, 0.4)',
+    borderRadius: 2,
   },
-  radialBurstMiddle: {
-    position: 'absolute' as const,
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    backgroundColor: 'rgba(255, 248, 220, 0.4)',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.95,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-  radialBurstInner: {
-    position: 'absolute' as const,
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: 'rgba(255, 215, 0, 0.5)',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 15,
-    elevation: 10,
-  },
-  coinImageContainer: {
+  coinWrapper: {
     width: 80,
     height: 80,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 1,
-    shadowRadius: 30,
-    elevation: 25,
+  },
+  rewardBadge: {
+    marginTop: 16,
+    backgroundColor: COLORS.gold,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  rewardText: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    color: '#1a1a2e',
   },
 });
