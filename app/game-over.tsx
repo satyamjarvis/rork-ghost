@@ -12,6 +12,9 @@ import { trpc } from '@/lib/trpc';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 
+// TEST MODE - Force show coin reward animation
+const FORCE_SHOW_COIN = true;
+
 export default function GameOverScreen() {
   const router = useRouter();
   const { gameState, resetGame } = useGame();
@@ -81,7 +84,8 @@ export default function GameOverScreen() {
 
     const playerWon = gameState?.winner === 'player1';
     console.log('[GameOver] Checking if player won:', playerWon);
-    if (playerWon) {
+    console.log('[GameOver] FORCE_SHOW_COIN:', FORCE_SHOW_COIN);
+    if (FORCE_SHOW_COIN || playerWon) {
       console.log('[GameOver] Player won! Starting coin reward animation in 600ms...');
       setTimeout(() => {
         console.log('[GameOver] Setting showCoinReward to true NOW');
@@ -219,7 +223,8 @@ export default function GameOverScreen() {
 
   console.log('[GameOver RENDER] player1Won:', player1Won, 'showCoinReward:', showCoinReward);
   console.log('[GameOver RENDER] gameState.winner:', gameState?.winner);
-  console.log('[GameOver RENDER] Will show coin overlay:', player1Won && showCoinReward);
+  console.log('[GameOver RENDER] FORCE_SHOW_COIN:', FORCE_SHOW_COIN);
+  console.log('[GameOver RENDER] Will show coin overlay:', FORCE_SHOW_COIN || player1Won);
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: middleColor }]}>
@@ -228,7 +233,7 @@ export default function GameOverScreen() {
       <FloatingGhost />
       
       {/* Reward Coin Overlay - Full screen overlay on top of everything */}
-      {player1Won && (
+      {(FORCE_SHOW_COIN || player1Won) && (
         <View style={styles.coinOverlayContainer} pointerEvents="none">
           <Animated.View style={[
             styles.coinOverlay,
