@@ -1,54 +1,29 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { Image, StyleSheet } from 'react-native';
 
 interface GoldenGhostCoinProps {
   size?: number;
 }
 
-export default function GoldenGhostCoin({ size = 20 }: GoldenGhostCoinProps) {
-  const coinSize = size;
-  const fontSize = size * 0.55;
-  const borderWidth = Math.max(1.5, size * 0.08);
+const COIN_IMAGE_URL = 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ozq5ak803jwtbh9i44dkw';
 
+export default function GoldenGhostCoin({ size = 20 }: GoldenGhostCoinProps) {
   return (
-    <View
+    <Image
+      source={{ uri: COIN_IMAGE_URL }}
       style={[
         styles.coin,
         {
-          width: coinSize,
-          height: coinSize,
-          borderRadius: coinSize / 2,
-          borderWidth: borderWidth,
+          width: size,
+          height: size,
         },
       ]}
-    >
-      <Text
-        style={[
-          styles.coinG,
-          {
-            fontSize: fontSize,
-          },
-        ]}
-      >
-        G
-      </Text>
-    </View>
+      resizeMode="contain"
+    />
   );
 }
 
 const styles = StyleSheet.create({
   coin: {
-    backgroundColor: '#F5D89A',
-    borderColor: '#E8B85C',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: 'rgba(0, 0, 0, 0.15)',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  coinG: {
-    fontWeight: '700' as const,
-    color: '#D4944A',
+    borderRadius: 0,
   },
 });
