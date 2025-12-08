@@ -150,15 +150,38 @@ export default function GameOverScreen() {
               transform: [{ scale: coinScaleAnim }],
             },
           ]}>
-            <Animated.View style={[styles.glowCircle, { opacity: glowAnim }]} />
+            {/* Light Rays */}
             <Animated.View 
               style={[
-                styles.shineContainer,
+                styles.raysContainer,
                 { transform: [{ rotate: shineRotate }] },
               ]}
             >
-              {[0, 45, 90, 135].map((deg) => (
-                <View key={deg} style={[styles.shineRay, { transform: [{ rotate: `${deg}deg` }] }]} />
+              {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
+                <View 
+                  key={deg} 
+                  style={[
+                    styles.lightRay, 
+                    { transform: [{ rotate: `${deg}deg` }] }
+                  ]} 
+                />
+              ))}
+            </Animated.View>
+            {/* Secondary shorter rays */}
+            <Animated.View 
+              style={[
+                styles.raysContainerInner,
+                { transform: [{ rotate: shineRotate }], opacity: glowAnim },
+              ]}
+            >
+              {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
+                <View 
+                  key={deg} 
+                  style={[
+                    styles.lightRayShort, 
+                    { transform: [{ rotate: `${deg}deg` }] }
+                  ]} 
+                />
               ))}
             </Animated.View>
             <View style={styles.coinWrapper}>
@@ -389,26 +412,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  glowCircle: {
+  raysContainer: {
     position: 'absolute' as const,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255, 215, 0, 0.3)',
-  },
-  shineContainer: {
-    position: 'absolute' as const,
-    width: 200,
-    height: 200,
+    width: 300,
+    height: 300,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shineRay: {
+  raysContainerInner: {
+    position: 'absolute' as const,
+    width: 220,
+    height: 220,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  lightRay: {
+    position: 'absolute' as const,
+    width: 6,
+    height: 300,
+    backgroundColor: 'transparent',
+    borderLeftWidth: 3,
+    borderRightWidth: 3,
+    borderLeftColor: 'rgba(255, 215, 0, 0.8)',
+    borderRightColor: 'rgba(255, 215, 0, 0.8)',
+    borderTopWidth: 0,
+    borderBottomWidth: 0,
+  },
+  lightRayShort: {
     position: 'absolute' as const,
     width: 4,
-    height: 200,
-    backgroundColor: 'rgba(255, 215, 0, 0.4)',
-    borderRadius: 2,
+    height: 220,
+    backgroundColor: 'rgba(255, 235, 100, 0.6)',
   },
   coinWrapper: {
     width: 80,
