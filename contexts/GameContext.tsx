@@ -197,6 +197,12 @@ export const [GameContext, useGame] = createContextHook(() => {
       setGameState(prevState => {
         if (!prevState) return null;
         
+        // Guard: Don't process if round already ended
+        if (prevState.phase === 'roundEnd' || prevState.phase === 'gameOver') {
+          console.log('[CallWord] Round already ended, skipping state update');
+          return prevState;
+        }
+        
         const round = prevState.rounds[prevState.currentRound - 1];
 
         const wordPoints = round.currentWord.split('').reduce((sum, letter) => {
@@ -269,6 +275,13 @@ export const [GameContext, useGame] = createContextHook(() => {
       
       setGameState(prevState => {
         if (!prevState) return null;
+        
+        // Guard: Don't process if round already ended
+        if (prevState.phase === 'roundEnd' || prevState.phase === 'gameOver') {
+          console.log('[CallWord Fallback] Round already ended, skipping state update');
+          return prevState;
+        }
+        
         const round = prevState.rounds[prevState.currentRound - 1];
         
         const fallbackWordPoints = round.currentWord.split('').reduce((sum, letter) => {
@@ -380,6 +393,13 @@ export const [GameContext, useGame] = createContextHook(() => {
       
       setGameState(prevState => {
         if (!prevState) return null;
+        
+        // Guard: Don't process if round already ended
+        if (prevState.phase === 'roundEnd' || prevState.phase === 'gameOver') {
+          console.log('[Challenge Basic] Round already ended, skipping state update');
+          return prevState;
+        }
+        
         const round = prevState.rounds[prevState.currentRound - 1];
         
         const challengeWordPoints = upperWord.split('').reduce((sum, letter) => {
@@ -436,6 +456,13 @@ export const [GameContext, useGame] = createContextHook(() => {
 
       setGameState(prevState => {
         if (!prevState) return null;
+        
+        // Guard: Don't process if round already ended
+        if (prevState.phase === 'roundEnd' || prevState.phase === 'gameOver') {
+          console.log('[Challenge Validated] Round already ended, skipping state update');
+          return prevState;
+        }
+        
         const round = prevState.rounds[prevState.currentRound - 1];
         
         const validWordPoints = upperWord.split('').reduce((sum, letter) => {
@@ -485,6 +512,13 @@ export const [GameContext, useGame] = createContextHook(() => {
 
       setGameState(prevState => {
         if (!prevState) return null;
+        
+        // Guard: Don't process if round already ended
+        if (prevState.phase === 'roundEnd' || prevState.phase === 'gameOver') {
+          console.log('[Challenge Fallback] Round already ended, skipping state update');
+          return prevState;
+        }
+        
         const round = prevState.rounds[prevState.currentRound - 1];
         
         const localWordPoints = upperWord.split('').reduce((sum, letter) => {
