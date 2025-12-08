@@ -29,8 +29,14 @@ export default function GameOverScreen() {
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
   useEffect(() => {
+    console.log('[GameOver] useEffect triggered');
+    console.log('[GameOver] gameState:', gameState);
+    console.log('[GameOver] gameState.winner:', gameState?.winner);
+    console.log('[GameOver] gameState.mode:', gameState?.mode);
+    
     if (gameState && gameState.winner && gameState.mode === 'ai') {
       const playerWon = gameState.winner === 'player1';
+      console.log('[GameOver] playerWon:', playerWon);
       if (playerWon) {
         awardGameWin();
       }
@@ -74,11 +80,13 @@ export default function GameOverScreen() {
     ]).start();
 
     const playerWon = gameState?.winner === 'player1';
+    console.log('[GameOver] Checking if player won:', playerWon);
     if (playerWon) {
-      console.log('[GameOver] Player won! Starting coin reward animation...');
+      console.log('[GameOver] Player won! Starting coin reward animation in 600ms...');
       setTimeout(() => {
+        console.log('[GameOver] Setting showCoinReward to true NOW');
         setShowCoinReward(true);
-        console.log('[GameOver] showCoinReward set to true');
+        console.log('[GameOver] showCoinReward state updated');
         
         // Entry bounce animation
         Animated.sequence([
@@ -208,6 +216,8 @@ export default function GameOverScreen() {
     resetGame();
     router.replace('/');
   };
+
+  console.log('[GameOver RENDER] player1Won:', player1Won, 'showCoinReward:', showCoinReward);
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: middleColor }]}>
