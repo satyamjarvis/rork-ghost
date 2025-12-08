@@ -1957,7 +1957,10 @@ const styles = StyleSheet.create({
   playerScore: {
     fontSize: 14,
     fontWeight: '700' as const,
-    color: COLORS.gold,
+    color: '#DFFF00',
+    textShadowColor: 'rgba(223, 255, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
   },
   actionButtons: {
     flexDirection: 'row',
