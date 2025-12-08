@@ -26,6 +26,8 @@ export default function GameOverScreen() {
   const shineRotateAnim = useRef(new Animated.Value(0)).current;
   const glowAnim = useRef(new Animated.Value(0.5)).current;
   const [showCoinReward, setShowCoinReward] = useState(false);
+  const coinDismissTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const coinAnimationsRef = useRef<Animated.CompositeAnimation[]>([]);
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
   useEffect(() => {
@@ -78,15 +80,17 @@ export default function GameOverScreen() {
           }),
         ]).start();
 
-        Animated.loop(
+        const shineLoop = Animated.loop(
           Animated.timing(shineRotateAnim, {
             toValue: 1,
             duration: 3000,
             useNativeDriver: true,
           })
-        ).start();
+        );
+        shineLoop.start();
+        coinAnimationsRef.current.push(shineLoop);
 
-        Animated.loop(
+        const glowLoop = Animated.loop(
           Animated.sequence([
             Animated.timing(glowAnim, {
               toValue: 1,
@@ -99,9 +103,31 @@ export default function GameOverScreen() {
               useNativeDriver: true,
             }),
           ])
-        ).start();
+        );
+        glowLoop.start();
+        coinAnimationsRef.current.push(glowLoop);
+
+        // Auto-dismiss coin animation after 3.5 seconds
+        coinDismissTimeout.current = setTimeout(() => {
+          Animated.timing(coinAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }).start(() => {
+            setShowCoinReward(false);
+            coinAnimationsRef.current.forEach(anim => anim.stop());
+            coinAnimationsRef.current = [];
+          });
+        }, 3500);
       }, 400);
     }
+
+    return () => {
+      if (coinDismissTimeout.current) {
+        clearTimeout(coinDismissTimeout.current);
+      }
+      coinAnimationsRef.current.forEach(anim => anim.stop());
+    };
   }, []);
 
   useEffect(() => {

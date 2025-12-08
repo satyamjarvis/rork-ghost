@@ -538,7 +538,9 @@ export default function GameScreen() {
         return sum + (POINTS_PER_LETTER[letter as keyof typeof POINTS_PER_LETTER] || 0);
       }, 0);
       
-      const matchIsOver = gameState.player1.roundsWon >= 2 || gameState.player2.roundsWon >= 2;
+      const player1TotalRoundsWon = gameState.player1.roundsWon;
+      const player2TotalRoundsWon = gameState.player2.roundsWon;
+      const matchIsOver = player1TotalRoundsWon >= 2 || player2TotalRoundsWon >= 2;
       
       setRoundWinnerName(winnerName);
       setRoundWinnerPoints(wordPoints);
