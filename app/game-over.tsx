@@ -13,7 +13,7 @@ import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 
 // TEST MODE - Force show coin reward animation
-const FORCE_SHOW_COIN = true;
+const FORCE_SHOW_COIN = false;
 
 export default function GameOverScreen() {
   const router = useRouter();
@@ -221,10 +221,22 @@ export default function GameOverScreen() {
     router.replace('/');
   };
 
-  console.log('[GameOver RENDER] player1Won:', player1Won, 'showCoinReward:', showCoinReward);
-  console.log('[GameOver RENDER] gameState.winner:', gameState?.winner);
+  console.log('[GameOver RENDER] ========== WINNER DEBUG ==========');
+  console.log('[GameOver RENDER] gameState.winner raw value:', gameState?.winner);
+  console.log('[GameOver RENDER] gameState.winner type:', typeof gameState?.winner);
+  console.log('[GameOver RENDER] gameState.winner === "player1":', gameState?.winner === 'player1');
+  console.log('[GameOver RENDER] gameState.winner === "player2":', gameState?.winner === 'player2');
+  console.log('[GameOver RENDER] JSON.stringify(gameState.winner):', JSON.stringify(gameState?.winner));
+  console.log('[GameOver RENDER] player1Won:', player1Won);
+  console.log('[GameOver RENDER] player2Won:', player2Won);
+  console.log('[GameOver RENDER] gameState.player1.roundsWon:', gameState?.player1?.roundsWon);
+  console.log('[GameOver RENDER] gameState.player2.roundsWon:', gameState?.player2?.roundsWon);
+  console.log('[GameOver RENDER] gameState.mode:', gameState?.mode);
+  console.log('[GameOver RENDER] gameState.phase:', gameState?.phase);
+  console.log('[GameOver RENDER] showCoinReward:', showCoinReward);
   console.log('[GameOver RENDER] FORCE_SHOW_COIN:', FORCE_SHOW_COIN);
   console.log('[GameOver RENDER] Will show coin overlay:', FORCE_SHOW_COIN || player1Won);
+  console.log('[GameOver RENDER] ================================');
 
   return (
     <Animated.View style={[styles.container, { backgroundColor: middleColor }]}>
