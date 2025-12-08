@@ -12,7 +12,7 @@ import { trpc } from '@/lib/trpc';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 
-const FORCE_SHOW_COIN = false;
+const FORCE_SHOW_COIN = true;
 
 export default function GameOverScreen() {
   const router = useRouter();
