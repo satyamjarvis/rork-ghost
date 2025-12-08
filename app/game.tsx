@@ -1870,7 +1870,7 @@ const styles = StyleSheet.create({
     position: 'absolute' as const,
     left: 20,
     right: 20,
-    bottom: 140,
+    bottom: 165,
   },
   keyboardContainer: {
     gap: 6,
