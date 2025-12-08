@@ -207,6 +207,86 @@ export default function GameOverScreen() {
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: topColor }]} />
       <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: bottomColor, opacity: 0.7 }]} />
       <FloatingGhost />
+      
+      {/* Reward Coin Overlay - Positioned Absolutely on Top */}
+      {player1Won && (
+        <Animated.View style={[
+          styles.coinOverlay,
+          {
+            opacity: coinOpacity,
+            transform: [
+              { translateY: coinTranslateY },
+              { scale: coinScale },
+            ],
+          },
+        ]}>
+          <View style={styles.coinRewardContent}>
+            <Text style={styles.coinRewardText}>+1</Text>
+            <Animated.View style={[styles.coinWithShine, { transform: [{ scale: entryBounceAnim }] }]}>
+              {/* Pulsing radial light burst */}
+              <Animated.View 
+                style={[
+                  styles.radialBurstOuter,
+                  {
+                    opacity: pulseOpacity,
+                    transform: [{ scale: pulseScale }],
+                  },
+                ]}
+              />
+              <Animated.View 
+                style={[
+                  styles.radialBurstMiddle,
+                  {
+                    opacity: pulseOpacity,
+                    transform: [{ scale: Animated.add(pulseScale, 0.1) }],
+                  },
+                ]}
+              />
+              <Animated.View 
+                style={[
+                  styles.radialBurstInner,
+                  {
+                    opacity: pulseAnim.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0.5, 1, 0.5],
+                    }),
+                  },
+                ]}
+              />
+              {/* Rotating shine rays */}
+              <Animated.View 
+                style={[
+                  styles.shineContainer,
+                  {
+                    opacity: shineOpacity,
+                    transform: [{ rotate: shineRotate }],
+                  },
+                ]}
+              >
+                {[...Array(12)].map((_, i) => (
+                  <View 
+                    key={i} 
+                    style={[
+                      styles.shineRay,
+                      { transform: [{ rotate: `${i * 30}deg` }] },
+                    ]} 
+                  />
+                ))}
+              </Animated.View>
+              {/* Golden Ghost Coin Reward */}
+              <Animated.View style={[
+                styles.coinImageContainer,
+                {
+                  transform: [{ rotate: coinRotate }],
+                },
+              ]}>
+                <GoldenGhostCoin size={70} />
+              </Animated.View>
+            </Animated.View>
+          </View>
+        </Animated.View>
+      )}
+      
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
         <Animated.View style={[styles.resultCard, { transform: [{ scale: scaleAnim }] }]}>
           <View style={styles.iconContainer}>
@@ -219,82 +299,6 @@ export default function GameOverScreen() {
               ? (gameState.player1.name === 'You' ? 'You Won!' : `${gameState.player1.name} Wins!`)
               : (gameState.player2.name === 'You' ? 'You Lost!' : `${gameState.player2.name} Wins!`)}
           </Text>
-
-          {player1Won && (
-            <Animated.View style={[
-              styles.coinRewardContainer,
-              {
-                opacity: coinOpacity,
-                transform: [
-                  { translateY: coinTranslateY },
-                  { scale: coinScale },
-                ],
-              },
-            ]}>
-              <Text style={styles.coinRewardText}>+1</Text>
-              <Animated.View style={[styles.coinWithShine, { transform: [{ scale: entryBounceAnim }] }]}>
-                {/* Pulsing radial light burst */}
-                <Animated.View 
-                  style={[
-                    styles.radialBurstOuter,
-                    {
-                      opacity: pulseOpacity,
-                      transform: [{ scale: pulseScale }],
-                    },
-                  ]}
-                />
-                <Animated.View 
-                  style={[
-                    styles.radialBurstMiddle,
-                    {
-                      opacity: pulseOpacity,
-                      transform: [{ scale: Animated.add(pulseScale, 0.1) }],
-                    },
-                  ]}
-                />
-                <Animated.View 
-                  style={[
-                    styles.radialBurstInner,
-                    {
-                      opacity: pulseAnim.interpolate({
-                        inputRange: [0, 0.5, 1],
-                        outputRange: [0.5, 1, 0.5],
-                      }),
-                    },
-                  ]}
-                />
-                {/* Rotating shine rays */}
-                <Animated.View 
-                  style={[
-                    styles.shineContainer,
-                    {
-                      opacity: shineOpacity,
-                      transform: [{ rotate: shineRotate }],
-                    },
-                  ]}
-                >
-                  {[...Array(12)].map((_, i) => (
-                    <View 
-                      key={i} 
-                      style={[
-                        styles.shineRay,
-                        { transform: [{ rotate: `${i * 30}deg` }] },
-                      ]} 
-                    />
-                  ))}
-                </Animated.View>
-                {/* Golden Ghost Coin Reward */}
-                <Animated.View style={[
-                  styles.coinImageContainer,
-                  {
-                    transform: [{ rotate: coinRotate }],
-                  },
-                ]}>
-                  <GoldenGhostCoin size={70} />
-                </Animated.View>
-              </Animated.View>
-            </Animated.View>
-          )}
 
           <View style={styles.finalScoresContainer}>
             <View style={[
@@ -485,7 +489,18 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     color: COLORS.white,
   },
-  coinRewardContainer: {
+  coinOverlay: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9999,
+    pointerEvents: 'none' as const,
+  },
+  coinRewardContent: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
@@ -496,7 +511,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderColor: 'rgba(255, 255, 255, 0.3)',
-    marginTop: 12,
   },
   coinRewardText: {
     fontSize: 24,
