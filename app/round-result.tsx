@@ -146,7 +146,10 @@ export default function RoundResultScreen() {
     }
 
     if (gameState.player1.roundsWon >= 2 || gameState.player2.roundsWon >= 2) {
-      router.replace('/game-over');
+      nextRound();
+      setTimeout(() => {
+        router.replace('/game-over');
+      }, 100);
     } else {
       nextRound();
       router.replace('/game');
