@@ -5,7 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayer } from '@/contexts/MultiplayerContext';
-import { Cpu, Users, Settings as SettingsIcon, ShoppingBag, Mail } from 'lucide-react-native';
+import { Cpu, Users, Settings as SettingsIcon, ShoppingBag, Mail, Trophy, User } from 'lucide-react-native';
 import { useRef, useEffect, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
@@ -144,6 +144,25 @@ export default function HomeScreen() {
           <Text style={styles.coinEmoji}>👻</Text>
         </TouchableOpacity>
         <TouchableOpacity 
+          style={styles.leaderboardButton}
+          onPress={() => {
+            if (Platform.OS !== 'web') {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }
+            router.push('/leaderboard');
+          }}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['rgba(255, 215, 0, 0.5)', 'rgba(255, 215, 0, 0.2)']}
+            style={styles.leaderboardGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <Trophy color={COLORS.white} size={20} />
+          </LinearGradient>
+        </TouchableOpacity>
+        <TouchableOpacity 
           style={styles.storeButton}
           onPress={() => {
             if (Platform.OS !== 'web') {
@@ -164,16 +183,39 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.settingsButton} onPress={handleToggleSettings}>
-        <LinearGradient
-          colors={showSettings ? ['rgba(255, 199, 87, 0.5)', 'rgba(255, 199, 87, 0.2)'] : ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
-          style={styles.settingsGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <SettingsIcon color={showSettings ? COLORS.gold : COLORS.white} size={20} />
-        </LinearGradient>
-      </TouchableOpacity>
+      <View style={styles.leftButtonsContainer}>
+        <TouchableOpacity style={styles.settingsButton} onPress={handleToggleSettings}>
+          <LinearGradient
+            colors={showSettings ? ['rgba(255, 199, 87, 0.5)', 'rgba(255, 199, 87, 0.2)'] : ['rgba(255, 255, 255, 0.2)', 'rgba(255, 255, 255, 0.1)']}
+            style={styles.settingsGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <SettingsIcon color={showSettings ? COLORS.gold : COLORS.white} size={20} />
+          </LinearGradient>
+        </TouchableOpacity>
+        {isAuthenticated && (
+          <TouchableOpacity 
+            style={styles.profileButton}
+            onPress={() => {
+              if (Platform.OS !== 'web') {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }
+              router.push('/profile');
+            }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['rgba(100, 181, 246, 0.5)', 'rgba(100, 181, 246, 0.2)']}
+              style={styles.profileGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <User color={COLORS.white} size={20} />
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+      </View>
 
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
         <View style={styles.header}>
@@ -435,10 +477,15 @@ const styles = StyleSheet.create({
   coinEmoji: {
     fontSize: 20,
   },
-  settingsButton: {
+  leftButtonsContainer: {
     position: 'absolute' as const,
     top: 70,
     left: 24,
+    flexDirection: 'row',
+    gap: 10,
+    zIndex: 10,
+  },
+  settingsButton: {
     borderRadius: 16,
     overflow: 'hidden' as const,
     shadowColor: COLORS.shadow,
@@ -446,7 +493,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
-    zIndex: 10,
+  },
+  profileButton: {
+    borderRadius: 16,
+    overflow: 'hidden' as const,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  profileGradient: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(100, 181, 246, 0.4)',
+    borderRadius: 16,
   },
   settingsGradient: {
     width: 48,
@@ -527,6 +591,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700' as const,
     color: COLORS.white,
+  },
+  leaderboardButton: {
+    borderRadius: 16,
+    overflow: 'hidden' as const,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  leaderboardGradient: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.4)',
+    borderRadius: 16,
   },
   storeButton: {
     borderRadius: 16,

@@ -25,6 +25,8 @@ function RootLayoutNav() {
       <Stack.Screen name="username-setup" options={{ headerShown: false }} />
       <Stack.Screen name="multiplayer" options={{ headerShown: false }} />
       <Stack.Screen name="multiplayer-game" options={{ headerShown: false }} />
+      <Stack.Screen name="profile" options={{ headerShown: false }} />
+      <Stack.Screen name="leaderboard" options={{ headerShown: false }} />
     </Stack>
   );
 }

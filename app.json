@@ -17,7 +17,10 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.Pixofactor.Ghost",
       "infoPlist": {
-        "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
+        "NSFaceIDUsageDescription": "Allow $(PRODUCT_NAME) to access your Face ID biometric data.",
+        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos",
+        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone"
       },
       "config": {
         "usesNonExemptEncryption": false
@@ -32,7 +35,10 @@
       "package": "app.rork.ios_word_game",
       "permissions": [
         "android.permission.VIBRATE",
-        "android.permission.HIGH_SAMPLING_RATE_SENSORS"
+        "android.permission.HIGH_SAMPLING_RATE_SENSORS",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "web": {
@@ -54,7 +60,13 @@
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
         }
       ],
-      "expo-apple-authentication"
+      "expo-apple-authentication",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

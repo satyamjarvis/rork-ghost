@@ -63,6 +63,7 @@ export type Profile = {
   wins: number;
   losses: number;
   ghost_coins: number;
+  all_time_points: number;
   created_at: string;
   updated_at: string;
 };
