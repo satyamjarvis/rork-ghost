@@ -10,6 +10,7 @@ import { useRef, useEffect, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
+import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 import type { AIDifficulty } from '@/types/store';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 
@@ -141,7 +142,7 @@ export default function HomeScreen() {
           activeOpacity={0.8}
         >
           <Text style={styles.coinText}>{wallet.ghostCoins}</Text>
-          <Text style={styles.coinEmoji}>👻</Text>
+          <GoldenGhostCoin size={20} />
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.leaderboardButton}

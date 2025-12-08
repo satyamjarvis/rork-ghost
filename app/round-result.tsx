@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import { POINTS_PER_LETTER } from '@/constants/game';
 import FloatingGhost from '@/components/FloatingGhost';
+import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 
 
@@ -560,7 +561,7 @@ export default function RoundResultScreen() {
             ))}
           </View>
           <View style={styles.flyingCoin}>
-            <Text style={styles.flyingCoinText}>👻</Text>
+            <GoldenGhostCoin size={28} />
           </View>
         </Animated.View>
       )}

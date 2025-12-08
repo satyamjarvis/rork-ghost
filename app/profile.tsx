@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
+import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Camera, Edit2, Trophy, Bomb, Check, X, User } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
@@ -398,7 +399,7 @@ export default function ProfileScreen() {
                 >
                   <View style={styles.inventoryRow}>
                     <View style={styles.inventoryItem}>
-                      <Text style={styles.inventoryEmoji}>👻</Text>
+                      <GoldenGhostCoin size={28} />
                       <View style={styles.inventoryInfo}>
                         <Text style={styles.inventoryValue}>{wallet.ghostCoins}</Text>
                         <Text style={styles.inventoryLabel}>Ghost Coins</Text>

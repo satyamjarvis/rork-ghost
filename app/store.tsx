@@ -10,6 +10,7 @@ import { useRef, useEffect } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
+import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 import { LetterBombPack } from '@/types/iap';
 
@@ -43,7 +44,7 @@ export default function StoreScreen() {
       if (RNPlatform.OS !== 'web') {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
-      Alert.alert('Not Enough Coins', `You need ${LETTER_BOMB_PRICE} 👻 Ghost Coins to purchase a Letter Bomb.`);
+      Alert.alert('Not Enough Coins', `You need ${LETTER_BOMB_PRICE} Ghost Coins to purchase a Letter Bomb.`);
       return;
     }
 
@@ -159,7 +160,7 @@ export default function StoreScreen() {
               </View>
               <View style={styles.coinDisplay}>
                 <Text style={styles.coinText}>{wallet.ghostCoins}</Text>
-                <Text style={styles.coinEmoji}>👻</Text>
+                <GoldenGhostCoin size={16} />
               </View>
             </View>
 
@@ -291,7 +292,7 @@ export default function StoreScreen() {
                       <View style={styles.itemFooter}>
                         <View style={styles.priceContainer}>
                           <Text style={styles.priceText}>{LETTER_BOMB_PRICE}</Text>
-                          <Text style={styles.priceEmoji}>👻</Text>
+                          <GoldenGhostCoin size={20} />
                         </View>
                         <TouchableOpacity
                           style={[
@@ -328,7 +329,7 @@ export default function StoreScreen() {
               <View style={styles.infoSection}>
                 <Text style={styles.infoTitle}>How to Get Letter Bombs</Text>
                 <Text style={styles.infoText}>
-                  • Win games against the AI to earn 👻 Ghost Coins{'\n'}
+                  • Win games against the AI to earn Ghost Coins{'\n'}
                   • Spend Ghost Coins in the shop above{'\n'}
                   • Purchase Letter Bomb packs with real money{'\n'}
                   • Strategic use of bombs can turn the tide!
