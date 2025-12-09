@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 56,
     fontWeight: '800' as const,
-    fontFamily: 'Simplifica',
+    fontFamily: 'JostItalic',
     color: COLORS.white,
     marginBottom: 4,
     letterSpacing: 4,
