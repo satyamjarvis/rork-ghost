@@ -280,12 +280,9 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
             <View style={styles.hintContainer}>
-              <Animated.View style={[styles.hintGlowWrapper, { 
+              <Animated.View style={[{ 
                 transform: [{ scale: hintScaleAnim }],
               }]}>
-                <Animated.Text style={[styles.hintTextGlow, { 
-                  opacity: hintGlowAnim,
-                }]}>sign in to track{"\n"}your stats!</Animated.Text>
                 <Text style={styles.hintText}>sign in to track{"\n"}your stats!</Text>
               </Animated.View>
               <Image 
@@ -654,21 +651,6 @@ const styles = StyleSheet.create({
     tintColor: 'rgba(255, 255, 255, 0.85)',
     transform: [{ scaleX: 1 }],
   },
-  hintGlowWrapper: {
-    position: 'relative' as const,
-  },
-  hintTextGlow: {
-    fontSize: 12,
-    color: '#7CFC00',
-    fontStyle: 'italic' as const,
-    lineHeight: 15,
-    fontWeight: '700' as const,
-    textAlign: 'right' as const,
-    position: 'absolute' as const,
-    textShadowColor: '#7CFC00',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
-  },
   hintText: {
     fontSize: 12,
     color: '#FFFFFF',
@@ -676,9 +658,6 @@ const styles = StyleSheet.create({
     lineHeight: 15,
     fontWeight: '600' as const,
     textAlign: 'right' as const,
-    textShadowColor: 'rgba(124, 252, 0, 0.6)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
   },
   settingsGradient: {
     width: 48,
