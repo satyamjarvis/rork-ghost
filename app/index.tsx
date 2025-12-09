@@ -247,6 +247,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </Animated.View>
 
+          {/* Multiplayer button hidden - code preserved for future use
           <Animated.View style={{ transform: [{ scale: scaleAnim2 }] }}>
             <TouchableOpacity
               style={styles.modeButton}
@@ -276,6 +277,7 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
           </Animated.View>
+          */}
         </View>
 
         {showSettings && (
