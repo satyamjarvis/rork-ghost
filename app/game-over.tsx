@@ -12,7 +12,7 @@ import { trpc } from '@/lib/trpc';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 
-const FORCE_SHOW_COIN = true;
+const FORCE_SHOW_COIN = false;
 
 export default function GameOverScreen() {
   const router = useRouter();
@@ -230,7 +230,7 @@ export default function GameOverScreen() {
           <Text style={styles.winnerText}>
             {player1Won 
               ? (gameState.player1.name === 'You' ? 'You Won!' : `${gameState.player1.name} Wins!`)
-              : (gameState.player2.name === 'You' ? 'You Lost!' : `${gameState.player2.name} Wins!`)}
+              : `${gameState.player2.name} Wins!`}
           </Text>
 
           <View style={styles.finalScoresContainer}>

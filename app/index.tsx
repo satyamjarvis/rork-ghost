@@ -221,7 +221,7 @@ export default function HomeScreen() {
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
         <View style={styles.header}>
           <Text style={styles.title}>GHOST</Text>
-          <Text style={styles.subtitle}>Word Game</Text>
+          <Text style={styles.subtitle}>The Word Game</Text>
         </View>
 
         <View style={styles.modesContainer}>
@@ -373,17 +373,17 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 60,
-    marginTop: 100,
+    marginTop: 140,
   },
   title: {
-    fontSize: 64,
+    fontSize: 56,
     fontWeight: '800' as const,
     color: COLORS.white,
-    marginBottom: 8,
+    marginBottom: 4,
     letterSpacing: 4,
   },
   subtitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '400' as const,
     color: COLORS.whiteTransparent,
     letterSpacing: 3,
