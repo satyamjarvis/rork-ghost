@@ -15,7 +15,7 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-const CUSTOM_FONT_URL = 'https://pub-a6f520df47a6404b9b9b55141695828f.r2.dev/Jost-Italic-VariableFont_wght.ttf';
+const CUSTOM_FONT_URL = 'https://pub-a6f520df47a6404b9b9b55141695828f.r2.dev/Jost-VariableFont_wght.ttf';
 
 function RootLayoutNav() {
   return (
@@ -42,9 +42,9 @@ export default function RootLayout() {
     async function loadFonts() {
       try {
         await Font.loadAsync({
-          'JostItalic': { uri: CUSTOM_FONT_URL },
+          'Jost': { uri: CUSTOM_FONT_URL },
         });
-        console.log('[Font] Jost Italic font loaded successfully');
+        console.log('[Font] Jost font loaded successfully');
         setFontsLoaded(true);
       } catch (error) {
         console.log('[Font] Error loading custom font:', error);
