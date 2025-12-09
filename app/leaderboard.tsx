@@ -40,7 +40,9 @@ export default function LeaderboardScreen() {
         .limit(100);
 
       if (error) {
-        console.error('[Leaderboard] Error fetching:', error);
+        console.error('[Leaderboard] Error fetching:', JSON.stringify(error, null, 2));
+        console.error('[Leaderboard] Error message:', error.message);
+        console.error('[Leaderboard] Error details:', error.details);
         return;
       }
 
@@ -56,13 +58,24 @@ export default function LeaderboardScreen() {
         if (userEntry) {
           setUserRank(userEntry.rank);
         } else {
-          const { data: rankData } = await supabase
-            .rpc('get_user_leaderboard_rank', { target_user_id: user.id });
-          setUserRank(rankData || null);
+          try {
+            const { data: rankData, error: rankError } = await supabase
+              .rpc('get_user_leaderboard_rank', { target_user_id: user.id });
+            if (rankError) {
+              console.log('[Leaderboard] User rank RPC not available:', rankError.message);
+              setUserRank(null);
+            } else {
+              setUserRank(rankData || null);
+            }
+          } catch (err) {
+            console.log('[Leaderboard] User rank calculation skipped');
+            setUserRank(null);
+          }
         }
       }
     } catch (err) {
-      console.error('[Leaderboard] Exception:', err);
+      console.error('[Leaderboard] Exception:', JSON.stringify(err, null, 2));
+      console.error('[Leaderboard] Exception details:', err);
     } finally {
       setIsLoading(false);
     }
