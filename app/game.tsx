@@ -1196,6 +1196,10 @@ export default function GameScreen() {
                         <Loader2 color={COLORS.gold} size={20} />
                         <Text style={styles.indicatorText}>AI responding to challenge...</Text>
                       </>
+                    ) : gameState.mode === 'ai' && gameState.currentPlayer === 'player1' && gameState.phase === 'playing' ? (
+                      <View style={styles.yourTurnBadge}>
+                        <Text style={styles.yourTurnText}>YOUR TURN</Text>
+                      </View>
                     ) : null}
                   </View>
 
@@ -2066,6 +2070,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600' as const,
     color: COLORS.gold,
+  },
+  yourTurnBadge: {
+    backgroundColor: 'rgba(223, 255, 0, 0.2)',
+    borderWidth: 1,
+    borderColor: 'rgba(223, 255, 0, 0.5)',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+  },
+  yourTurnText: {
+    fontSize: 14,
+    fontWeight: '700' as const,
+    color: '#DFFF00',
+    letterSpacing: 1,
+    textShadowColor: 'rgba(223, 255, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
   },
   challengeIndicator: {
     position: 'absolute' as const,
