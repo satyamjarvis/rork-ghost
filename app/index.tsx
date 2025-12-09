@@ -259,7 +259,7 @@ export default function HomeScreen() {
             <View style={styles.hintContainer}>
               <Animated.Text style={[styles.hintText, { opacity: hintGlowAnim }]}>sign in to track{"\n"}your stats!</Animated.Text>
               <Image 
-                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/eqqr1y5p0zwxf4qifnqoq' }}
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/4uqzw1s61afmb5atsbvs8' }}
                 style={styles.hintArrowImage}
               />
             </View>
@@ -593,8 +593,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   hintArrowImage: {
-    width: 50,
-    height: 50,
+    width: 35,
+    height: 35,
     marginLeft: 4,
     marginTop: -15,
     tintColor: 'rgba(255, 255, 255, 0.85)',
