@@ -46,7 +46,7 @@ export const [AudioContext, useAudio] = createContextHook(() => {
       });
 
       console.log('[Audio] Creating sound object...');
-      const audioUrl = 'https://pub-a6f520df47a6404b9b9b55141695828f.r2.dev/Super%20Ghost%20Theme%201%20(short).mp3';
+      const audioUrl = 'https://pub-a6f520df47a6404b9b9b55141695828f.r2.dev/Ghost%20Theme%20Short%20Cleaned%20Adobe.mp3';
       console.log('[Audio] Loading from URL:', audioUrl);
       const { sound } = await Audio.Sound.createAsync(
         { uri: audioUrl },
