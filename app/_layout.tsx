@@ -8,6 +8,7 @@ import { PlayerContext } from "@/contexts/PlayerContext";
 import { AuthContext } from "@/contexts/AuthContext";
 import { MultiplayerContext } from "@/contexts/MultiplayerContext";
 import { IAPContext } from "@/contexts/IAPContext";
+import { AudioContextProvider } from "@/contexts/AudioContext";
 import { trpc, trpcClient } from "@/lib/trpc";
 SplashScreen.preventAutoHideAsync();
 
@@ -39,19 +40,21 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <AuthContext>
-          <MultiplayerContext>
-            <PlayerContext>
-              <IAPContext>
-                <GameContext>
-                  <GestureHandlerRootView style={{ flex: 1 }}>
-                    <RootLayoutNav />
-                  </GestureHandlerRootView>
-                </GameContext>
-              </IAPContext>
-            </PlayerContext>
-          </MultiplayerContext>
-        </AuthContext>
+        <AudioContextProvider>
+          <AuthContext>
+            <MultiplayerContext>
+              <PlayerContext>
+                <IAPContext>
+                  <GameContext>
+                    <GestureHandlerRootView style={{ flex: 1 }}>
+                      <RootLayoutNav />
+                    </GestureHandlerRootView>
+                  </GameContext>
+                </IAPContext>
+              </PlayerContext>
+            </MultiplayerContext>
+          </AuthContext>
+        </AudioContextProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

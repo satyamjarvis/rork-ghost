@@ -5,7 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayer } from '@/contexts/MultiplayerContext';
-import { Cpu, Users, Settings as SettingsIcon, ShoppingBag, Mail, Trophy, User, LogIn } from 'lucide-react-native';
+import { Cpu, Users, Settings as SettingsIcon, ShoppingBag, Mail, Trophy, User, LogIn, Volume2, VolumeX } from 'lucide-react-native';
 import { useRef, useEffect, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
@@ -13,6 +13,7 @@ import FloatingGhost from '@/components/FloatingGhost';
 import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 import type { AIDifficulty } from '@/types/store';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
+import { useAudio } from '@/contexts/AudioContext';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function HomeScreen() {
   const { wallet, settings, setAIDifficulty: saveAIDifficulty } = usePlayer();
   const { isAuthenticated, signOut } = useAuth();
   const { pendingInvites, activeGames } = useMultiplayer();
+  const { isMuted, toggleMute } = useAudio();
   const scaleAnim1 = useRef(new Animated.Value(1)).current;
   const scaleAnim2 = useRef(new Animated.Value(1)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -339,6 +341,29 @@ export default function HomeScreen() {
               }),
             }],
           }]}>
+            <View style={styles.settingsRow}>
+              <Text style={styles.settingsTitle}>Music</Text>
+              <TouchableOpacity
+                style={[styles.muteButton, isMuted && styles.muteButtonActive]}
+                onPress={() => {
+                  if (Platform.OS !== 'web') {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }
+                  toggleMute();
+                }}
+                activeOpacity={0.7}
+              >
+                {isMuted ? (
+                  <VolumeX color={COLORS.white} size={20} />
+                ) : (
+                  <Volume2 color={COLORS.white} size={20} />
+                )}
+                <Text style={styles.muteButtonText}>
+                  {isMuted ? 'Unmute' : 'Mute'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            
             <Text style={styles.settingsTitle}>AI Difficulty</Text>
             <View style={styles.difficultyButtons}>
               {(['easy', 'medium', 'hard', 'superior'] as AIDifficulty[]).map((difficulty) => (
@@ -630,6 +655,32 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     marginBottom: 16,
     textAlign: 'center' as const,
+  },
+  settingsRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'space-between' as const,
+    marginBottom: 20,
+  },
+  muteButton: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  muteButtonActive: {
+    backgroundColor: 'rgba(255, 100, 100, 0.3)',
+    borderColor: 'rgba(255, 100, 100, 0.5)',
+  },
+  muteButtonText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: COLORS.white,
   },
   difficultyButtons: {
     flexDirection: 'row',
