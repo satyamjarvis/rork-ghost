@@ -5,7 +5,7 @@ import { useGame } from '@/contexts/GameContext';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayer } from '@/contexts/MultiplayerContext';
-import { Cpu, Users, Settings as SettingsIcon, ShoppingBag, Mail, Trophy, User } from 'lucide-react-native';
+import { Cpu, Users, Settings as SettingsIcon, ShoppingBag, Mail, Trophy, User, LogIn } from 'lucide-react-native';
 import { useRef, useEffect, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
@@ -195,7 +195,7 @@ export default function HomeScreen() {
             <SettingsIcon color={showSettings ? COLORS.gold : COLORS.white} size={20} />
           </LinearGradient>
         </TouchableOpacity>
-        {isAuthenticated && (
+        {isAuthenticated ? (
           <TouchableOpacity 
             style={styles.profileButton}
             onPress={() => {
@@ -213,6 +213,26 @@ export default function HomeScreen() {
               end={{ x: 1, y: 1 }}
             >
               <User color={COLORS.white} size={20} />
+            </LinearGradient>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity 
+            style={styles.signInButton}
+            onPress={() => {
+              if (Platform.OS !== 'web') {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              }
+              router.push('/auth');
+            }}
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={['rgba(76, 175, 80, 0.5)', 'rgba(76, 175, 80, 0.2)']}
+              style={styles.signInGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <LogIn color={COLORS.white} size={20} />
             </LinearGradient>
           </TouchableOpacity>
         )}
@@ -513,6 +533,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: 'rgba(100, 181, 246, 0.4)',
+    borderRadius: 16,
+  },
+  signInButton: {
+    borderRadius: 16,
+    overflow: 'hidden' as const,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  signInGradient: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'rgba(76, 175, 80, 0.4)',
     borderRadius: 16,
   },
   settingsGradient: {

@@ -64,6 +64,16 @@ export type Profile = {
   losses: number;
   ghost_coins: number;
   all_time_points: number;
+  ai_wins: number;
+  ai_losses: number;
+  ai_points: number;
+  ai_win_streak: number;
+  ai_longest_win_streak: number;
+  pvp_wins: number;
+  pvp_losses: number;
+  pvp_points: number;
+  pvp_win_streak: number;
+  pvp_longest_win_streak: number;
   created_at: string;
   updated_at: string;
 };

@@ -3,19 +3,19 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlayer } from '@/contexts/PlayerContext';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS, COLOR_SCHEMES } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
 import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Camera, Edit2, Trophy, Bomb, Check, X, User } from 'lucide-react-native';
+import { ArrowLeft, Camera, Edit2, Trophy, Bomb, Check, X, User, Cpu, Users, Flame, Target } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { profile, user, isAuthenticated, refreshProfile, signOut } = useAuth();
+  const { profile, user, isAuthenticated, refreshProfile, signOut, getAIStats, getPVPStats } = useAuth();
   const { wallet, inventory } = usePlayer();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   
@@ -23,7 +23,9 @@ export default function ProfileScreen() {
   const [newUsername, setNewUsername] = useState<string>('');
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState<boolean>(false);
-  const [allTimePoints, setAllTimePoints] = useState<number>(0);
+
+  const aiStats = getAIStats();
+  const pvpStats = getPVPStats();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -42,27 +44,8 @@ export default function ProfileScreen() {
   useEffect(() => {
     if (profile) {
       setNewUsername(profile.username);
-      fetchAllTimePoints();
     }
   }, [profile]);
-
-  const fetchAllTimePoints = useCallback(async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('all_time_points')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!error && data) {
-        setAllTimePoints(data.all_time_points || 0);
-      }
-    } catch (err) {
-      console.error('[Profile] Error fetching all-time points:', err);
-    }
-  }, [user]);
 
   const handleBack = () => {
     if (Platform.OS !== 'web') {
@@ -244,11 +227,14 @@ export default function ProfileScreen() {
     );
   };
 
-  const winRate = profile ? 
-    (profile.wins + profile.losses > 0 
-      ? Math.round((profile.wins / (profile.wins + profile.losses)) * 100) 
-      : 0) 
-    : 0;
+  const calculateWinRate = (wins: number, losses: number): number => {
+    const total = wins + losses;
+    return total > 0 ? Math.round((wins / total) * 100) : 0;
+  };
+
+  const aiWinRate = calculateWinRate(aiStats.wins, aiStats.losses);
+  const pvpWinRate = calculateWinRate(pvpStats.wins, pvpStats.losses);
+  const totalWinRate = calculateWinRate(profile?.wins || 0, profile?.losses || 0);
 
   return (
     <LinearGradient
@@ -344,48 +330,125 @@ export default function ProfileScreen() {
               </View>
             </View>
 
-            <View style={styles.statsGrid}>
-              <View style={styles.statCard}>
+            <View style={styles.overallStatsCard}>
+              <LinearGradient
+                colors={['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.05)']}
+                style={styles.overallStatsGradient}
+              >
+                <View style={styles.overallStatsRow}>
+                  <View style={styles.overallStatItem}>
+                    <Text style={styles.overallStatValue}>{profile?.wins || 0}</Text>
+                    <Text style={styles.overallStatLabel}>Total Wins</Text>
+                  </View>
+                  <View style={styles.overallStatDivider} />
+                  <View style={styles.overallStatItem}>
+                    <Text style={styles.overallStatValue}>{profile?.losses || 0}</Text>
+                    <Text style={styles.overallStatLabel}>Total Losses</Text>
+                  </View>
+                  <View style={styles.overallStatDivider} />
+                  <View style={styles.overallStatItem}>
+                    <Text style={styles.overallStatValue}>{totalWinRate}%</Text>
+                    <Text style={styles.overallStatLabel}>Win Rate</Text>
+                  </View>
+                </View>
+              </LinearGradient>
+            </View>
+
+            <View style={styles.modeStatsSection}>
+              <View style={styles.modeStatsCard}>
                 <LinearGradient
-                  colors={['rgba(76, 175, 80, 0.3)', 'rgba(76, 175, 80, 0.1)']}
-                  style={styles.statGradient}
+                  colors={['rgba(255, 199, 87, 0.25)', 'rgba(255, 199, 87, 0.08)']}
+                  style={styles.modeStatsGradient}
                 >
-                  <Trophy color="#4CAF50" size={28} />
-                  <Text style={styles.statValue}>{profile?.wins || 0}</Text>
-                  <Text style={styles.statLabel}>Wins</Text>
+                  <View style={styles.modeHeader}>
+                    <View style={styles.modeIconContainer}>
+                      <Cpu color={COLORS.gold} size={24} />
+                    </View>
+                    <Text style={styles.modeTitle}>vs AI</Text>
+                  </View>
+                  
+                  <View style={styles.modeStatsGrid}>
+                    <View style={styles.modeStatItem}>
+                      <Trophy color="#4CAF50" size={20} />
+                      <Text style={styles.modeStatValue}>{aiStats.wins}</Text>
+                      <Text style={styles.modeStatLabel}>Wins</Text>
+                    </View>
+                    <View style={styles.modeStatItem}>
+                      <X color="#FF6B6B" size={20} />
+                      <Text style={styles.modeStatValue}>{aiStats.losses}</Text>
+                      <Text style={styles.modeStatLabel}>Losses</Text>
+                    </View>
+                    <View style={styles.modeStatItem}>
+                      <Target color="#64B5F6" size={20} />
+                      <Text style={styles.modeStatValue}>{aiWinRate}%</Text>
+                      <Text style={styles.modeStatLabel}>Win Rate</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.modeExtrasRow}>
+                    <View style={styles.modeExtraItem}>
+                      <Flame color="#FF9800" size={16} />
+                      <Text style={styles.modeExtraText}>Streak: {aiStats.winStreak}</Text>
+                    </View>
+                    <View style={styles.modeExtraItem}>
+                      <Trophy color={COLORS.gold} size={16} />
+                      <Text style={styles.modeExtraText}>Best: {aiStats.longestWinStreak}</Text>
+                    </View>
+                    <View style={styles.modeExtraItem}>
+                      <Text style={styles.pointsEmoji}>⭐</Text>
+                      <Text style={styles.modeExtraText}>{aiStats.points.toLocaleString()} pts</Text>
+                    </View>
+                  </View>
                 </LinearGradient>
               </View>
 
-              <View style={styles.statCard}>
+              <View style={styles.modeStatsCard}>
                 <LinearGradient
-                  colors={['rgba(255, 107, 107, 0.3)', 'rgba(255, 107, 107, 0.1)']}
-                  style={styles.statGradient}
+                  colors={['rgba(100, 181, 246, 0.25)', 'rgba(100, 181, 246, 0.08)']}
+                  style={styles.modeStatsGradient}
                 >
-                  <X color="#FF6B6B" size={28} />
-                  <Text style={styles.statValue}>{profile?.losses || 0}</Text>
-                  <Text style={styles.statLabel}>Losses</Text>
-                </LinearGradient>
-              </View>
+                  <View style={styles.modeHeader}>
+                    <View style={[styles.modeIconContainer, styles.pvpIconContainer]}>
+                      <Users color="#64B5F6" size={24} />
+                    </View>
+                    <Text style={styles.modeTitle}>vs Player</Text>
+                    <View style={styles.comingSoonBadge}>
+                      <Text style={styles.comingSoonText}>Coming Soon</Text>
+                    </View>
+                  </View>
+                  
+                  <View style={styles.modeStatsGrid}>
+                    <View style={styles.modeStatItem}>
+                      <Trophy color="#4CAF50" size={20} />
+                      <Text style={styles.modeStatValue}>{pvpStats.wins}</Text>
+                      <Text style={styles.modeStatLabel}>Wins</Text>
+                    </View>
+                    <View style={styles.modeStatItem}>
+                      <X color="#FF6B6B" size={20} />
+                      <Text style={styles.modeStatValue}>{pvpStats.losses}</Text>
+                      <Text style={styles.modeStatLabel}>Losses</Text>
+                    </View>
+                    <View style={styles.modeStatItem}>
+                      <Target color="#64B5F6" size={20} />
+                      <Text style={styles.modeStatValue}>{pvpWinRate}%</Text>
+                      <Text style={styles.modeStatLabel}>Win Rate</Text>
+                    </View>
+                  </View>
 
-              <View style={styles.statCard}>
-                <LinearGradient
-                  colors={['rgba(255, 200, 87, 0.3)', 'rgba(255, 200, 87, 0.1)']}
-                  style={styles.statGradient}
-                >
-                  <Text style={styles.statEmoji}>📊</Text>
-                  <Text style={styles.statValue}>{winRate}%</Text>
-                  <Text style={styles.statLabel}>Win Rate</Text>
-                </LinearGradient>
-              </View>
-
-              <View style={styles.statCard}>
-                <LinearGradient
-                  colors={['rgba(100, 181, 246, 0.3)', 'rgba(100, 181, 246, 0.1)']}
-                  style={styles.statGradient}
-                >
-                  <Text style={styles.statEmoji}>⭐</Text>
-                  <Text style={styles.statValue}>{allTimePoints.toLocaleString()}</Text>
-                  <Text style={styles.statLabel}>All-Time Points</Text>
+                  <View style={styles.modeExtrasRow}>
+                    <View style={styles.modeExtraItem}>
+                      <Flame color="#FF9800" size={16} />
+                      <Text style={styles.modeExtraText}>Streak: {pvpStats.winStreak}</Text>
+                    </View>
+                    <View style={styles.modeExtraItem}>
+                      <Trophy color={COLORS.gold} size={16} />
+                      <Text style={styles.modeExtraText}>Best: {pvpStats.longestWinStreak}</Text>
+                    </View>
+                    <View style={styles.modeExtraItem}>
+                      <Text style={styles.pointsEmoji}>⭐</Text>
+                      <Text style={styles.modeExtraText}>{pvpStats.points.toLocaleString()} pts</Text>
+                    </View>
+                  </View>
                 </LinearGradient>
               </View>
             </View>
@@ -473,23 +536,23 @@ const styles = StyleSheet.create({
   },
   avatarSection: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   avatarContainer: {
     position: 'relative' as const,
     marginBottom: 16,
   },
   avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     borderWidth: 4,
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   avatarPlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: COLORS.whiteGlass,
     alignItems: 'center',
     justifyContent: 'center',
@@ -500,9 +563,9 @@ const styles = StyleSheet.create({
     position: 'absolute' as const,
     bottom: 0,
     right: 0,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: COLORS.gold,
     alignItems: 'center',
     justifyContent: 'center',
@@ -518,12 +581,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   username: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700' as const,
     color: COLORS.white,
   },
   displayName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '400' as const,
     color: COLORS.whiteTransparent,
     marginTop: 4,
@@ -534,14 +597,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   usernameInput: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600' as const,
     color: COLORS.white,
     backgroundColor: COLORS.whiteGlass,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    minWidth: 180,
+    minWidth: 160,
     textAlign: 'center' as const,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
@@ -561,39 +624,128 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: COLORS.gold,
   },
-  statsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
-  },
-  statCard: {
-    width: '48%' as any,
+  overallStatsCard: {
+    marginBottom: 20,
     borderRadius: 16,
     overflow: 'hidden' as const,
   },
-  statGradient: {
-    alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
+  overallStatsGradient: {
+    padding: 20,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
-  statEmoji: {
-    fontSize: 28,
+  overallStatsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
   },
-  statValue: {
+  overallStatItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  overallStatValue: {
     fontSize: 28,
     fontWeight: '800' as const,
     color: COLORS.white,
-    marginTop: 8,
   },
-  statLabel: {
-    fontSize: 13,
+  overallStatLabel: {
+    fontSize: 12,
     fontWeight: '500' as const,
     color: COLORS.whiteTransparent,
     marginTop: 4,
+  },
+  overallStatDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  modeStatsSection: {
+    gap: 16,
+    marginBottom: 24,
+  },
+  modeStatsCard: {
+    borderRadius: 20,
+    overflow: 'hidden' as const,
+  },
+  modeStatsGradient: {
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  modeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginBottom: 16,
+  },
+  modeIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 199, 87, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pvpIconContainer: {
+    backgroundColor: 'rgba(100, 181, 246, 0.2)',
+  },
+  modeTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    color: COLORS.white,
+    flex: 1,
+  },
+  comingSoonBadge: {
+    backgroundColor: 'rgba(100, 181, 246, 0.3)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  comingSoonText: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    color: '#64B5F6',
+  },
+  modeStatsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+  },
+  modeStatItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  modeStatValue: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    color: COLORS.white,
+  },
+  modeStatLabel: {
+    fontSize: 12,
+    fontWeight: '500' as const,
+    color: COLORS.whiteTransparent,
+  },
+  modeExtrasRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  modeExtraItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  modeExtraText: {
+    fontSize: 13,
+    fontWeight: '500' as const,
+    color: COLORS.whiteTransparent,
+  },
+  pointsEmoji: {
+    fontSize: 14,
   },
   inventorySection: {
     marginBottom: 24,
@@ -623,9 +775,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-  },
-  inventoryEmoji: {
-    fontSize: 28,
   },
   inventoryInfo: {
     gap: 2,

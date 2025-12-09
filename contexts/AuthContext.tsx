@@ -4,6 +4,7 @@ import { Platform, Alert } from 'react-native';
 import { supabase, Profile } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import type { GameModeStats } from '@/types/user';
 
 export const [AuthContext, useAuth] = createContextHook(() => {
   const [session, setSession] = useState<Session | null>(null);
@@ -183,6 +184,106 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     }
   }, [user, fetchProfile]);
 
+  const recordAIGameResult = useCallback(async (won: boolean, pointsEarned: number) => {
+    if (!user || !profile) {
+      console.log('[Auth] Cannot record AI game - no user or profile');
+      return;
+    }
+
+    console.log('[Auth] Recording AI game result:', { won, pointsEarned });
+
+    try {
+      const newWinStreak = won ? (profile.ai_win_streak || 0) + 1 : 0;
+      const newLongestStreak = Math.max(profile.ai_longest_win_streak || 0, newWinStreak);
+
+      const updates: Partial<Profile> = {
+        ai_wins: won ? (profile.ai_wins || 0) + 1 : (profile.ai_wins || 0),
+        ai_losses: won ? (profile.ai_losses || 0) : (profile.ai_losses || 0) + 1,
+        ai_points: (profile.ai_points || 0) + pointsEarned,
+        ai_win_streak: newWinStreak,
+        ai_longest_win_streak: newLongestStreak,
+        wins: won ? (profile.wins || 0) + 1 : (profile.wins || 0),
+        losses: won ? (profile.losses || 0) : (profile.losses || 0) + 1,
+        all_time_points: (profile.all_time_points || 0) + pointsEarned,
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('[Auth] Error recording AI game result:', error);
+        return;
+      }
+
+      console.log('[Auth] AI game result recorded successfully');
+      await fetchProfile(user.id);
+    } catch (err) {
+      console.error('[Auth] Exception recording AI game result:', err);
+    }
+  }, [user, profile, fetchProfile]);
+
+  const recordPVPGameResult = useCallback(async (won: boolean, pointsEarned: number) => {
+    if (!user || !profile) {
+      console.log('[Auth] Cannot record PVP game - no user or profile');
+      return;
+    }
+
+    console.log('[Auth] Recording PVP game result:', { won, pointsEarned });
+
+    try {
+      const newWinStreak = won ? (profile.pvp_win_streak || 0) + 1 : 0;
+      const newLongestStreak = Math.max(profile.pvp_longest_win_streak || 0, newWinStreak);
+
+      const updates: Partial<Profile> = {
+        pvp_wins: won ? (profile.pvp_wins || 0) + 1 : (profile.pvp_wins || 0),
+        pvp_losses: won ? (profile.pvp_losses || 0) : (profile.pvp_losses || 0) + 1,
+        pvp_points: (profile.pvp_points || 0) + pointsEarned,
+        pvp_win_streak: newWinStreak,
+        pvp_longest_win_streak: newLongestStreak,
+        wins: won ? (profile.wins || 0) + 1 : (profile.wins || 0),
+        losses: won ? (profile.losses || 0) : (profile.losses || 0) + 1,
+        all_time_points: (profile.all_time_points || 0) + pointsEarned,
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('[Auth] Error recording PVP game result:', error);
+        return;
+      }
+
+      console.log('[Auth] PVP game result recorded successfully');
+      await fetchProfile(user.id);
+    } catch (err) {
+      console.error('[Auth] Exception recording PVP game result:', err);
+    }
+  }, [user, profile, fetchProfile]);
+
+  const getAIStats = useCallback((): GameModeStats => {
+    return {
+      wins: profile?.ai_wins || 0,
+      losses: profile?.ai_losses || 0,
+      points: profile?.ai_points || 0,
+      winStreak: profile?.ai_win_streak || 0,
+      longestWinStreak: profile?.ai_longest_win_streak || 0,
+    };
+  }, [profile]);
+
+  const getPVPStats = useCallback((): GameModeStats => {
+    return {
+      wins: profile?.pvp_wins || 0,
+      losses: profile?.pvp_losses || 0,
+      points: profile?.pvp_points || 0,
+      winStreak: profile?.pvp_win_streak || 0,
+      longestWinStreak: profile?.pvp_longest_win_streak || 0,
+    };
+  }, [profile]);
+
   return {
     session,
     user,
@@ -194,5 +295,9 @@ export const [AuthContext, useAuth] = createContextHook(() => {
     createProfile,
     signOut,
     refreshProfile,
+    recordAIGameResult,
+    recordPVPGameResult,
+    getAIStats,
+    getPVPStats,
   };
 });

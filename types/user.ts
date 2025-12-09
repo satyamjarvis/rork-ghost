@@ -14,3 +14,16 @@ export interface UserStats {
   winStreak: number;
   longestWinStreak: number;
 }
+
+export interface GameModeStats {
+  wins: number;
+  losses: number;
+  points: number;
+  winStreak: number;
+  longestWinStreak: number;
+}
+
+export interface PlayerStats {
+  ai: GameModeStats;
+  pvp: GameModeStats;
+}

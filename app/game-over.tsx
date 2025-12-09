@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useGame } from '@/contexts/GameContext';
 import { usePlayer } from '@/contexts/PlayerContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { Trophy, Home } from 'lucide-react-native';
 import { useEffect, useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
@@ -18,6 +19,7 @@ export default function GameOverScreen() {
   const router = useRouter();
   const { gameState, resetGame } = useGame();
   const { awardGameWin } = usePlayer();
+  const { isAuthenticated, recordAIGameResult } = useAuth();
   const recordGameMutation = trpc.user.recordGame.useMutation();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
@@ -43,15 +45,23 @@ export default function GameOverScreen() {
       console.log('[GameOver] Player1 rounds won:', gameState.player1.roundsWon);
       console.log('[GameOver] Player2 rounds won:', gameState.player2.roundsWon);
       console.log('[GameOver] Player1 won match:', player1Won);
+      console.log('[GameOver] Is authenticated:', isAuthenticated);
       
       if (player1Won) {
         awardGameWin();
       }
+      
       recordGameMutation.mutate({
         won: player1Won,
         roundsWon: gameState.player1.roundsWon,
         roundsLost: gameState.player2.roundsWon,
       });
+
+      if (isAuthenticated) {
+        const pointsEarned = player1Won ? 100 : 25;
+        console.log('[GameOver] Recording AI game to profile, points:', pointsEarned);
+        recordAIGameResult(player1Won, pointsEarned);
+      }
     }
 
     if (Platform.OS !== 'web') {
@@ -138,7 +148,7 @@ export default function GameOverScreen() {
       }
       coinAnimationsRef.current.forEach(anim => anim.stop());
     };
-  }, [player1Won]);
+  }, [player1Won, isAuthenticated, recordAIGameResult, awardGameWin, recordGameMutation, gameState]);
 
   useEffect(() => {
     if (!gameState) {
