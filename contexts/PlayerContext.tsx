@@ -60,7 +60,7 @@ export const [PlayerContext, usePlayer] = createContextHook(() => {
         if (savedUserId) {
           setSupabaseUserId(savedUserId);
           await syncCoinsWithSupabase(savedUserId);
-        } else if (coinsData) {
+        } else if (coinsData && coinsData !== 'null' && coinsData !== 'undefined') {
           try {
             const parsedWallet = JSON.parse(coinsData);
             if (parsedWallet && typeof parsedWallet.ghostCoins === 'number') {
@@ -86,7 +86,7 @@ export const [PlayerContext, usePlayer] = createContextHook(() => {
           setWallet(newWallet);
         }
 
-        if (inventoryData) {
+        if (inventoryData && inventoryData !== 'null' && inventoryData !== 'undefined') {
           try {
             const parsedInventory = JSON.parse(inventoryData);
             if (parsedInventory && typeof parsedInventory.letterBombs === 'number') {
@@ -100,7 +100,7 @@ export const [PlayerContext, usePlayer] = createContextHook(() => {
           }
         }
 
-        if (settingsData) {
+        if (settingsData && settingsData !== 'null' && settingsData !== 'undefined') {
           try {
             const parsedSettings = JSON.parse(settingsData);
             if (parsedSettings && parsedSettings.aiDifficulty) {
@@ -114,7 +114,7 @@ export const [PlayerContext, usePlayer] = createContextHook(() => {
           }
         }
 
-        if (statsData) {
+        if (statsData && statsData !== 'null' && statsData !== 'undefined') {
           try {
             const parsedStats = JSON.parse(statsData);
             if (parsedStats && typeof parsedStats.gamesPlayed === 'number') {
