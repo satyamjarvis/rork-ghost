@@ -15,7 +15,7 @@ SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
-const CUSTOM_FONT_URL = 'https://pub-a6f520df47a6404b9b9b55141695828f.r2.dev/Idealist%20Hacker%20Mono.otf';
+const CUSTOM_FONT_URL = 'https://pub-a6f520df47a6404b9b9b55141695828f.r2.dev/SIMPLIFICA%20Typeface.ttf';
 
 function RootLayoutNav() {
   return (
@@ -42,7 +42,7 @@ export default function RootLayout() {
     async function loadFonts() {
       try {
         await Font.loadAsync({
-          'IdealistHacker': { uri: CUSTOM_FONT_URL },
+          'Simplifica': { uri: CUSTOM_FONT_URL },
         });
         console.log('[Font] Custom font loaded successfully');
         setFontsLoaded(true);
