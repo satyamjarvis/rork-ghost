@@ -47,7 +47,7 @@ export const [AudioContextProvider, useAudio] = createContextHook(() => {
 
       console.log('[Audio] Creating sound object...');
       const { sound } = await Audio.Sound.createAsync(
-        { uri: 'https://drive.google.com/uc?export=download&id=10oJcuO3GO2fxEmgHFuDiGdjKNdkC9gXu' },
+        { uri: 'https://raw.githubusercontent.com/drobstl/rork-ghost/main/Super%20Ghost%20Theme%201.mp3' },
         { 
           isLooping: true, 
           shouldPlay: false,
