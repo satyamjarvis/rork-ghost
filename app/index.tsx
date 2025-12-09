@@ -25,6 +25,7 @@ export default function HomeScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const settingsAnim = useRef(new Animated.Value(0)).current;
+  const hintGlowAnim = useRef(new Animated.Value(0.6)).current;
 
   useEffect(() => {
     setAIDifficulty(settings.aiDifficulty);
@@ -37,6 +38,25 @@ export default function HomeScreen() {
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
+
+  useEffect(() => {
+    const glowAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(hintGlowAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(hintGlowAnim, {
+          toValue: 0.6,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    glowAnimation.start();
+    return () => glowAnimation.stop();
+  }, [hintGlowAnim]);
 
   const handleModeSelect = (mode: 'ai') => {
     if (Platform.OS !== 'web') {
@@ -217,29 +237,31 @@ export default function HomeScreen() {
           </TouchableOpacity>
         ) : (
           <View style={styles.signInWithHint}>
-            <TouchableOpacity 
-              style={styles.signInButton}
-              onPress={() => {
-                if (Platform.OS !== 'web') {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                }
-                router.push('/auth');
-              }}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['rgba(76, 175, 80, 0.5)', 'rgba(76, 175, 80, 0.2)']}
-                style={styles.signInGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+            <View style={styles.signInRow}>
+              <TouchableOpacity 
+                style={styles.signInButton}
+                onPress={() => {
+                  if (Platform.OS !== 'web') {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  }
+                  router.push('/auth');
+                }}
+                activeOpacity={0.8}
               >
-                <LogIn color={COLORS.white} size={20} />
-              </LinearGradient>
-            </TouchableOpacity>
-            <View style={styles.hintContainer}>
-              <Text style={styles.hintArrow}>↖</Text>
-              <Text style={styles.hintText}>sign in to track{"\n"}your stats!</Text>
+                <LinearGradient
+                  colors={['rgba(76, 175, 80, 0.5)', 'rgba(76, 175, 80, 0.2)']}
+                  style={styles.signInGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <LogIn color={COLORS.white} size={20} />
+                </LinearGradient>
+              </TouchableOpacity>
+              <View style={styles.hintArrowContainer}>
+                <Text style={styles.hintArrow}>↗</Text>
+              </View>
             </View>
+            <Animated.Text style={[styles.hintText, { opacity: hintGlowAnim }]}>sign in to track{"\n"}your stats!</Animated.Text>
           </View>
         )}
       </View>
@@ -563,25 +585,28 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
   },
-  hintContainer: {
+  signInRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 6,
-    marginLeft: 4,
+    alignItems: 'flex-end',
+  },
+  hintArrowContainer: {
+    marginLeft: 6,
+    marginBottom: 8,
   },
   hintArrow: {
-    fontSize: 18,
+    fontSize: 22,
     color: 'rgba(255, 255, 255, 0.85)',
-    marginRight: 4,
     fontWeight: '300' as const,
-    transform: [{ rotate: '-15deg' }],
+    transform: [{ rotate: '25deg' }, { scaleX: 1.2 }],
   },
   hintText: {
     fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: 'rgba(255, 255, 255, 0.9)',
     fontStyle: 'italic' as const,
     lineHeight: 14,
     fontWeight: '300' as const,
+    marginTop: 4,
+    marginLeft: 54,
   },
   settingsGradient: {
     width: 48,
