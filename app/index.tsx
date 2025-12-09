@@ -257,8 +257,8 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
             <View style={styles.hintContainer}>
-              <Text style={styles.hintArrow}>↱</Text>
               <Animated.Text style={[styles.hintText, { opacity: hintGlowAnim }]}>sign in to track{"\n"}your stats!</Animated.Text>
+              <Text style={styles.hintArrow}>↗</Text>
             </View>
           </View>
         )}
@@ -584,17 +584,18 @@ const styles = StyleSheet.create({
   },
   hintContainer: {
     position: 'absolute' as const,
-    top: 52,
-    left: 4,
+    top: 54,
+    right: 10,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   hintArrow: {
-    fontSize: 24,
+    fontSize: 22,
     color: 'rgba(255, 255, 255, 0.85)',
     fontWeight: '300' as const,
-    marginRight: 4,
-    marginTop: -2,
+    marginLeft: 6,
+    marginTop: -8,
+    transform: [{ rotate: '-15deg' }],
   },
   hintText: {
     fontSize: 11,
@@ -602,6 +603,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic' as const,
     lineHeight: 14,
     fontWeight: '300' as const,
+    textAlign: 'right' as const,
   },
   settingsGradient: {
     width: 48,
