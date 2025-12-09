@@ -237,31 +237,29 @@ export default function HomeScreen() {
           </TouchableOpacity>
         ) : (
           <View style={styles.signInWithHint}>
-            <View style={styles.signInRow}>
-              <TouchableOpacity 
-                style={styles.signInButton}
-                onPress={() => {
-                  if (Platform.OS !== 'web') {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  }
-                  router.push('/auth');
-                }}
-                activeOpacity={0.8}
+            <TouchableOpacity 
+              style={styles.signInButton}
+              onPress={() => {
+                if (Platform.OS !== 'web') {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }
+                router.push('/auth');
+              }}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['rgba(76, 175, 80, 0.5)', 'rgba(76, 175, 80, 0.2)']}
+                style={styles.signInGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
               >
-                <LinearGradient
-                  colors={['rgba(76, 175, 80, 0.5)', 'rgba(76, 175, 80, 0.2)']}
-                  style={styles.signInGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <LogIn color={COLORS.white} size={20} />
-                </LinearGradient>
-              </TouchableOpacity>
-              <View style={styles.hintArrowContainer}>
-                <Text style={styles.hintArrow}>↗</Text>
-              </View>
+                <LogIn color={COLORS.white} size={20} />
+              </LinearGradient>
+            </TouchableOpacity>
+            <View style={styles.hintContainer}>
+              <Text style={styles.hintArrow}>↱</Text>
+              <Animated.Text style={[styles.hintText, { opacity: hintGlowAnim }]}>sign in to track{"\n"}your stats!</Animated.Text>
             </View>
-            <Animated.Text style={[styles.hintText, { opacity: hintGlowAnim }]}>sign in to track{"\n"}your stats!</Animated.Text>
           </View>
         )}
       </View>
@@ -582,22 +580,21 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   signInWithHint: {
-    flexDirection: 'column',
+    position: 'relative' as const,
+  },
+  hintContainer: {
+    position: 'absolute' as const,
+    top: 52,
+    left: 4,
+    flexDirection: 'row',
     alignItems: 'flex-start',
   },
-  signInRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  hintArrowContainer: {
-    marginLeft: 6,
-    marginBottom: 8,
-  },
   hintArrow: {
-    fontSize: 22,
+    fontSize: 24,
     color: 'rgba(255, 255, 255, 0.85)',
     fontWeight: '300' as const,
-    transform: [{ rotate: '25deg' }, { scaleX: 1.2 }],
+    marginRight: 4,
+    marginTop: -2,
   },
   hintText: {
     fontSize: 11,
@@ -605,8 +602,6 @@ const styles = StyleSheet.create({
     fontStyle: 'italic' as const,
     lineHeight: 14,
     fontWeight: '300' as const,
-    marginTop: 4,
-    marginLeft: 54,
   },
   settingsGradient: {
     width: 48,
