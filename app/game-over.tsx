@@ -30,10 +30,20 @@ export default function GameOverScreen() {
   const coinAnimationsRef = useRef<Animated.CompositeAnimation[]>([]);
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
+  // Determine winner based on rounds won (most reliable source)
+  const player1Won = gameState ? gameState.player1.roundsWon >= 2 : false;
+  const player2Won = gameState ? gameState.player2.roundsWon >= 2 : false;
+  
+  const hasRecordedRef = useRef(false);
+
   useEffect(() => {
-    const player1Won = gameState?.winner === 'player1';
-    
-    if (gameState && gameState.winner && gameState.mode === 'ai') {
+    if (gameState && gameState.mode === 'ai' && !hasRecordedRef.current) {
+      hasRecordedRef.current = true;
+      
+      console.log('[GameOver] Player1 rounds won:', gameState.player1.roundsWon);
+      console.log('[GameOver] Player2 rounds won:', gameState.player2.roundsWon);
+      console.log('[GameOver] Player1 won match:', player1Won);
+      
       if (player1Won) {
         awardGameWin();
       }
@@ -128,7 +138,7 @@ export default function GameOverScreen() {
       }
       coinAnimationsRef.current.forEach(anim => anim.stop());
     };
-  }, []);
+  }, [player1Won]);
 
   useEffect(() => {
     if (!gameState) {
@@ -140,8 +150,9 @@ export default function GameOverScreen() {
     return null;
   }
 
-  const player1Won = gameState.winner === 'player1';
-  const player2Won = gameState.winner === 'player2';
+  // Use rounds won to determine winner display (already calculated above)
+  const displayPlayer1Won = player1Won;
+  const displayPlayer2Won = player2Won;
   
   // Calculate actual rounds won (cap at 2 for best of 3)
   const player1RoundsDisplay = Math.min(gameState.player1.roundsWon, 2);
@@ -228,7 +239,7 @@ export default function GameOverScreen() {
 
           <Text style={styles.gameOverText}>Game Over</Text>
           <Text style={styles.winnerText}>
-            {player1Won 
+            {displayPlayer1Won 
               ? (gameState.player1.name === 'You' ? 'You Won!' : `${gameState.player1.name} Wins!`)
               : `${gameState.player2.name} Wins!`}
           </Text>
@@ -236,20 +247,20 @@ export default function GameOverScreen() {
           <View style={styles.finalScoresContainer}>
             <View style={[
               styles.finalScoreBox,
-              player1Won && styles.winnerBox,
+              displayPlayer1Won && styles.winnerBox,
             ]}>
               <Text style={styles.finalPlayerName}>{gameState.player1.name}</Text>
               <Text style={styles.finalScore}>{player1RoundsDisplay}</Text>
-              {player1Won && <Text style={styles.winnerLabel}>Winner!</Text>}
+              {displayPlayer1Won && <Text style={styles.winnerLabel}>Winner!</Text>}
             </View>
 
             <View style={[
               styles.finalScoreBox,
-              player2Won && styles.winnerBox,
+              displayPlayer2Won && styles.winnerBox,
             ]}>
               <Text style={styles.finalPlayerName}>{gameState.player2.name}</Text>
               <Text style={styles.finalScore}>{player2RoundsDisplay}</Text>
-              {player2Won && <Text style={styles.winnerLabel}>Winner!</Text>}
+              {displayPlayer2Won && <Text style={styles.winnerLabel}>Winner!</Text>}
             </View>
           </View>
 
