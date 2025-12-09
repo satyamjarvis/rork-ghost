@@ -281,10 +281,20 @@ export function shouldAIChallenge(currentWord: string, difficulty: AIDifficulty 
   if (difficulty === 'superior') {
     const hasVeryFewOptions = possibleWords.length <= 2;
     const allAreLongWords = possibleWords.every(w => w.length > currentWord.length + 3);
+    
+    const last2 = currentWord.slice(-2).toUpperCase();
+    const last3 = currentWord.slice(-3).toUpperCase();
+    
     const hasWeirdPattern = currentWord.length >= 3 && (
-      (currentWord.slice(-3).split('').filter(c => 'AEIOU'.includes(c)).length === 0) ||
-      (currentWord.slice(-3).split('').filter(c => 'AEIOU'.includes(c)).length === 3)
+      (last3.split('').filter(c => 'AEIOU'.includes(c)).length === 0) ||
+      (last3.split('').filter(c => 'AEIOU'.includes(c)).length === 3)
     );
+    
+    const uncommonEndings = ['QU', 'XY', 'ZZ', 'WW', 'VV', 'JJ', 'KK', 'XX', 'YY', 'QQ'];
+    const hasUncommonEnding = uncommonEndings.some(ending => last2 === ending);
+    
+    const uncommonTriples = ['QUE', 'ZZZ', 'WWW', 'VVV', 'JJJ', 'KKK', 'XXX', 'YYY', 'QQQ', 'XYZ', 'WXY'];
+    const hasUncommonTriple = uncommonTriples.some(triple => last3 === triple);
     
     if (hasVeryFewOptions && allAreLongWords) {
       console.log('[AI Superior Challenge] ⚠️ Very few options and all are long words - CHALLENGING!');
@@ -293,6 +303,30 @@ export function shouldAIChallenge(currentWord: string, difficulty: AIDifficulty 
     
     if (hasWeirdPattern && possibleWords.length < 5) {
       console.log('[AI Superior Challenge] ⚠️ Weird letter pattern detected - CHALLENGING!');
+      return true;
+    }
+    
+    if (hasUncommonEnding || hasUncommonTriple) {
+      console.log('[AI Superior Challenge] ⚠️ Uncommon letter pattern detected - CHALLENGING!');
+      return true;
+    }
+    
+    if (possibleWords.length <= 3 && currentWord.length >= 4) {
+      const avgWordLength = possibleWords.reduce((sum, w) => sum + w.length, 0) / possibleWords.length;
+      if (avgWordLength > currentWord.length + 4) {
+        console.log('[AI Superior Challenge] ⚠️ Only very long words possible - suspicious, CHALLENGING!');
+        return true;
+      }
+    }
+    
+    const commonPrefixes = ['UN', 'RE', 'IN', 'DIS', 'EN', 'NON', 'PRE', 'MIS', 'OVER', 'SUB', 'ANTI', 'AUTO', 'SEMI'];
+    const looksLikeBluff = currentWord.length >= 3 && 
+      !commonPrefixes.some(prefix => currentWord.startsWith(prefix)) &&
+      possibleWords.length < 4 &&
+      !possibleWords.some(w => w.length <= currentWord.length + 2);
+    
+    if (looksLikeBluff) {
+      console.log('[AI Superior Challenge] ⚠️ Suspicious pattern - likely a bluff, CHALLENGING!');
       return true;
     }
   }

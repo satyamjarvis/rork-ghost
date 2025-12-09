@@ -707,10 +707,24 @@ export const [GameContext, useGame] = createContextHook(() => {
             
             if (aiDifficulty === 'superior' && currentRound.currentWord.length >= 4) {
               if (isValidWord(currentRound.currentWord)) {
-                console.log('[AI Superior] 🎯 Detected valid word, calling WORD!');
-                callWord();
-                setIsAIThinking(false);
-                return;
+                const longerWords = getAllWordsStartingWith(currentRound.currentWord);
+                const hasLongerContinuations = longerWords.some(w => w.length > currentRound.currentWord.length);
+                
+                if (!hasLongerContinuations) {
+                  console.log('[AI Superior] 🎯 Detected completed word with no continuations - calling WORD!');
+                  callWord();
+                  setIsAIThinking(false);
+                  return;
+                } else {
+                  console.log('[AI Superior] 🤔 Word is valid but has continuations, strategic decision...');
+                  const shouldCallAnyway = Math.random() < 0.7;
+                  if (shouldCallAnyway) {
+                    console.log('[AI Superior] 🎯 Calling word anyway for the win!');
+                    callWord();
+                    setIsAIThinking(false);
+                    return;
+                  }
+                }
               }
             }
             
@@ -723,11 +737,31 @@ export const [GameContext, useGame] = createContextHook(() => {
               return;
             }
             
+            if (aiDifficulty === 'superior') {
+              const possibleWords = getAllWordsStartingWith(currentRound.currentWord);
+              const validContinuations = possibleWords.filter(w => w.length > currentRound.currentWord.length);
+              
+              if (validContinuations.length <= 2 && currentRound.currentWord.length >= 3) {
+                console.log('[AI Superior] 🚨 Very few valid continuations - considering challenge!');
+                const shouldChallengeSuspicious = Math.random() < 0.6;
+                if (shouldChallengeSuspicious) {
+                  console.log('[AI Superior] 🚨 Challenging due to limited continuations!');
+                  initiateChallenge();
+                  setIsAIThinking(false);
+                  return;
+                }
+              }
+            }
+            
             if (aiDifficulty === 'superior' && currentRound.wordHistory.length > 2) {
-              const shouldUseBomb = Math.random() < 0.45;
-              if (shouldUseBomb) {
-                const lastMove = currentRound.wordHistory[currentRound.wordHistory.length - 1];
-                if (lastMove.playerId === 'player1') {
+              const lastMove = currentRound.wordHistory[currentRound.wordHistory.length - 1];
+              if (lastMove.playerId === 'player1') {
+                const possibleWords = getAllWordsStartingWith(currentRound.currentWord);
+                const isInDangerousPosition = possibleWords.length <= 5 || 
+                  possibleWords.every(w => w.length <= currentRound.currentWord.length + 2);
+                
+                const shouldUseBomb = isInDangerousPosition ? Math.random() < 0.65 : Math.random() < 0.35;
+                if (shouldUseBomb) {
                   console.log('[AI] 💣 AI is using a LETTER BOMB!');
                   const aiLetter = findBestLetter(currentRound.currentWord.slice(0, -1), aiDifficulty);
                   console.log('[AI] Selected replacement letter:', aiLetter);
@@ -780,7 +814,7 @@ export const [GameContext, useGame] = createContextHook(() => {
         }, 2000);
       }
     }
-  }, [gameState, isAIThinking, playLetterAI, submitChallengeWord, aiDifficulty, initiateChallenge, useLetterBomb]);
+  }, [gameState, isAIThinking, playLetterAI, submitChallengeWord, aiDifficulty, initiateChallenge, useLetterBomb, callWord]);
 
   return {
     gameState,
