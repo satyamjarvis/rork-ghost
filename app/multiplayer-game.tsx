@@ -920,7 +920,9 @@ export default function MultiplayerGameScreen() {
                   onPress={handleLetterBomb}
                   activeOpacity={0.7}
                 >
-                  <Bomb color={COLORS.white} size={20} />
+                  <View style={styles.bombIconMirror}>
+                    <Bomb color={COLORS.white} size={20} />
+                  </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -1468,5 +1470,8 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600' as const,
     color: '#1a1a1a',
+  },
+  bombIconMirror: {
+    transform: [{ scaleX: -1 }],
   },
 });

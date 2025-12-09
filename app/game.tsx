@@ -1235,7 +1235,9 @@ export default function GameScreen() {
                           activeOpacity={0.7}
                         >
                           <View style={styles.iconButtonWrapper}>
-                            <Bomb color={COLORS.white} size={28} />
+                            <View style={styles.bombIconMirror}>
+                              <Bomb color={COLORS.white} size={28} />
+                            </View>
                             <View style={styles.bombCountBadge}>
                               <Text style={styles.bombCountText}>{inventory.letterBombs}</Text>
                             </View>
@@ -2169,6 +2171,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '800' as const,
     color: COLORS.white,
+  },
+  bombIconMirror: {
+    transform: [{ scaleX: -1 }],
   },
   roundWinnerOverlay: {
     position: 'absolute' as const,
