@@ -705,6 +705,15 @@ export const [GameContext, useGame] = createContextHook(() => {
           try {
             console.log('[AI Turn] Current word:', currentRound.currentWord);
             
+            if (aiDifficulty === 'superior' && currentRound.currentWord.length >= 4) {
+              if (isValidWord(currentRound.currentWord)) {
+                console.log('[AI Superior] 🎯 Detected valid word, calling WORD!');
+                callWord();
+                setIsAIThinking(false);
+                return;
+              }
+            }
+            
             const shouldChallenge = shouldAIChallenge(currentRound.currentWord, aiDifficulty);
             
             if (shouldChallenge && currentRound.currentWord.length >= 3) {

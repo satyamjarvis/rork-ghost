@@ -278,6 +278,25 @@ export function shouldAIChallenge(currentWord: string, difficulty: AIDifficulty 
     return false;
   }
 
+  if (difficulty === 'superior') {
+    const hasVeryFewOptions = possibleWords.length <= 2;
+    const allAreLongWords = possibleWords.every(w => w.length > currentWord.length + 3);
+    const hasWeirdPattern = currentWord.length >= 3 && (
+      (currentWord.slice(-3).split('').filter(c => 'AEIOU'.includes(c)).length === 0) ||
+      (currentWord.slice(-3).split('').filter(c => 'AEIOU'.includes(c)).length === 3)
+    );
+    
+    if (hasVeryFewOptions && allAreLongWords) {
+      console.log('[AI Superior Challenge] ⚠️ Very few options and all are long words - CHALLENGING!');
+      return true;
+    }
+    
+    if (hasWeirdPattern && possibleWords.length < 5) {
+      console.log('[AI Superior Challenge] ⚠️ Weird letter pattern detected - CHALLENGING!');
+      return true;
+    }
+  }
+
   if (difficulty === 'medium' || difficulty === 'hard' || difficulty === 'superior') {
     const hasOnlyCompletingWords = possibleWords.every(word => 
       word.length === currentWord.length && word.length >= 4

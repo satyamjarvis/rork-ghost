@@ -31,13 +31,14 @@ export default function GameOverScreen() {
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
   useEffect(() => {
+    const player1Won = gameState?.winner === 'player1';
+    
     if (gameState && gameState.winner && gameState.mode === 'ai') {
-      const playerWon = gameState.winner === 'player1';
-      if (playerWon) {
+      if (player1Won) {
         awardGameWin();
       }
       recordGameMutation.mutate({
-        won: playerWon,
+        won: player1Won,
         roundsWon: gameState.player1.roundsWon,
         roundsLost: gameState.player2.roundsWon,
       });
@@ -61,8 +62,7 @@ export default function GameOverScreen() {
       }),
     ]).start();
 
-    const playerWon = gameState?.winner === 'player1';
-    if (FORCE_SHOW_COIN || playerWon) {
+    if (FORCE_SHOW_COIN || player1Won) {
       setTimeout(() => {
         setShowCoinReward(true);
         
