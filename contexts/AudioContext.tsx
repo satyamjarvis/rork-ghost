@@ -46,9 +46,7 @@ export const [AudioContext, useAudio] = createContextHook(() => {
       });
 
       console.log('[Audio] Creating sound object...');
-      const baseUrl = 'https://raw.githubusercontent.com/drobstl/rork-ghost/main/';
-      const fileName = 'Super Ghost Theme 1.mp3';
-      const audioUrl = baseUrl + encodeURIComponent(fileName);
+      const audioUrl = 'https://raw.githubusercontent.com/drobstl/rork-ghost/main/Super%20Ghost%20Theme%201.mp3';
       console.log('[Audio] Loading from URL:', audioUrl);
       const { sound } = await Audio.Sound.createAsync(
         { uri: audioUrl },
