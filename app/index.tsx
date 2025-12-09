@@ -259,7 +259,7 @@ export default function HomeScreen() {
             <View style={styles.hintContainer}>
               <Animated.Text style={[styles.hintText, { opacity: hintGlowAnim }]}>sign in to track{"\n"}your stats!</Animated.Text>
               <Image 
-                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/4uqzw1s61afmb5atsbvs8' }}
+                source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/wm3jmuflvvdf2r3mj0gy0' }}
                 style={styles.hintArrowImage}
               />
             </View>
