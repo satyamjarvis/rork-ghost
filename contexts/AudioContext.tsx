@@ -47,7 +47,7 @@ export const [AudioContextProvider, useAudio] = createContextHook(() => {
 
       console.log('[Audio] Creating sound object...');
       const { sound } = await Audio.Sound.createAsync(
-        { uri: 'https://rork.app/pa/m2gdxyxncu82a2xmk2i5t/background-music' },
+        { uri: 'https://drive.google.com/uc?export=download&id=10oJcuO3GO2fxEmgHFuDiGdjKNdkC9gXu' },
         { 
           isLooping: true, 
           shouldPlay: false,
