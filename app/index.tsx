@@ -587,7 +587,7 @@ const styles = StyleSheet.create({
   },
   hintContainer: {
     position: 'absolute' as const,
-    top: 59,
+    top: 74,
     right: 40,
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -596,9 +596,9 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
     marginLeft: 4,
-    marginTop: -15,
+    marginTop: -30,
     tintColor: 'rgba(255, 255, 255, 0.85)',
-    transform: [{ scaleX: -1 }],
+    transform: [{ scaleX: 1 }],
   },
   hintText: {
     fontSize: 11,
