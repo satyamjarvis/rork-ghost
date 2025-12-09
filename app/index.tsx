@@ -216,25 +216,31 @@ export default function HomeScreen() {
             </LinearGradient>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity 
-            style={styles.signInButton}
-            onPress={() => {
-              if (Platform.OS !== 'web') {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              }
-              router.push('/auth');
-            }}
-            activeOpacity={0.8}
-          >
-            <LinearGradient
-              colors={['rgba(76, 175, 80, 0.5)', 'rgba(76, 175, 80, 0.2)']}
-              style={styles.signInGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
+          <View style={styles.signInWithHint}>
+            <TouchableOpacity 
+              style={styles.signInButton}
+              onPress={() => {
+                if (Platform.OS !== 'web') {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                }
+                router.push('/auth');
+              }}
+              activeOpacity={0.8}
             >
-              <LogIn color={COLORS.white} size={20} />
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={['rgba(76, 175, 80, 0.5)', 'rgba(76, 175, 80, 0.2)']}
+                style={styles.signInGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <LogIn color={COLORS.white} size={20} />
+              </LinearGradient>
+            </TouchableOpacity>
+            <View style={styles.hintContainer}>
+              <Text style={styles.hintArrow}>↖</Text>
+              <Text style={styles.hintText}>sign in to track{"\n"}your stats!</Text>
+            </View>
+          </View>
         )}
       </View>
 
@@ -552,6 +558,30 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(76, 175, 80, 0.4)',
     borderRadius: 16,
+  },
+  signInWithHint: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  hintContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginTop: 6,
+    marginLeft: 4,
+  },
+  hintArrow: {
+    fontSize: 18,
+    color: 'rgba(255, 255, 255, 0.85)',
+    marginRight: 4,
+    fontWeight: '300' as const,
+    transform: [{ rotate: '-15deg' }],
+  },
+  hintText: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontStyle: 'italic' as const,
+    lineHeight: 14,
+    fontWeight: '300' as const,
   },
   settingsGradient: {
     width: 48,
