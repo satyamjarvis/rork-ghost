@@ -27,7 +27,8 @@ export default function HomeScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const settingsAnim = useRef(new Animated.Value(0)).current;
-  const hintGlowAnim = useRef(new Animated.Value(0.6)).current;
+  const hintGlowAnim = useRef(new Animated.Value(0)).current;
+  const hintScaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     setAIDifficulty(settings.aiDifficulty);
@@ -46,19 +47,39 @@ export default function HomeScreen() {
       Animated.sequence([
         Animated.timing(hintGlowAnim, {
           toValue: 1,
-          duration: 1500,
+          duration: 800,
           useNativeDriver: true,
         }),
         Animated.timing(hintGlowAnim, {
-          toValue: 0.6,
-          duration: 1500,
+          toValue: 0,
+          duration: 800,
           useNativeDriver: true,
         }),
       ])
     );
+    
+    const scaleAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(hintScaleAnim, {
+          toValue: 1.08,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(hintScaleAnim, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    
     glowAnimation.start();
-    return () => glowAnimation.stop();
-  }, [hintGlowAnim]);
+    scaleAnimation.start();
+    return () => {
+      glowAnimation.stop();
+      scaleAnimation.stop();
+    };
+  }, [hintGlowAnim, hintScaleAnim]);
 
   const handleModeSelect = (mode: 'ai') => {
     if (Platform.OS !== 'web') {
@@ -259,7 +280,14 @@ export default function HomeScreen() {
               </LinearGradient>
             </TouchableOpacity>
             <View style={styles.hintContainer}>
-              <Animated.Text style={[styles.hintText, { opacity: hintGlowAnim }]}>sign in to track{"\n"}your stats!</Animated.Text>
+              <Animated.View style={[styles.hintGlowWrapper, { 
+                transform: [{ scale: hintScaleAnim }],
+              }]}>
+                <Animated.Text style={[styles.hintTextGlow, { 
+                  opacity: hintGlowAnim,
+                }]}>sign in to track{"\n"}your stats!</Animated.Text>
+                <Text style={styles.hintText}>sign in to track{"\n"}your stats!</Text>
+              </Animated.View>
               <Image 
                 source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/wm3jmuflvvdf2r3mj0gy0' }}
                 style={styles.hintArrowImage}
@@ -625,13 +653,31 @@ const styles = StyleSheet.create({
     tintColor: 'rgba(255, 255, 255, 0.85)',
     transform: [{ scaleX: 1 }],
   },
-  hintText: {
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.9)',
+  hintGlowWrapper: {
+    position: 'relative' as const,
+  },
+  hintTextGlow: {
+    fontSize: 12,
+    color: '#7CFC00',
     fontStyle: 'italic' as const,
-    lineHeight: 14,
-    fontWeight: '300' as const,
+    lineHeight: 15,
+    fontWeight: '700' as const,
     textAlign: 'right' as const,
+    position: 'absolute' as const,
+    textShadowColor: '#7CFC00',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
+  },
+  hintText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    fontStyle: 'italic' as const,
+    lineHeight: 15,
+    fontWeight: '600' as const,
+    textAlign: 'right' as const,
+    textShadowColor: 'rgba(124, 252, 0, 0.6)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
   },
   settingsGradient: {
     width: 48,
