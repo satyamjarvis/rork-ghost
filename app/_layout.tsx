@@ -8,7 +8,7 @@ import { PlayerContext } from "@/contexts/PlayerContext";
 import { AuthContext } from "@/contexts/AuthContext";
 import { MultiplayerContext } from "@/contexts/MultiplayerContext";
 import { IAPContext } from "@/contexts/IAPContext";
-import { AudioContextProvider } from "@/contexts/AudioContext";
+import { AudioContext as AudioContextProvider } from "@/contexts/AudioContext";
 import { trpc, trpcClient } from "@/lib/trpc";
 SplashScreen.preventAutoHideAsync();
 

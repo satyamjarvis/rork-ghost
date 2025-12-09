@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MUSIC_MUTED_KEY = '@ghostGame:musicMuted';
 
-export const [AudioContextProvider, useAudio] = createContextHook(() => {
+export const [AudioContext, useAudio] = createContextHook(() => {
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
