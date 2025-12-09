@@ -1908,6 +1908,7 @@ const styles = StyleSheet.create({
   keyLetter: {
     fontSize: 18,
     fontWeight: '700' as const,
+    fontFamily: 'IdealistHacker',
     color: COLORS.white,
     textShadowColor: 'rgba(0, 0, 0, 0.2)',
     textShadowOffset: { width: 0, height: 1 },
@@ -2012,6 +2013,7 @@ const styles = StyleSheet.create({
   wordLetterText: {
     fontSize: 60,
     fontWeight: '700' as const,
+    fontFamily: 'IdealistHacker',
     color: 'rgba(255, 255, 255, 0.95)',
     letterSpacing: 0,
     lineHeight: 68,
