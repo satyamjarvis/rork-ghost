@@ -446,6 +446,7 @@ export default function HomeScreen() {
               • Build toward a word without completing it{'\n'}
               • Don&apos;t complete words of 4+ letters{'\n'}
               • Don&apos;t make an impossible word{'\n'}
+              • Earn or buy letter bombs in the store to gain the ultimate advantage on your opponent.{'\n'}
               • Best of 3 rounds wins!
             </Text>
           </View>
@@ -485,6 +486,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 18,
     fontWeight: '400' as const,
+    fontFamily: 'Jost',
     color: COLORS.whiteTransparent,
     letterSpacing: 3,
   },
@@ -516,6 +518,7 @@ const styles = StyleSheet.create({
   modeTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
     marginBottom: 2,
     textAlign: 'center' as const,
@@ -523,6 +526,7 @@ const styles = StyleSheet.create({
   modeDescription: {
     fontSize: 13,
     fontWeight: '400' as const,
+    fontFamily: 'Jost',
     color: COLORS.whiteTransparent,
     textAlign: 'center' as const,
   },
@@ -536,12 +540,14 @@ const styles = StyleSheet.create({
   rulesTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
     marginBottom: 12,
   },
   rulesText: {
     fontSize: 16,
     fontWeight: '400' as const,
+    fontFamily: 'Jost',
     color: COLORS.whiteTransparent,
     lineHeight: 24,
   },
@@ -575,6 +581,7 @@ const styles = StyleSheet.create({
   coinText: {
     fontSize: 20,
     fontWeight: '700' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
   },
   coinEmoji: {
@@ -646,7 +653,7 @@ const styles = StyleSheet.create({
   hintArrowImage: {
     width: 35,
     height: 35,
-    marginLeft: 4,
+    marginLeft: -6,
     marginTop: -30,
     tintColor: 'rgba(255, 255, 255, 0.85)',
     transform: [{ scaleX: 1 }],
@@ -678,6 +685,7 @@ const styles = StyleSheet.create({
   settingsTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
     marginBottom: 16,
     textAlign: 'center' as const,
@@ -706,6 +714,7 @@ const styles = StyleSheet.create({
   muteButtonText: {
     fontSize: 14,
     fontWeight: '600' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
   },
   difficultyButtons: {
@@ -730,6 +739,7 @@ const styles = StyleSheet.create({
   difficultyButtonText: {
     fontSize: 12,
     fontWeight: '600' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
   },
   difficultyButtonTextActive: {
@@ -739,6 +749,7 @@ const styles = StyleSheet.create({
   difficultyDescription: {
     fontSize: 13,
     fontWeight: '400' as const,
+    fontFamily: 'Jost',
     color: COLORS.whiteTransparent,
     textAlign: 'center' as const,
     lineHeight: 18,
@@ -763,6 +774,7 @@ const styles = StyleSheet.create({
   saveButtonText: {
     fontSize: 16,
     fontWeight: '700' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
   },
   leaderboardButton: {
@@ -816,6 +828,7 @@ const styles = StyleSheet.create({
   inviteBadgeText: {
     fontSize: 12,
     fontWeight: '700' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
   },
 });
