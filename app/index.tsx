@@ -6,7 +6,8 @@ import { usePlayer } from '@/contexts/PlayerContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useMultiplayer } from '@/contexts/MultiplayerContext';
 import { Cpu, Users, Settings as SettingsIcon, ShoppingBag, Mail, Trophy, User, LogIn, Volume2, VolumeX } from 'lucide-react-native';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { COLORS } from '@/constants/colors';
 import FloatingGhost from '@/components/FloatingGhost';
@@ -45,41 +46,59 @@ export default function HomeScreen() {
       duration: 800,
       useNativeDriver: true,
     }).start();
+  }, [fadeAnim]);
 
+  const startTitleAnimation = useCallback(() => {
     titleGOpacity.setValue(0);
     titleHOpacity.setValue(0);
     titleOOpacity.setValue(0);
     titleSOpacity.setValue(0);
     titleTOpacity.setValue(0);
 
-    Animated.stagger(2000, [
-      Animated.timing(titleGOpacity, {
-        toValue: 1,
-        duration: 4000,
-        useNativeDriver: true,
-      }),
+    Animated.timing(titleGOpacity, {
+      toValue: 1,
+      duration: 4000,
+      useNativeDriver: true,
+    }).start();
+
+    setTimeout(() => {
       Animated.timing(titleHOpacity, {
         toValue: 1,
         duration: 4000,
         useNativeDriver: true,
-      }),
+      }).start();
+    }, 1000);
+
+    setTimeout(() => {
       Animated.timing(titleOOpacity, {
         toValue: 1,
         duration: 4000,
         useNativeDriver: true,
-      }),
+      }).start();
+    }, 2000);
+
+    setTimeout(() => {
       Animated.timing(titleSOpacity, {
         toValue: 1,
         duration: 4000,
         useNativeDriver: true,
-      }),
+      }).start();
+    }, 3000);
+
+    setTimeout(() => {
       Animated.timing(titleTOpacity, {
         toValue: 1,
         duration: 4000,
         useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, titleGOpacity, titleHOpacity, titleOOpacity, titleSOpacity, titleTOpacity]);
+      }).start();
+    }, 4000);
+  }, [titleGOpacity, titleHOpacity, titleOOpacity, titleSOpacity, titleTOpacity]);
+
+  useFocusEffect(
+    useCallback(() => {
+      startTitleAnimation();
+    }, [startTitleAnimation])
+  );
 
   useEffect(() => {
     const glowAnimation = Animated.loop(
