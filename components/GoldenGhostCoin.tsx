@@ -143,7 +143,7 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
                     borderLeftWidth: size * 0.8,
                     borderRightWidth: size * 0.8,
                     borderTopWidth: size * 2,
-                    borderTopColor: 'rgba(255, 255, 255, 0.7)',
+                    borderTopColor: 'rgba(255, 240, 200, 0.8)',
                   },
                 ]}
               />
@@ -206,10 +206,10 @@ const styles = StyleSheet.create({
   },
   glowCircle: {
     position: 'absolute' as const,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    shadowColor: '#ffffff',
+    backgroundColor: 'rgba(255, 240, 200, 0.25)',
+    shadowColor: '#ffd700',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 25,
+    shadowOpacity: 0.7,
+    shadowRadius: 30,
   },
 });

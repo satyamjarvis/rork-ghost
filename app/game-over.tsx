@@ -108,7 +108,7 @@ export default function GameOverScreen() {
           }).start(() => {
             setShowCoinReward(false);
           });
-        }, 3500);
+        }, 4000);
       }, 400);
     }
 
