@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 60,
-    marginTop: 140,
+    marginTop: 155,
   },
   title: {
     fontSize: 56,
@@ -540,14 +540,12 @@ const styles = StyleSheet.create({
   rulesTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
-    fontFamily: 'Jost',
     color: COLORS.white,
     marginBottom: 12,
   },
   rulesText: {
     fontSize: 16,
     fontWeight: '400' as const,
-    fontFamily: 'Jost',
     color: COLORS.whiteTransparent,
     lineHeight: 24,
   },
@@ -630,6 +628,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
+    marginLeft: 15,
   },
   signInGradient: {
     width: 48,
