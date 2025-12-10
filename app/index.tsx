@@ -29,6 +29,7 @@ export default function HomeScreen() {
   const settingsAnim = useRef(new Animated.Value(0)).current;
   const hintGlowAnim = useRef(new Animated.Value(0)).current;
   const hintScaleAnim = useRef(new Animated.Value(1)).current;
+  const titleTOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     setAIDifficulty(settings.aiDifficulty);
@@ -40,7 +41,13 @@ export default function HomeScreen() {
       duration: 800,
       useNativeDriver: true,
     }).start();
-  }, [fadeAnim]);
+
+    Animated.timing(titleTOpacity, {
+      toValue: 1,
+      duration: 3000,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim, titleTOpacity]);
 
   useEffect(() => {
     const glowAnimation = Animated.loop(
@@ -296,7 +303,13 @@ export default function HomeScreen() {
 
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
         <View style={styles.header}>
-          <Text style={styles.title}>GHOST</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>GHOS</Text>
+            <View style={styles.tLetterContainer}>
+              <Text style={[styles.title, styles.underscorePlaceholder]}>__</Text>
+              <Animated.Text style={[styles.title, styles.tLetter, { opacity: titleTOpacity }]}>T</Animated.Text>
+            </View>
+          </View>
           <Text style={styles.subtitle}>The Word Game</Text>
         </View>
 
@@ -475,6 +488,10 @@ const styles = StyleSheet.create({
     marginBottom: 60,
     marginTop: 155,
   },
+  titleContainer: {
+    flexDirection: 'row' as const,
+    alignItems: 'center',
+  },
   title: {
     fontSize: 56,
     fontWeight: '800' as const,
@@ -482,6 +499,20 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     marginBottom: 4,
     letterSpacing: 4,
+  },
+  tLetterContainer: {
+    position: 'relative' as const,
+    width: 40,
+    height: 64,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  underscorePlaceholder: {
+    position: 'absolute' as const,
+    letterSpacing: 0,
+  },
+  tLetter: {
+    position: 'absolute' as const,
   },
   subtitle: {
     fontSize: 18,
