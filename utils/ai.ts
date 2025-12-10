@@ -389,6 +389,13 @@ export function findBestLetter(currentWord: string, difficulty: AIDifficulty = '
     if (possibleMoves.length === 0) {
       console.log('[AI] ⚠️  No valid continuations at all. Attempting bluff with invalid letter.');
       
+      if (difficulty === 'superior' && Math.random() < 0.5) {
+        const vowelBluff = ['A', 'E', 'I', 'O', 'U'];
+        const randomVowel = vowelBluff[Math.floor(Math.random() * vowelBluff.length)];
+        console.log(`[AI SUPERIOR] 🎲 VOWEL BLUFF: Playing "${randomVowel}" - user must challenge!`);
+        return randomVowel;
+      }
+      
       const bluffLetters = difficulty === 'superior' || difficulty === 'hard'
         ? ['X', 'Q', 'Z', 'J', 'K', 'V', 'W', 'Y']
         : ['E', 'R', 'T', 'S', 'N', 'A', 'I', 'O'];
@@ -401,7 +408,15 @@ export function findBestLetter(currentWord: string, difficulty: AIDifficulty = '
     
     possibleMoves.sort((a, b) => b.bluffScore - a.bluffScore);
     
-    const shouldBluff = Math.random() > 0.6;
+    let shouldBluff = Math.random() > 0.6;
+    
+    if (difficulty === 'superior' && Math.random() < 0.5) {
+      console.log('[AI SUPERIOR] 🎲 Cornered - attempting 50% vowel bluff strategy...');
+      const vowelBluff = ['A', 'E', 'I', 'O', 'U'];
+      const randomVowel = vowelBluff[Math.floor(Math.random() * vowelBluff.length)];
+      console.log(`[AI SUPERIOR] 🎲 VOWEL BLUFF: Playing "${randomVowel}" - user must challenge!`);
+      return randomVowel;
+    }
     
     if (shouldBluff && possibleMoves.some(m => m.completesWord)) {
       const completingMoves = possibleMoves.filter(m => m.completesWord);
@@ -410,6 +425,14 @@ export function findBestLetter(currentWord: string, difficulty: AIDifficulty = '
       return move.letter;
     } else {
       console.log('[AI] 🎲 Attempting BLUFF with invalid letter...');
+      
+      if (difficulty === 'superior' && Math.random() < 0.5) {
+        const vowelBluff = ['A', 'E', 'I', 'O', 'U'];
+        const randomVowel = vowelBluff[Math.floor(Math.random() * vowelBluff.length)];
+        console.log(`[AI SUPERIOR] 🎲 VOWEL BLUFF: Playing "${randomVowel}" - user must challenge!`);
+        return randomVowel;
+      }
+      
       const bluffLetters = difficulty === 'superior' || difficulty === 'hard'
         ? ['X', 'Q', 'Z', 'J', 'K', 'V', 'W', 'Y']
         : ['E', 'R', 'T', 'S', 'N', 'A', 'I', 'O'];

@@ -638,8 +638,8 @@ const styles = StyleSheet.create({
   },
   hintContainer: {
     position: 'absolute' as const,
-    top: 74,
-    right: 40,
+    top: 79,
+    right: 35,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },

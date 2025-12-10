@@ -30,6 +30,7 @@ export default function GameOverScreen() {
   const [showCoinReward, setShowCoinReward] = useState(false);
   const coinDismissTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const coinAnimationsRef = useRef<Animated.CompositeAnimation[]>([]);
+  const hasShownCoinRef = useRef(false);
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
   // Determine winner based on rounds won (most reliable source)
@@ -82,7 +83,9 @@ export default function GameOverScreen() {
       }),
     ]).start();
 
-    if (FORCE_SHOW_COIN || player1Won) {
+    if ((FORCE_SHOW_COIN || player1Won) && !hasShownCoinRef.current) {
+      hasShownCoinRef.current = true;
+      
       setTimeout(() => {
         setShowCoinReward(true);
         
@@ -127,16 +130,16 @@ export default function GameOverScreen() {
         glowLoop.start();
         coinAnimationsRef.current.push(glowLoop);
 
-        // Auto-dismiss coin animation after 3.5 seconds
         coinDismissTimeout.current = setTimeout(() => {
+          coinAnimationsRef.current.forEach(anim => anim.stop());
+          coinAnimationsRef.current = [];
+          
           Animated.timing(coinAnim, {
             toValue: 0,
             duration: 300,
             useNativeDriver: true,
           }).start(() => {
             setShowCoinReward(false);
-            coinAnimationsRef.current.forEach(anim => anim.stop());
-            coinAnimationsRef.current = [];
           });
         }, 3500);
       }, 400);
@@ -145,8 +148,10 @@ export default function GameOverScreen() {
     return () => {
       if (coinDismissTimeout.current) {
         clearTimeout(coinDismissTimeout.current);
+        coinDismissTimeout.current = null;
       }
       coinAnimationsRef.current.forEach(anim => anim.stop());
+      coinAnimationsRef.current = [];
     };
   }, [player1Won, isAuthenticated, recordAIGameResult, awardGameWin, recordGameMutation, gameState]);
 
