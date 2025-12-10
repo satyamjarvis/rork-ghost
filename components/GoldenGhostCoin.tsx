@@ -131,25 +131,23 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
               style={[
                 styles.ray,
                 {
-                  width: size * 0.4,
-                  height: size * 1.5,
                   opacity: config.opacity,
                   transform: [{ scaleY: config.scale }],
                 },
               ]}
-            />
-            <Animated.View
-              style={[
-                styles.ray,
-                {
-                  width: size * 0.3,
-                  height: size * 1.8,
-                  opacity: config.opacity,
-                  transform: [{ scaleY: config.scale }],
-                  marginTop: -size * 0.2,
-                },
-              ]}
-            />
+            >
+              <Animated.View
+                style={[
+                  styles.rayInner,
+                  {
+                    borderLeftWidth: size * 0.8,
+                    borderRightWidth: size * 0.8,
+                    borderTopWidth: size * 2,
+                    borderTopColor: 'rgba(255, 255, 255, 0.7)',
+                  },
+                ]}
+              />
+            </Animated.View>
           </Animated.View>
         ))}
         
@@ -192,22 +190,26 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   ray: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    shadowColor: '#87CEEB',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    borderBottomLeftRadius: 5,
-    borderBottomRightRadius: 5,
+    backgroundColor: 'transparent',
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    borderTopWidth: 0,
+  },
+  rayInner: {
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid' as const,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
   },
   glowCircle: {
     position: 'absolute' as const,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    shadowColor: '#87CEEB',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#ffffff',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.9,
-    shadowRadius: 20,
+    shadowOpacity: 0.6,
+    shadowRadius: 25,
   },
 });
