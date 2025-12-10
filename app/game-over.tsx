@@ -202,11 +202,14 @@ export default function GameOverScreen() {
               transform: [{ scale: coinScaleAnim }],
             },
           ]}>
-            {/* Light Rays */}
+            {/* Light Rays - Rotating */}
             <Animated.View 
               style={[
                 styles.raysContainer,
-                { transform: [{ rotate: shineRotate }] },
+                { 
+                  transform: [{ rotate: shineRotate }],
+                  opacity: glowAnim,
+                },
               ]}
             >
               {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
@@ -219,11 +222,14 @@ export default function GameOverScreen() {
                 />
               ))}
             </Animated.View>
-            {/* Secondary shorter rays */}
+            {/* Secondary shorter rays - Rotating in opposite direction */}
             <Animated.View 
               style={[
                 styles.raysContainerInner,
-                { transform: [{ rotate: shineRotate }], opacity: glowAnim },
+                { 
+                  transform: [{ rotate: shineRotate }],
+                  opacity: glowAnim,
+                },
               ]}
             >
               {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
@@ -236,6 +242,7 @@ export default function GameOverScreen() {
                 />
               ))}
             </Animated.View>
+            {/* Static Coin */}
             <View style={styles.coinWrapper}>
               <GoldenGhostCoin size={80} />
             </View>
