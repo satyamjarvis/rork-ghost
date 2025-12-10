@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 60,
-    marginTop: 160,
+    marginTop: 140,
   },
   title: {
     fontSize: 56,
@@ -540,12 +540,14 @@ const styles = StyleSheet.create({
   rulesTitle: {
     fontSize: 20,
     fontWeight: '700' as const,
+    fontFamily: 'Jost',
     color: COLORS.white,
     marginBottom: 12,
   },
   rulesText: {
     fontSize: 16,
     fontWeight: '400' as const,
+    fontFamily: 'Jost',
     color: COLORS.whiteTransparent,
     lineHeight: 24,
   },
@@ -588,7 +590,7 @@ const styles = StyleSheet.create({
   leftButtonsContainer: {
     position: 'absolute' as const,
     top: 70,
-    left: 34,
+    left: 24,
     flexDirection: 'row',
     gap: 10,
     zIndex: 10,
