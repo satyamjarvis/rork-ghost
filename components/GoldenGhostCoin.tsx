@@ -27,6 +27,8 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
   const ray7Scale = useRef(new Animated.Value(1)).current;
   const ray8Scale = useRef(new Animated.Value(1)).current;
 
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     if (!animated) return;
 
@@ -82,10 +84,20 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
 
     animations.forEach(anim => anim.start());
 
+    const rotateAnimation = Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 8000,
+        useNativeDriver: true,
+      })
+    );
+    rotateAnimation.start();
+
     return () => {
       animations.forEach(anim => anim.stop());
+      rotateAnimation.stop();
     };
-  }, [animated, ray1Opacity, ray2Opacity, ray3Opacity, ray4Opacity, ray5Opacity, ray6Opacity, ray7Opacity, ray8Opacity, ray1Scale, ray2Scale, ray3Scale, ray4Scale, ray5Scale, ray6Scale, ray7Scale, ray8Scale]);
+  }, [animated, ray1Opacity, ray2Opacity, ray3Opacity, ray4Opacity, ray5Opacity, ray6Opacity, ray7Opacity, ray8Opacity, ray1Scale, ray2Scale, ray3Scale, ray4Scale, ray5Scale, ray6Scale, ray7Scale, ray8Scale, rotateAnim]);
 
   if (!animated) {
     return (
@@ -114,9 +126,14 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
     { opacity: ray8Opacity, scale: ray8Scale, angle: 315, widthMultiplier: 1.3 },
   ];
 
+  const rotateInterpolate = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   return (
     <View style={[styles.container, { width: size * 3, height: size * 3 }]}>
-      <View style={[styles.raysContainer, { width: size * 3, height: size * 3 }]}>
+      <Animated.View style={[styles.raysContainer, { width: size * 3, height: size * 3, transform: [{ rotate: rotateInterpolate }] }]}>
         {rayConfigs.map((config, index) => (
           <Animated.View
             key={index}
@@ -141,9 +158,9 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
                 style={[
                   styles.rayInner,
                   {
-                    borderLeftWidth: size * 0.25 * config.widthMultiplier,
-                    borderRightWidth: size * 0.25 * config.widthMultiplier,
-                    borderTopWidth: size * 1.8,
+                    borderLeftWidth: size * 0.2 * config.widthMultiplier,
+                    borderRightWidth: size * 0.2 * config.widthMultiplier,
+                    borderTopWidth: size * 1.2,
                     borderTopColor: 'rgba(255, 240, 200, 0.8)',
                   },
                 ]}
@@ -153,7 +170,7 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
         ))}
         
         <View style={[styles.glowCircle, { width: size * 2, height: size * 2, borderRadius: size }]} />
-      </View>
+      </Animated.View>
       <Image
         source={{ uri: COIN_IMAGE_URL }}
         style={[
