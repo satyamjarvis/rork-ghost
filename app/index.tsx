@@ -44,7 +44,7 @@ export default function HomeScreen() {
 
     Animated.timing(titleTOpacity, {
       toValue: 1,
-      duration: 3000,
+      duration: 4000,
       useNativeDriver: true,
     }).start();
   }, [fadeAnim, titleTOpacity]);
@@ -305,10 +305,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>GHOS</Text>
-            <View style={styles.tLetterContainer}>
-              <Text style={[styles.title, styles.underscorePlaceholder]}>__</Text>
-              <Animated.Text style={[styles.title, styles.tLetter, { opacity: titleTOpacity }]}>T</Animated.Text>
-            </View>
+            <Animated.Text style={[styles.title, { opacity: titleTOpacity }]}>T</Animated.Text>
           </View>
           <Text style={styles.subtitle}>The Word Game</Text>
         </View>
@@ -500,20 +497,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     letterSpacing: 4,
   },
-  tLetterContainer: {
-    position: 'relative' as const,
-    width: 40,
-    height: 64,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  underscorePlaceholder: {
-    position: 'absolute' as const,
-    letterSpacing: 0,
-  },
-  tLetter: {
-    position: 'absolute' as const,
-  },
+
   subtitle: {
     fontSize: 18,
     fontWeight: '400' as const,
