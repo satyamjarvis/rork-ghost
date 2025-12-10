@@ -103,27 +103,29 @@ export default function GameOverScreen() {
           }),
         ]).start();
 
+        shineRotateAnim.setValue(0);
         const shineLoop = Animated.loop(
           Animated.timing(shineRotateAnim, {
             toValue: 1,
             duration: 3000,
-            useNativeDriver: true,
+            useNativeDriver: false,
           })
         );
         shineLoop.start();
         coinAnimationsRef.current.push(shineLoop);
 
+        glowAnim.setValue(0.5);
         const glowLoop = Animated.loop(
           Animated.sequence([
             Animated.timing(glowAnim, {
               toValue: 1,
               duration: 800,
-              useNativeDriver: true,
+              useNativeDriver: false,
             }),
             Animated.timing(glowAnim, {
               toValue: 0.5,
               duration: 800,
-              useNativeDriver: true,
+              useNativeDriver: false,
             }),
           ])
         );
