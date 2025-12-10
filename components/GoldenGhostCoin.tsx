@@ -133,6 +133,7 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
                 {
                   opacity: config.opacity,
                   transform: [{ scaleY: config.scale }],
+                  bottom: size * 1.5,
                 },
               ]}
             >
@@ -140,10 +141,10 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
                 style={[
                   styles.rayInner,
                   {
-                    borderLeftWidth: size * 0.4,
-                    borderRightWidth: size * 0.4,
-                    borderTopWidth: size * 2,
-                    borderTopColor: 'rgba(255, 240, 200, 0.8)',
+                    borderLeftWidth: size * 0.15,
+                    borderRightWidth: size * 0.15,
+                    borderBottomWidth: size * 1.8,
+                    borderBottomColor: 'rgba(255, 240, 200, 0.8)',
                   },
                 ]}
               />
@@ -203,6 +204,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid' as const,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
+    borderTopColor: 'transparent',
   },
   glowCircle: {
     position: 'absolute' as const,
