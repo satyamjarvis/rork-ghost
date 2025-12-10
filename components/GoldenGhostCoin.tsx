@@ -9,95 +9,42 @@ interface GoldenGhostCoinProps {
 const COIN_IMAGE_URL = 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/nsumd31rqusfvatr89zfn';
 
 export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenGhostCoinProps) {
-  const ray1Opacity = useRef(new Animated.Value(0.3)).current;
-  const ray2Opacity = useRef(new Animated.Value(0.4)).current;
-  const ray3Opacity = useRef(new Animated.Value(0.5)).current;
-  const ray4Opacity = useRef(new Animated.Value(0.3)).current;
-  const ray5Opacity = useRef(new Animated.Value(0.6)).current;
-  const ray6Opacity = useRef(new Animated.Value(0.4)).current;
-  const ray7Opacity = useRef(new Animated.Value(0.5)).current;
-  const ray8Opacity = useRef(new Animated.Value(0.3)).current;
-
-  const ray1Scale = useRef(new Animated.Value(1)).current;
-  const ray2Scale = useRef(new Animated.Value(1)).current;
-  const ray3Scale = useRef(new Animated.Value(1)).current;
-  const ray4Scale = useRef(new Animated.Value(1)).current;
-  const ray5Scale = useRef(new Animated.Value(1)).current;
-  const ray6Scale = useRef(new Animated.Value(1)).current;
-  const ray7Scale = useRef(new Animated.Value(1)).current;
-  const ray8Scale = useRef(new Animated.Value(1)).current;
-
-  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const rayAnims = useRef(
+    Array.from({ length: 16 }, () => new Animated.Value(0.15 + Math.random() * 0.25))
+  ).current;
 
   useEffect(() => {
     if (!animated) return;
 
-    const createPulseAnimation = (
-      opacityAnim: Animated.Value,
-      scaleAnim: Animated.Value,
-      delay: number,
-      duration: number
-    ) => {
+    const animations = rayAnims.map((anim, index) => {
+      const baseOpacity = 0.1 + Math.random() * 0.2;
+      const peakOpacity = 0.4 + Math.random() * 0.3;
+      const duration = 600 + Math.random() * 800;
+      const delay = index * 80;
+
       return Animated.loop(
         Animated.sequence([
           Animated.delay(delay),
-          Animated.parallel([
-            Animated.sequence([
-              Animated.timing(opacityAnim, {
-                toValue: 0.8,
-                duration: duration,
-                useNativeDriver: true,
-              }),
-              Animated.timing(opacityAnim, {
-                toValue: 0.2,
-                duration: duration,
-                useNativeDriver: true,
-              }),
-            ]),
-            Animated.sequence([
-              Animated.timing(scaleAnim, {
-                toValue: 1.3,
-                duration: duration,
-                useNativeDriver: true,
-              }),
-              Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: duration,
-                useNativeDriver: true,
-              }),
-            ]),
-          ]),
+          Animated.timing(anim, {
+            toValue: peakOpacity,
+            duration: duration,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: baseOpacity,
+            duration: duration * 1.2,
+            useNativeDriver: true,
+          }),
         ])
       );
-    };
-
-    const animations = [
-      createPulseAnimation(ray1Opacity, ray1Scale, 0, 800),
-      createPulseAnimation(ray2Opacity, ray2Scale, 100, 900),
-      createPulseAnimation(ray3Opacity, ray3Scale, 200, 700),
-      createPulseAnimation(ray4Opacity, ray4Scale, 300, 1000),
-      createPulseAnimation(ray5Opacity, ray5Scale, 50, 850),
-      createPulseAnimation(ray6Opacity, ray6Scale, 150, 950),
-      createPulseAnimation(ray7Opacity, ray7Scale, 250, 750),
-      createPulseAnimation(ray8Opacity, ray8Scale, 350, 800),
-    ];
+    });
 
     animations.forEach(anim => anim.start());
 
-    const rotateAnimation = Animated.loop(
-      Animated.timing(rotateAnim, {
-        toValue: 1,
-        duration: 8000,
-        useNativeDriver: true,
-      })
-    );
-    rotateAnimation.start();
-
     return () => {
       animations.forEach(anim => anim.stop());
-      rotateAnimation.stop();
     };
-  }, [animated, ray1Opacity, ray2Opacity, ray3Opacity, ray4Opacity, ray5Opacity, ray6Opacity, ray7Opacity, ray8Opacity, ray1Scale, ray2Scale, ray3Scale, ray4Scale, ray5Scale, ray6Scale, ray7Scale, ray8Scale, rotateAnim]);
+  }, [animated, rayAnims]);
 
   if (!animated) {
     return (
@@ -116,61 +63,75 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
   }
 
   const rayConfigs = [
-    { opacity: ray1Opacity, scale: ray1Scale, angle: 0, widthMultiplier: 0.8 },
-    { opacity: ray2Opacity, scale: ray2Scale, angle: 45, widthMultiplier: 1.2 },
-    { opacity: ray3Opacity, scale: ray3Scale, angle: 90, widthMultiplier: 0.6 },
-    { opacity: ray4Opacity, scale: ray4Scale, angle: 135, widthMultiplier: 1.0 },
-    { opacity: ray5Opacity, scale: ray5Scale, angle: 180, widthMultiplier: 0.9 },
-    { opacity: ray6Opacity, scale: ray6Scale, angle: 225, widthMultiplier: 1.1 },
-    { opacity: ray7Opacity, scale: ray7Scale, angle: 270, widthMultiplier: 0.7 },
-    { opacity: ray8Opacity, scale: ray8Scale, angle: 315, widthMultiplier: 1.3 },
+    { angle: 0, length: 2.2, width: 3 },
+    { angle: 22, length: 1.6, width: 2 },
+    { angle: 45, length: 2.4, width: 4 },
+    { angle: 68, length: 1.4, width: 2 },
+    { angle: 90, length: 2.0, width: 3 },
+    { angle: 112, length: 1.5, width: 2 },
+    { angle: 135, length: 2.3, width: 4 },
+    { angle: 158, length: 1.3, width: 2 },
+    { angle: 180, length: 2.1, width: 3 },
+    { angle: 202, length: 1.5, width: 2 },
+    { angle: 225, length: 2.5, width: 4 },
+    { angle: 248, length: 1.4, width: 2 },
+    { angle: 270, length: 2.2, width: 3 },
+    { angle: 292, length: 1.6, width: 2 },
+    { angle: 315, length: 2.3, width: 4 },
+    { angle: 338, length: 1.3, width: 2 },
   ];
 
-  const rotateInterpolate = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+  const containerSize = size * 5;
+  const rayStartOffset = size * 0.4;
 
   return (
-    <View style={[styles.container, { width: size * 3, height: size * 3 }]}>
-      <Animated.View style={[styles.raysContainer, { width: size * 3, height: size * 3, transform: [{ rotate: rotateInterpolate }] }]}>
-        {rayConfigs.map((config, index) => (
-          <Animated.View
-            key={index}
-            style={[
-              styles.rayWrapper,
-              {
-                transform: [{ rotate: `${config.angle}deg` }],
-              },
-            ]}
-          >
+    <View style={[styles.container, { width: containerSize, height: containerSize }]}>
+      <View style={[styles.raysContainer, { width: containerSize, height: containerSize }]}>
+        <View style={[styles.softGlow, { 
+          width: size * 2.5, 
+          height: size * 2.5, 
+          borderRadius: size * 1.25,
+        }]} />
+        
+        {rayConfigs.map((config, index) => {
+          const rayLength = size * config.length;
+          const rayWidth = size * 0.08 * config.width;
+          const angleRad = (config.angle * Math.PI) / 180;
+          
+          const startX = containerSize / 2 + Math.cos(angleRad) * rayStartOffset - rayWidth / 2;
+          const startY = containerSize / 2 + Math.sin(angleRad) * rayStartOffset - rayLength;
+          
+          return (
             <Animated.View
+              key={index}
               style={[
-                styles.ray,
+                styles.softRay,
                 {
-                  opacity: config.opacity,
-                  transform: [{ scaleY: config.scale }],
-                  bottom: size * 1.5,
+                  width: rayWidth,
+                  height: rayLength,
+                  left: startX,
+                  top: startY,
+                  opacity: rayAnims[index],
+                  transform: [
+                    { translateX: rayWidth / 2 },
+                    { translateY: rayLength },
+                    { rotate: `${config.angle + 90}deg` },
+                    { translateX: -rayWidth / 2 },
+                    { translateY: -rayLength },
+                  ],
+                  borderRadius: rayWidth / 2,
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  shadowColor: '#fff',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: 0.8,
+                  shadowRadius: rayWidth,
                 },
               ]}
-            >
-              <Animated.View
-                style={[
-                  styles.rayInner,
-                  {
-                    borderLeftWidth: size * 0.2 * config.widthMultiplier,
-                    borderRightWidth: size * 0.2 * config.widthMultiplier,
-                    borderTopWidth: size * 1.2,
-                    borderTopColor: 'rgba(255, 240, 200, 0.8)',
-                  },
-                ]}
-              />
-            </Animated.View>
-          </Animated.View>
-        ))}
-        
-        <View style={[styles.glowCircle, { width: size * 2, height: size * 2, borderRadius: size }]} />
-      </Animated.View>
+            />
+          );
+        })}
+      </View>
+      
       <Image
         source={{ uri: COIN_IMAGE_URL }}
         style={[
@@ -178,7 +139,7 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
           {
             width: size,
             height: size,
-            zIndex: 2,
+            zIndex: 10,
           },
         ]}
         resizeMode="contain"
@@ -200,35 +161,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rayWrapper: {
+  softGlow: {
     position: 'absolute' as const,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    width: '100%',
-  },
-  ray: {
-    backgroundColor: 'transparent',
-    borderLeftWidth: 0,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-    borderTopWidth: 0,
-  },
-  rayInner: {
-    width: 0,
-    height: 0,
-    backgroundColor: 'transparent',
-    borderStyle: 'solid' as const,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderBottomColor: 'transparent',
-  },
-  glowCircle: {
-    position: 'absolute' as const,
-    backgroundColor: 'rgba(255, 240, 200, 0.25)',
-    shadowColor: '#ffd700',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    shadowColor: '#fff',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.7,
-    shadowRadius: 30,
+    shadowOpacity: 1,
+    shadowRadius: 40,
+  },
+  softRay: {
+    position: 'absolute' as const,
   },
 });
