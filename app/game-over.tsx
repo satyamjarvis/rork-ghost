@@ -108,7 +108,7 @@ export default function GameOverScreen() {
           Animated.timing(shineRotateAnim, {
             toValue: 1,
             duration: 3000,
-            useNativeDriver: false,
+            useNativeDriver: true,
           })
         );
         shineLoop.start();
@@ -120,12 +120,12 @@ export default function GameOverScreen() {
             Animated.timing(glowAnim, {
               toValue: 1,
               duration: 800,
-              useNativeDriver: false,
+              useNativeDriver: true,
             }),
             Animated.timing(glowAnim, {
               toValue: 0.5,
               duration: 800,
-              useNativeDriver: false,
+              useNativeDriver: true,
             }),
           ])
         );
@@ -155,7 +155,7 @@ export default function GameOverScreen() {
       coinAnimationsRef.current.forEach(anim => anim.stop());
       coinAnimationsRef.current = [];
     };
-  }, [player1Won, isAuthenticated, recordAIGameResult, awardGameWin, recordGameMutation, gameState]);
+  }, [player1Won, isAuthenticated, recordAIGameResult, awardGameWin, recordGameMutation, gameState, fadeAnim, scaleAnim, coinAnim, coinScaleAnim, shineRotateAnim, glowAnim]);
 
   useEffect(() => {
     if (!gameState) {
