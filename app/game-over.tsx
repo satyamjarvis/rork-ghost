@@ -25,11 +25,8 @@ export default function GameOverScreen() {
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const coinAnim = useRef(new Animated.Value(0)).current;
   const coinScaleAnim = useRef(new Animated.Value(0.3)).current;
-  const shineRotateAnim = useRef(new Animated.Value(0)).current;
-  const glowAnim = useRef(new Animated.Value(0.5)).current;
   const [showCoinReward, setShowCoinReward] = useState(false);
   const coinDismissTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const coinAnimationsRef = useRef<Animated.CompositeAnimation[]>([]);
   const hasShownCoinRef = useRef(false);
   const { topColor, middleColor, bottomColor } = useAnimatedBackground();
 
@@ -103,39 +100,7 @@ export default function GameOverScreen() {
           }),
         ]).start();
 
-        shineRotateAnim.setValue(0);
-        const shineLoop = Animated.loop(
-          Animated.timing(shineRotateAnim, {
-            toValue: 1,
-            duration: 3000,
-            useNativeDriver: true,
-          })
-        );
-        shineLoop.start();
-        coinAnimationsRef.current.push(shineLoop);
-
-        glowAnim.setValue(0.5);
-        const glowLoop = Animated.loop(
-          Animated.sequence([
-            Animated.timing(glowAnim, {
-              toValue: 1,
-              duration: 800,
-              useNativeDriver: false,
-            }),
-            Animated.timing(glowAnim, {
-              toValue: 0.5,
-              duration: 800,
-              useNativeDriver: false,
-            }),
-          ])
-        );
-        glowLoop.start();
-        coinAnimationsRef.current.push(glowLoop);
-
         coinDismissTimeout.current = setTimeout(() => {
-          coinAnimationsRef.current.forEach(anim => anim.stop());
-          coinAnimationsRef.current = [];
-          
           Animated.timing(coinAnim, {
             toValue: 0,
             duration: 300,
@@ -152,10 +117,8 @@ export default function GameOverScreen() {
         clearTimeout(coinDismissTimeout.current);
         coinDismissTimeout.current = null;
       }
-      coinAnimationsRef.current.forEach(anim => anim.stop());
-      coinAnimationsRef.current = [];
     };
-  }, [player1Won, isAuthenticated, recordAIGameResult, awardGameWin, recordGameMutation, gameState, fadeAnim, scaleAnim, coinAnim, coinScaleAnim, shineRotateAnim, glowAnim]);
+  }, [player1Won, isAuthenticated, recordAIGameResult, awardGameWin, recordGameMutation, gameState, fadeAnim, scaleAnim, coinAnim, coinScaleAnim]);
 
   useEffect(() => {
     if (!gameState) {
@@ -175,10 +138,7 @@ export default function GameOverScreen() {
   const player1RoundsDisplay = Math.min(gameState.player1.roundsWon, 2);
   const player2RoundsDisplay = Math.min(gameState.player2.roundsWon, 2);
 
-  const shineRotate = shineRotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
+
 
   const handlePlayAgain = () => {
     if (Platform.OS !== 'web') {
@@ -204,50 +164,7 @@ export default function GameOverScreen() {
               transform: [{ scale: coinScaleAnim }],
             },
           ]}>
-            {/* Light Rays - Rotating */}
-            <Animated.View 
-              style={[
-                styles.raysContainer,
-                { 
-                  transform: [{ rotate: shineRotate }],
-                  opacity: glowAnim,
-                },
-              ]}
-            >
-              {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => (
-                <View 
-                  key={deg} 
-                  style={[
-                    styles.lightRay, 
-                    { transform: [{ rotate: `${deg}deg` }] }
-                  ]} 
-                />
-              ))}
-            </Animated.View>
-            {/* Secondary shorter rays - Rotating in opposite direction */}
-            <Animated.View 
-              style={[
-                styles.raysContainerInner,
-                { 
-                  transform: [{ rotate: shineRotate }],
-                  opacity: glowAnim,
-                },
-              ]}
-            >
-              {[15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345].map((deg) => (
-                <View 
-                  key={deg} 
-                  style={[
-                    styles.lightRayShort, 
-                    { transform: [{ rotate: `${deg}deg` }] }
-                  ]} 
-                />
-              ))}
-            </Animated.View>
-            {/* Static Coin */}
-            <View style={styles.coinWrapper}>
-              <GoldenGhostCoin size={80} />
-            </View>
+            <GoldenGhostCoin size={80} animated={true} />
             <View style={styles.rewardBadge}>
               <Text style={styles.rewardText}>+1 Coin</Text>
             </View>
@@ -473,44 +390,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  raysContainer: {
-    position: 'absolute' as const,
-    width: 300,
-    height: 300,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  raysContainerInner: {
-    position: 'absolute' as const,
-    width: 220,
-    height: 220,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  lightRay: {
-    position: 'absolute' as const,
-    width: 6,
-    height: 300,
-    backgroundColor: 'transparent',
-    borderLeftWidth: 3,
-    borderRightWidth: 3,
-    borderLeftColor: 'rgba(255, 215, 0, 0.8)',
-    borderRightColor: 'rgba(255, 215, 0, 0.8)',
-    borderTopWidth: 0,
-    borderBottomWidth: 0,
-  },
-  lightRayShort: {
-    position: 'absolute' as const,
-    width: 4,
-    height: 220,
-    backgroundColor: 'rgba(255, 235, 100, 0.6)',
-  },
-  coinWrapper: {
-    width: 80,
-    height: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+
   rewardBadge: {
     marginTop: 16,
     backgroundColor: COLORS.gold,
