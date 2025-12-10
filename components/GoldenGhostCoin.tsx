@@ -104,14 +104,14 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
   }
 
   const rayConfigs = [
-    { opacity: ray1Opacity, scale: ray1Scale, angle: 0 },
-    { opacity: ray2Opacity, scale: ray2Scale, angle: 45 },
-    { opacity: ray3Opacity, scale: ray3Scale, angle: 90 },
-    { opacity: ray4Opacity, scale: ray4Scale, angle: 135 },
-    { opacity: ray5Opacity, scale: ray5Scale, angle: 180 },
-    { opacity: ray6Opacity, scale: ray6Scale, angle: 225 },
-    { opacity: ray7Opacity, scale: ray7Scale, angle: 270 },
-    { opacity: ray8Opacity, scale: ray8Scale, angle: 315 },
+    { opacity: ray1Opacity, scale: ray1Scale, angle: 0, widthMultiplier: 0.8 },
+    { opacity: ray2Opacity, scale: ray2Scale, angle: 45, widthMultiplier: 1.2 },
+    { opacity: ray3Opacity, scale: ray3Scale, angle: 90, widthMultiplier: 0.6 },
+    { opacity: ray4Opacity, scale: ray4Scale, angle: 135, widthMultiplier: 1.0 },
+    { opacity: ray5Opacity, scale: ray5Scale, angle: 180, widthMultiplier: 0.9 },
+    { opacity: ray6Opacity, scale: ray6Scale, angle: 225, widthMultiplier: 1.1 },
+    { opacity: ray7Opacity, scale: ray7Scale, angle: 270, widthMultiplier: 0.7 },
+    { opacity: ray8Opacity, scale: ray8Scale, angle: 315, widthMultiplier: 1.3 },
   ];
 
   return (
@@ -141,10 +141,10 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
                 style={[
                   styles.rayInner,
                   {
-                    borderLeftWidth: size * 0.15,
-                    borderRightWidth: size * 0.15,
-                    borderBottomWidth: size * 1.8,
-                    borderBottomColor: 'rgba(255, 240, 200, 0.8)',
+                    borderLeftWidth: size * 0.25 * config.widthMultiplier,
+                    borderRightWidth: size * 0.25 * config.widthMultiplier,
+                    borderTopWidth: size * 1.8,
+                    borderTopColor: 'rgba(255, 240, 200, 0.8)',
                   },
                 ]}
               />
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid' as const,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: 'transparent',
+    borderBottomColor: 'transparent',
   },
   glowCircle: {
     position: 'absolute' as const,
