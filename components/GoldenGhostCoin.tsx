@@ -140,10 +140,10 @@ export default function GoldenGhostCoin({ size = 20, animated = false }: GoldenG
                 style={[
                   styles.rayInner,
                   {
-                    borderLeftWidth: size * 0.3,
-                    borderRightWidth: size * 0.3,
-                    borderBottomWidth: size * 2,
-                    borderBottomColor: 'rgba(255, 240, 200, 0.8)',
+                    borderLeftWidth: size * 0.4,
+                    borderRightWidth: size * 0.4,
+                    borderTopWidth: size * 2,
+                    borderTopColor: 'rgba(255, 240, 200, 0.8)',
                   },
                 ]}
               />
