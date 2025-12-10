@@ -29,6 +29,10 @@ export default function HomeScreen() {
   const settingsAnim = useRef(new Animated.Value(0)).current;
   const hintGlowAnim = useRef(new Animated.Value(0)).current;
   const hintScaleAnim = useRef(new Animated.Value(1)).current;
+  const titleGOpacity = useRef(new Animated.Value(0)).current;
+  const titleHOpacity = useRef(new Animated.Value(0)).current;
+  const titleOOpacity = useRef(new Animated.Value(0)).current;
+  const titleSOpacity = useRef(new Animated.Value(0)).current;
   const titleTOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -42,12 +46,40 @@ export default function HomeScreen() {
       useNativeDriver: true,
     }).start();
 
-    Animated.timing(titleTOpacity, {
-      toValue: 1,
-      duration: 4000,
-      useNativeDriver: true,
-    }).start();
-  }, [fadeAnim, titleTOpacity]);
+    titleGOpacity.setValue(0);
+    titleHOpacity.setValue(0);
+    titleOOpacity.setValue(0);
+    titleSOpacity.setValue(0);
+    titleTOpacity.setValue(0);
+
+    Animated.stagger(2000, [
+      Animated.timing(titleGOpacity, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(titleHOpacity, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(titleOOpacity, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(titleSOpacity, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(titleTOpacity, {
+        toValue: 1,
+        duration: 4000,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [fadeAnim, titleGOpacity, titleHOpacity, titleOOpacity, titleSOpacity, titleTOpacity]);
 
   useEffect(() => {
     const glowAnimation = Animated.loop(
@@ -304,7 +336,10 @@ export default function HomeScreen() {
       <Animated.View style={[styles.content, { opacity: fadeAnim }]}>
         <View style={styles.header}>
           <View style={styles.titleContainer}>
-            <Text style={styles.title}>GHOS</Text>
+            <Animated.Text style={[styles.title, { opacity: titleGOpacity }]}>G</Animated.Text>
+            <Animated.Text style={[styles.title, { opacity: titleHOpacity }]}>H</Animated.Text>
+            <Animated.Text style={[styles.title, { opacity: titleOOpacity }]}>O</Animated.Text>
+            <Animated.Text style={[styles.title, { opacity: titleSOpacity }]}>S</Animated.Text>
             <Animated.Text style={[styles.title, { opacity: titleTOpacity }]}>T</Animated.Text>
           </View>
           <Text style={styles.subtitle}>The Word Game</Text>
