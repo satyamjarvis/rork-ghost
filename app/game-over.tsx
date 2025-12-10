@@ -13,7 +13,7 @@ import { trpc } from '@/lib/trpc';
 import { useAnimatedBackground } from '@/hooks/useAnimatedBackground';
 import GoldenGhostCoin from '@/components/GoldenGhostCoin';
 
-const FORCE_SHOW_COIN = false;
+const FORCE_SHOW_COIN = true;
 
 export default function GameOverScreen() {
   const router = useRouter();
@@ -120,12 +120,12 @@ export default function GameOverScreen() {
             Animated.timing(glowAnim, {
               toValue: 1,
               duration: 800,
-              useNativeDriver: true,
+              useNativeDriver: false,
             }),
             Animated.timing(glowAnim, {
               toValue: 0.5,
               duration: 800,
-              useNativeDriver: true,
+              useNativeDriver: false,
             }),
           ])
         );
